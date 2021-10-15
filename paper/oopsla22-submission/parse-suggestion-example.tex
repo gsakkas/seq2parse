@@ -1,0 +1,75 @@
+\begin{figure}
+    \centering
+    \begin{minipage}[c]{0.49\linewidth}
+        \centering
+        \begin{tikzpicture}
+        [font=\small, edge from parent,
+        every node/.style={top color=white, bottom color=black!15,
+        circle, minimum size=9mm, draw=black!75,
+        thick, drop shadow, align=center},
+        edge from parent/.style={draw=black!75,thick},
+        level distance=2cm]
+        \node (ReturnStmt) {\texttt{ReturnStmt}}
+            child {
+                node (return) {\texttt{\bfseries return}}
+            }
+            child {
+                node (ArgList) {\texttt{ArgList}}
+                child {
+                    node (ArithExpr1) {\texttt{ArithExpr}}
+                    child {
+                        node (ArithExpr2) {\texttt{ArithExpr}}
+                    }
+                    child {
+                        node (plus) {\texttt{\bfseries +}}
+                    }
+                    child {
+                        node [style={top color=white, bottom color=blue!45,
+                        circle, minimum size=9mm, draw=blue!55,
+                        thick, drop shadow, align=center}] (ArithExpr3) {\texttt{ArithExpr}}
+                    }
+                }
+            };
+        \end{tikzpicture}
+        \subcaption{Adding the blue node}
+        \label{fig:adding-partial}
+    \end{minipage}
+    \begin{minipage}[c]{0.49\linewidth}
+        \centering
+        \begin{tikzpicture}
+            [font=\small, edge from parent,
+            every node/.style={top color=white, bottom color=black!15,
+            circle, minimum size=9mm, draw=black!75,
+            thick, drop shadow, align=center},
+            edge from parent/.style={draw=black!75,thick},
+            level distance=2cm]
+            \node (ReturnStmt) {\texttt{ReturnStmt}}
+                child {
+                    node (return) {\texttt{\bfseries return}}
+                }
+                child {
+                    node (ArgList) [style={top color=white, bottom color=red!45,
+                    circle, minimum size=9mm, draw=red!55,
+                    thick, drop shadow, align=center}] {\texttt{ArgList}}
+                    child {
+                        node (ArithExpr1) [style={top color=white, bottom color=red!45,
+                        circle, minimum size=9mm, draw=red!55,
+                        thick, drop shadow, align=center}] {\texttt{ArithExpr}}
+                        child {
+                            node (ArithExpr2) [style={top color=white, bottom color=red!45,
+                            circle, minimum size=9mm, draw=red!55,
+                            thick, drop shadow, align=center}] {\texttt{ArithExpr}}
+                        }
+                        child {
+                            node (plus) [style={top color=white, bottom color=red!45,
+                            circle, minimum size=9mm, draw=red!55,
+                            thick, drop shadow, align=center}] {\texttt{\bfseries +}}
+                        }
+                    }
+                };
+            \end{tikzpicture}
+        \subcaption{Deleting the red nodes}
+        \label{fig:deleting-partial}
+    \end{minipage}
+    \caption{Two possible partial parse tree suggestion for the tree at \autoref{fig:partial-parse-tree}}
+\end{figure}

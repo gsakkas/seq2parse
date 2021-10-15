@@ -1,0 +1,63 @@
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+    [font=\small, edge from parent,
+    every node/.style={top color=white, bottom color=black!15,
+    circle, minimum size=9mm, draw=black!75,
+    thick, drop shadow, align=center},
+    edge from parent/.style={draw=black!75,thick},
+    level distance=2cm]
+    \node (func) {Funcdef}
+        child {
+            node (def) {\texttt{\bfseries def}}
+        }
+        child {
+            node (name1) {\texttt{Name}}
+        }
+        child {
+            node (params) {\texttt{Params}}
+            child {
+                node (openParen) {\texttt{\bfseries (}}
+            }
+            child {
+                node (name2) {\texttt{Name}}
+            }
+            child {
+                node (closeParen) {\texttt{\bfseries )}}
+            }
+        }
+        child {
+            node (colon) {\texttt{\bfseries :}}
+        }
+        child {
+            node (suite) {\texttt{Suite}}
+            child {
+                node (etc) {\texttt{...}}
+            }
+            child {
+                node (ReturnStmt) {\texttt{ReturnStmt}}
+                % node (ReturnStmt) {\texttt{\begin{tabular}{c}
+                %                                 Return\\
+                %                                 Stmt
+                %                             \end{tabular}}}
+                child {
+                    node (return) {\texttt{\bfseries return}}
+                }
+                child {
+                    node (ArgList) {\texttt{ArgList}}
+                    child {
+                        node (ArithExpr1) {\texttt{ArithExpr}}
+                        child {
+                            node (ArithExpr2) {\texttt{ArithExpr}}
+                        }
+                        child {
+                            node (plus) {\texttt{\bfseries +}}
+                        }
+                    }
+                }
+            }
+        };
+    \end{tikzpicture}
+    \caption{The partial parse tree generated for the example at \autoref{fig:foo-prog}}
+    \label{fig:partial-parse-tree}
+\end{figure}

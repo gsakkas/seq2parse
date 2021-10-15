@@ -1,0 +1,120 @@
+
+
+{-
+
+*    x = 2 +      ===>      ID(x) EQ  NUM(2) OP(+)  NUMBER
+
+1. Text-Technical
+
+2. Text-Eval
+    (a) quant with % programs that can be repaired
+    (b) quant with matching user-fix-lines (compare with python)
+
+3. Make it work on CONCRETE syntax (not ABSTRACT tokens)
+    (c) concrete-syntax-repairs with human (small)
+    (d) concrete-syntax-repairs with human (large)
+
+# Overview
+
+## Problem
+
+How to pinpoint / repair parse error
+
+## Solution
+
+Use Earley-has-error-correcting-rules!
+
+Describe all the rules
+
+## Problem
+
+Early is too slow! Too many rules! Time complexity blah blah
+
+## Solution
+
+Train classifer to predict RULES!
+
+Program -> TOKEN-SEQ -> Classifer
+
+## Problem
+
+Naive use low-level TokenSeq
+  - loses context and very poor accuracy
+
+def foo(x, y):
+  if x:
+    return y + 1
+  return 0
+
+2 ++ 5
+
+return a +
+
+
+Problem: how to abstract away irrelevant prefix
+         of CONCRETE-TOKEN-SEQUENCE tokens to
+         focus training / classifer
+         on the relevant suffix
+
+t1 t2 t3 t4 t5 ... t98 t99 t100
+
+## Key Insight
+
+Use ABS-TOKEN-SEQ
+
+- Compute PCFG
+- Use partial parse tree for ABS-SEQ
+
+## Solution
+
+Show the ABSTRACT tree
+
+Show the SUBSET of rules
+
+Show the REPAIRED tree
+
+-----------
+
+
+
+1. User parser to build a partial parse tree (see gdoc example)
+
+2. Use partial tree to get new ABSTRACT-TOKEN-SEQUENCE
+
+   show parse tree
+
+   show ABSTRACT TOKEN SEQUENCE
+
+3. Use ABSTRACT-TOKEN-SEQUENCE to train classifier
+
+
+
+type Classifier = ConcTokenSeq -> ECRules
+
+// explain
+buildPCFG  :: TrainingSet -> PCFG
+
+// explain
+abstractor ::  PCFG -> ConcTokenSeq -> AbsTokenSeq
+  ...
+
+def trainer    :: TrainingSet -> Classifier
+  ...
+
+-- exists, but slow, how to shrink ECRules
+earlyECParser :: ConcTokenSeq -> ECRules -> ConcTokenSeq
+
+\sysClassifier :: Classifier
+\sysClassifier = trainer(trainingSet)
+
+fixer :: ConcTokenSeq -> ConcTokenSeq
+def fixer(cseq):
+  rules = \sysClassifier(cseq)
+  return earlyECParser(cseq, rules)
+
+
+Earley ->
+
+Evaluation
+
+-}
