@@ -60,8 +60,8 @@ and around $65 \%$ of the syntax error. Although, this is a considerable
 difference, we observe that there is still a large number of the "simpler" parse
 errors that required more than 2 minutes to be fixed. We also observe that only
 $50 \%$ of the parse errors are fixed under 1 minute. Therefore, an automated
-tool that repairs or parses those programs in a few seconds would be beneficial
-of a lot of programmers, novices or not.
+tool that repairs or parses those programs in a few seconds could be beneficial
+for a lot of programmers, novices or not.
 
 \begin{figure}[h]
   \centering
@@ -78,4 +78,8 @@ program to fix all parse errors, more time is needed for the programmers to make
 those changes. Additionally, the median token-level changes needed in the lexed
 programs (\eg \emph{type diff}) to fix a runtime error is 24 token changes on
 average (median is 8), while in order to fix a program with parse errors it
-requires 10 token changes on average (median is 3).
+requires 10 token changes on average (median is 3). This results further
+indicates that, while simple parse errors can easily and quickly be fixed by the
+programmers and the Python parser messages can be enough, they still struggle
+fixing programs that have more parse errors that maybe the error message doesn't
+even point to.

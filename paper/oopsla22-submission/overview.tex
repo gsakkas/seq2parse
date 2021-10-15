@@ -3,7 +3,7 @@
 
 We begin with an overview of our approach to suggesting fixes for programs with
 parse errors by fine-tuning error correcting parsers with prior knowledge of the
-processes (novice) programmers follow to correct the errors.
+processes (novice) programmers follow to repair their errors.
 
 \begin{figure}[ht]
 \begin{ecode}
@@ -34,7 +34,7 @@ and such parse errors can easily go unnoticed \citep{?} by programmers when they
 are part of bigger programs.
 %
 Our goal is to use historical data of how programmers have fixed similar errors
-in their programs to automatically and rapidly guide novices to come up with
+in their programs to automatically and rapidly guide programmers to come up with
 candidate solutions like the one above.
 
 
@@ -50,18 +50,18 @@ original program.
 
 \mypara{Another Problem} However, these error-correcting parsers have a time
 complexity that is cubed on the input program size and squared on the grammar
-size used. And the biggest cost of these parsers is the large number of added
-production rules. Therefore, they are not tractable or scalable options for
-real-world programming languages and programs.
+size used. Futhermore, there is the added cost of the large number of additional
+production rules these parsers have to use. Therefore, they are not tractable or
+scalable options for real-world programming languages and programs.
 
 
 \mypara{Solution: Train classifier to predict error rules} The original Earley
 parsing is a fairly efficient parsing algorithm \citep{?} based on dynamic
-programming. Its error-correcting version is very inefficient though for larger
-real-world grammars, since it requires the addition of a large number of error
-production rules as mentioned before. However, not each erroneous program needs
-all of those rules to be parsed. In this work, we present a novel strategy to
-selecting just a small set of error production rules that can be used with an
+programming. Its error-correcting version can be very inefficient though for
+larger real-world grammars, since it requires the addition of a large number of
+error production rules as mentioned before. However, not each erroneous program
+needs all of those rules to be parsed. In this work, we present a novel strategy
+to selecting just a small set of error production rules that can be used with an
 updated \emph{Error Correcting Earley Parser} (ECEP) to repair a program with
 parse errors.
 %
@@ -84,7 +84,7 @@ of our approach by describing how to:
   \item Use an \emph{Error Correcting Earley Parser} (ECEP) to repair programs
   with parse errors (\S~\ref{sec:overview:earleyparsing}),
 
-  \item Abstract erroneous programs with theirs \emph{partial parses} by using
+  \item Abstract erroneous programs with their \emph{partial parses} by using
   Probabilistic Context-Free Grammars (PCFGs)
   (\S~\ref{sec:overview:abstraction}),
 
@@ -102,14 +102,17 @@ dynamic programming, meaning that partial parses are stored in a data structure
 called a chart, which can later be re-used. This eliminates backtracking and
 prevents a combinatorial explosion. Worst case, it has a time complexity of
 $O(n^3 G^2)$ for generic context-free grammars, where $n$ is the number of
-\emph{tokens} of the input program and $G$ is the grammar size. However, this
-parsing algorithm has limited use in large real-world programming languages, \eg
-Python or Java, and more time- and memory-efficient parsing algorithms are used.
-\autoref{fig:production-rules} presents for example some production rules for
-the Python language. \emph{Terms} in the grammar starting with a capital letter
-here represent non-terminal symbols while the rest are terminals that will
-appear in a Python programs. The \texttt{Stmt} defines all the Python statements
-for example.
+\emph{tokens} of the input program and $G$ is the grammar size, \ie the number
+of \emph{production rules} it includes. However, this parsing algorithm has
+limited use in large real-world programming languages, \eg Python or Java, and
+more time- and memory-efficient parsing algorithms are used, \eg LR parsing \etc
+\citep{?}. \autoref{fig:production-rules} presents for example some production
+rules for the Python language. \emph{Terms} in the grammar starting with a
+capital letter here represent \emph{non-terminal} symbols while the rest are
+\emph{terminals} that could appear in a Python program. For example, the
+non-terminal \texttt{Stmt} defines all the possible Python statements for
+example, \ie expressions (\texttt{Expr\_Stmt}), imports (\texttt{Import\_Stmt}),
+\etc.
 
 \begin{figure}[ht]
 \begin{ecode}
@@ -153,8 +156,8 @@ with parse errors. The ECEP also extends the original grammar $G$ with a set of
 grammar contains error rules for the three major types of errors that this
 algorithm considers, \ie it adds error rules for all terminals that account for
 \emph{insertion}, \emph{deletion}, \emph{replacement} errors.
-\autoref{fig:error-rules} presents \texttt{Err\_Return} that add these rules for
-the terminal \texttt{return}.
+\autoref{fig:error-rules} presents \texttt{Err\_Return} that adds these rules
+for the terminal \texttt{return}.
 
 It also adds some non-terminal error rules that introduce these errors when the
 parsing algorithm is executed. These rules are for example in lines 1 and 2 of
@@ -164,7 +167,7 @@ not scalable for large programs or programs with a lot of parse errors.
 
 However, ECEP is an effective approach on finding minimum distance parses for
 programs than don't belong into the given programming language, \ie have parse
-errors. A straight-forward approach is to keep ECEP tractable is to only add a
+errors. A straight-forward approach to keep ECEP tractable is to only add a
 small set of error production rules, \ie keep the size of $G'$ limited and
 slightly larger than the original grammar $G$.
 
@@ -244,11 +247,11 @@ location that lead to that parse error. However, these partial parses provide
 useful information and abstraction for the program at hand. For example, the
 partial parse tree shown in \autoref{fig:partial-parse-tree} can be generated by
 an Earley parser for the running example program. Using this partial parse tree
-we get the \emph{abstracted token sequence} shown in the bottom of
-\autoref{fig:foo-prog-abstract}. Any \emph{completed} production rule, \ie the
+we can extract the \emph{abstracted token sequence} shown in the bottom of
+\autoref{fig:foo-prog-abstract}. Any \emph{completed} production rules, \eg the
 one for \texttt{Parameters}, can be used to replace the relevant non-terminals,
-\ie the parenthesis with the function arguments, with the high-level
-non-terminal.
+\eg the parenthesis with the function arguments in this example, with the
+high-level non-terminal.
 
 \input{partial-parse-example.tex}
 
@@ -260,7 +263,9 @@ dynamic programming technique and internally keeps all possible parses from the
 begging of the token sequence until position $i$ in its charts. Therefore, when
 there is a parse error at token $i$, it is possible to have more than one
 partial parses to choose from in order to generate the abstracted token
-sequence.
+sequence. For the running example, if we focus on the \texttt{return} statement
+of the program, there are two possible partial parses in the parser chart, as
+shown in \autoref{fig:two-partial-parses} for example, that we can use to repair the program. \autoref{fig:adding-partial} would lead to a solution that completes the returned arithmetic expression by adding the blue node, while the \autoref{fig:deleting-partial} would produce a solution that returns just the number by deleting the arithmetic expression
 
 In that aid, Probabilistic Context-Free Grammars (PCFGs) have been used in
 previous work \citep{?} to select \emph{complete} parses for ambiguous grammars.
@@ -301,9 +306,9 @@ into a output sequence. Both the encoder and the decoder can be an (older)
 Long-Short-Term-Memory (LSTM)-based model \citep{?} or a state-of-the-art
 \emph{Transformer} \citep{?}.
 
-\mypara{Transformer Classifier} Next, we desire to train a model that can
-correctly predict a small set of error production rules for a given abstracted
-token sequence. We encode this problem into a \emph{supervised multi-class
+\mypara{Transformer Classifier} We desire to train a model that can correctly
+predict a small set of error production rules for a given abstracted token
+sequence. We encode this problem into a \emph{supervised multi-class
 classification}. A \emph{supervised} learning problem is one where, given a
 labeled training set, the task is to learn a function that accurately maps the
 inputs to output labels and generalizes to future inputs. In a
@@ -324,6 +329,6 @@ Neural networks have the advantage of associating each class with a
 \emph{confidence score} that can be interpreted as the model's confidence of
 each class being correct for a given input. Therefore, confidence scores can be
 used to rank error rule predictions for new programs and select the top-$N$ ones
-that will maintain a decent performance with the ECEP. Exploiting recent
-advances in machine learning, we use deep and dense architectures
+that will maintain a decent performance when used with the ECEP. Exploiting
+recent advances in machine learning, we use deep and dense architectures
 \citep{Schmidhuber_2015} for more accurate predictions.

@@ -18,7 +18,7 @@
                 child {
                     node (ArithExpr1) {\texttt{ArithExpr}}
                     child {
-                        node (ArithExpr2) {\texttt{ArithExpr}}
+                        node (ArithExpr2) {\texttt{Literal}}
                     }
                     child {
                         node (plus) {\texttt{\bfseries +}}
@@ -48,17 +48,11 @@
                     node (return) {\texttt{\bfseries return}}
                 }
                 child {
-                    node (ArgList) [style={top color=white, bottom color=red!45,
-                    circle, minimum size=9mm, draw=red!55,
-                    thick, drop shadow, align=center}] {\texttt{ArgList}}
+                    node (ArgList) {\texttt{ArgList}}
                     child {
-                        node (ArithExpr1) [style={top color=white, bottom color=red!45,
-                        circle, minimum size=9mm, draw=red!55,
-                        thick, drop shadow, align=center}] {\texttt{ArithExpr}}
+                        node (ArithExpr1) {\texttt{ArithExpr}}
                         child {
-                            node (ArithExpr2) [style={top color=white, bottom color=red!45,
-                            circle, minimum size=9mm, draw=red!55,
-                            thick, drop shadow, align=center}] {\texttt{ArithExpr}}
+                            node (ArithExpr2) {\texttt{Literal}}
                         }
                         child {
                             node (plus) [style={top color=white, bottom color=red!45,
@@ -68,8 +62,9 @@
                     }
                 };
             \end{tikzpicture}
-        \subcaption{Deleting the red nodes}
+        \subcaption{Deleting the red node}
         \label{fig:deleting-partial}
     \end{minipage}
     \caption{Two possible partial parse tree suggestion for the tree at \autoref{fig:partial-parse-tree}}
+    \label{fig:two-partial-parses}
 \end{figure}
