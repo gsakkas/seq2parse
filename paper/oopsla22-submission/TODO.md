@@ -1,11 +1,11 @@
 ## TODO
 
-[ ] draft overview-motivation
+[x] draft overview-motivation
 
-[ ] draft overview-approach
-	- example error rules [relevant and not-relevant]
-	- example parse tree using relevant rules to fix
-	- example partial-parse tree
+[x] draft overview-approach
+- example error rules [relevant and not-relevant]
+- example parse tree using relevant rules to fix
+- example partial-parse tree
 
 [ ] draft technical section
 	- figure of whole pipeline
