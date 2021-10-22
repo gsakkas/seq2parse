@@ -1,9 +1,42 @@
 \section{Abstracting Programs with Parse Errors}
 \label{sec:prog-abstract}
 
-\mypara{Program Lexer}
+We start by introducing our approach for abstracting programs with parse errors
+into a suitable sequence of tokens for training sequence classifiers. We explain
+how a traditional Earley parser can be used to extract partial parses, along
+with a Probabilistic Context-Free Grammar (PCFG), in order to get a better level
+of abstraction with richer context information than the simple \emph{Lexer}
+output.
+
+\mypara{Lexical Analysis}
+\emph{Lexical analysis}, lexing or tokenization is the process of converting a
+sequence of characters \ie a program into a sequence of tokens (strings with an
+assigned and thus identified meaning). The program that performs lexical
+analysis is called a \emph{lexer} and is usually combined with a parser, which
+together analyze the syntax of a programming language $L$. However, when a
+program has a syntax error, the output token sequence of the lexer is the only
+level of abstraction that we can acquire for such a program, since the parser
+returns an error.
 
 \mypara{Token Sequences}
+Our goal is to repair a \emph{program token sequence} $t_i$, which is a lexed
+program with parse errors (\ie $t_i \notin L$), into a \emph{fixed token
+sequence} $t_o \in L$ that can be used to return a repaired program without
+syntax errors. Let $t_i$ be a sequence $T_1, T_2, \dots, T_n$ and $t_o$ be the
+updated sequence $T_1, T_2, \dots, T_i, \dots, T_j, \dots, T_k$. The subsequence
+$T_i, \dots, T_j$ is a part of $t_i$ that has been replaced, deleted or inserted
+in order to generate the $t_o$. It can be the whole program, part of it or
+multiple parts of it. The $t_o$ will finally be a token sequence that can be
+parsed by the original language's $L$ parser.
+
+However, programs can be large, \ie $n$ can take a really large value, which
+makes it unsuitable for training effectively sequence models. These large
+programs can also contain a lot of irrelevant information for fixing a specific
+parse error, \eg if in our running example in \autoref{fig:orig-prog} there was
+another correct function definition before the one with the parse error.
+Therefore, our goal is to generate first a \emph{abstracted token sequence}
+$t_a$ that removes all irrelevant information from $t_i$ and gives hints for the
+parse error fix by using the internal states of an \emph{Earley} parser.
 
 
 \subsection{Earley Partial Parses} \label{sec:prog-abstract:partial}
