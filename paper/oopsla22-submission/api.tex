@@ -1,4 +1,4 @@
-\begin{figure}
+\begin{figure}[h]
 \small
 \begin{minipage}[c]{\linewidth}
   \lstDeleteShortInline{|}
@@ -17,16 +17,27 @@
     \midrule
     \featuresym   & \defeq & e \to \Emap{\datasym} \\
     \predictorsym & \defeq & e \to \Emap{(\labelsym{\Conf})} \\
+    % \midrule
+    % \abstrsym   & : & e \to \T \\
+    % \diffsym    & : & \pairsym \to \List{e} \\
+    % \midrule
+    % \extractsym & : & \featuresym \to \List{\T} \to \pairsym \\
+    %             &   & \quad \to \Emap{(\datasym \times \labelsym{\ConfBin})} \\
+    % \trainsym   & : & \List{\datasym \times \labelsym{\ConfBin}} \to \Model \times \ModelT \\
+    % \ranksym & : & \Model \to \ModelT \to \datasym \to \labelsym{\Conf} \\
+    % \midrule
+    % \predictsym  & : & \featuresym \to \List{\T} \to \datasetsym \to \predictorsym \\
     \midrule
-    \abstrsym   & : & e \to \T \\
-    \diffsym    & : & \pairsym \to \List{e} \\
+    \ecepsym      & : & e \to \errorrulessym \to e \\
     \midrule
-    \extractsym & : & \featuresym \to \List{\T} \to \pairsym \\
-                &   & \quad \to \Emap{(\datasym \times \labelsym{\ConfBin})} \\
-    \trainsym   & : & \List{\datasym \times \labelsym{\ConfBin}} \to \Model \times \ModelT \\
-    \ranksym & : & \Model \to \ModelT \to \datasym \to \labelsym{\Conf} \\
+    \learnPCFGsym & : & \datasetsym \to \pcfgsym \\
+    \partialsym   & : & \pcfgsym \to \datasetsym \to \abstractdatasetsym \\
     \midrule
-    \predictsym  & : & \featuresym \to \List{\T} \to \datasetsym \to \predictorsym \\
+    \diffsym      & : & \pairsym \to \List{e} \\
+    \extractsym   & : & \List{e} \to \errorrulessym \\
+    \trainsym     & : & \List{\abstractdatasetsym \times \errorrulessym} \to \Model \\
+    \midrule
+    \predictsym   & : & \datasetsym \to \Model \to \List{e} \\
   \end{array}
   }
   \]

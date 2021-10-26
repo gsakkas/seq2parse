@@ -8,6 +8,8 @@ with a Probabilistic Context-Free Grammar (PCFG), in order to get a better level
 of abstraction with richer context information than the simple \emph{Lexer}
 output.
 
+\input{api.tex}
+
 \mypara{Lexical Analysis}
 \emph{Lexical analysis}, lexing or tokenization is the process of converting a
 sequence of characters \ie a program into a sequence of tokens (strings with an
@@ -34,14 +36,60 @@ makes it unsuitable for training effectively sequence models. These large
 programs can also contain a lot of irrelevant information for fixing a specific
 parse error, \eg if in our running example in \autoref{fig:orig-prog} there was
 another correct function definition before the one with the parse error.
-Therefore, our goal is to generate first a \emph{abstracted token sequence}
+Therefore, our goal is to first generate a \emph{abstracted token sequence}
 $t_a$ that removes all irrelevant information from $t_i$ and gives hints for the
 parse error fix by using the internal states of an \emph{Earley} parser.
 
 
-\subsection{Earley Partial Parses} \label{sec:prog-abstract:partial}
+\subsection{Earley Partial Parses}
+\label{sec:prog-abstract:partial}
 
-\mypara{Problem: Multiple Partial Parses}
+We propose using an \emph{Earley parser} to generate the abstracted token
+sequence $t_a$ for an input program sequence $t_i$. An Earley parser holds
+internally a \emph{chart} data structure, \ie \emph{a list of partial parses}.
+Given a production rule $X \rightarrow \alpha \beta$, the notation $X
+\rightarrow \alpha \cdot \beta$ represents a condition in which $\alpha$ has
+already been parsed and $\beta$ is expected and both are sequences of terminal
+and non-terminal symbols.
+
+Each state is a tuple $(X \rightarrow \alpha \cdot \beta,\ i)$, consisting of
+\begin{itemize}
+    \item the production currently being matched $(X \rightarrow \alpha \beta)$
+    \item the current position in that production (represented by the dot
+    $\cdot$)
+    \item the position $i$ in the input at which the matching of this production
+    began: the origin position
+\end{itemize}
+
+The state set at input position $k$ is called $S(k)$. The parser is seeded with
+$S(0)$ consisting of only the top-level rule. The parser then repeatedly
+executes three operations: \emph{prediction, scanning,} and \emph{completion}.
+There exists a \emph{complete parse} if $(X \rightarrow \gamma \cdot, 0)$ ends
+up in $S(n)$, where $(X \rightarrow \gamma)$ is the top level-rule and $n$ the
+input length. We define as a \emph{partial parse} any partially completed rule,
+\ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state $S(k)$,
+where $i < k < n$.
+
+Let, again, $T_1, T_2, \dots, T_i, \dots, T_k, \dots, T_n$ be the an input token
+sequence $t_i$, where in location $k$ there is a parse error and the Earley
+parser can not add any more rules in state $S(k + 1)$. We abstract $t_i$ by
+getting the longest possible part of the program that has a partial parse, \ie
+by finding the largest $i$ for which there is a rule $(X \rightarrow \alpha
+\cdot \beta, 0) \in S(i)$. We use this rule for $X$ to replace $T_1, T_2, \dots,
+T_i$ in $t_i$ with $\alpha$, thus getting an abstracted sequence $t_a$. We
+continue abstracting the program until we reach the parse error and have no
+states to use, \ie where $S(k + 1) = \emptyset$. In the same manner, we use the
+longest possible partial parses that we can extract from the chart to abstract
+$T_{i+1}, \dots, T_k$.
+
+\mypara{Problem: Multiple Partial Parses} Each of the states $S(i)$, where $0
+\leq i \leq k$, holds a large number of uncompleted rules, \ie partial parses.
+We used as a heuristic to choose the longest possible partial parses to abstract
+our erroneous programs and thus limiting the size of the program token sequence
+$t_i$ as much as possible. However, it is possible that we have two or more such
+parses in $S(k)$, where they have the same length, \eg $\{(X \rightarrow \alpha
+\cdot \beta, i),\ (X' \rightarrow \alpha' \cdot \beta', i)\} \in S(k)$.
+
 
 \mypara{Example}
 
