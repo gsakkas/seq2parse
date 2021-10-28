@@ -5,46 +5,38 @@
   \[
   \boxed{
   \begin{array}{lcl}
-    \Conf         & \defeq & \{r \in \R\ |\ 0 \le r \le 1\} \\
-    \ConfBin      & \defeq & \{b \in \R\ |\ b = 0 \vee b = 1\} \\
-    \T            & \defeq & e^{RTL} \\
-    \Emap{a}      & \defeq & e \to a \\
-    \Tmap{a}      & \defeq & \T \to a \\
-    \datasym      & \defeq & \List{\Conf} \\
-    \labelsym{a}  & \defeq & a \times \Tmap{a} \\
-    \pairsym      & \defeq & e \times e \\
+    G              & \defeq  & (N,\ \Sigma,\ P,\ S) \\
+    \pcfgsym       & \defeq  & (N,\ \Sigma,\ P,\ S, W) \\
+    \midrule
+    G'             & \defeq  & (N',\ \Sigma,\ P',\ S') \\
+    P'             & \supset & P \\
+    N'             & \supset & N \\
+    \midrule
+    \errorrulessym & \in     & P' \\
+    e              & \in    & L(G) \\
+    e_{\bot}       & \notin & L(G) \\
+    \pairsym      & \defeq & e_{\bot} \times e \\
     \datasetsym   & \defeq & \List{\pairsym} \\
     \midrule
-    \featuresym   & \defeq & e \to \Emap{\datasym} \\
-    \predictorsym & \defeq & e \to \Emap{(\labelsym{\Conf})} \\
-    % \midrule
-    % \abstrsym   & : & e \to \T \\
-    % \diffsym    & : & \pairsym \to \List{e} \\
-    % \midrule
-    % \extractsym & : & \featuresym \to \List{\T} \to \pairsym \\
-    %             &   & \quad \to \Emap{(\datasym \times \labelsym{\ConfBin})} \\
-    % \trainsym   & : & \List{\datasym \times \labelsym{\ConfBin}} \to \Model \times \ModelT \\
-    % \ranksym & : & \Model \to \ModelT \to \datasym \to \labelsym{\Conf} \\
-    % \midrule
-    % \predictsym  & : & \featuresym \to \List{\T} \to \datasetsym \to \predictorsym \\
+    \ecepsym       & : & e_{\bot} \to \errorrulessym \to e \\
+    \learnPCFGsym  & : & \List{e} \to \pcfgsym \\
+    \partialsym    & : & \pcfgsym \to e_{\bot} \to \hat{e}_{\bot}  \\
     \midrule
-    \ecepsym      & : & e \to \errorrulessym \to e \\
+    \trainDLsym    & : & \List{\hat{e}_{\bot} \times \errorrulessym} \to \Model \\
+    \predictDLsym  & : & \Model \to \hat{e}_{\bot} \to \errorrulessym \\
     \midrule
-    \learnPCFGsym & : & \datasetsym \to \pcfgsym \\
-    \partialsym   & : & \pcfgsym \to \datasetsym \to \abstractdatasetsym \\
+    \diffsym       & : & \pairsym \to \errorrulessym \\
+    \trainsym      & : & \datasetsym \to \Model \\
+    \predictsym    & : & \Model \to e_{\bot} \to \errorrulessym \\
     \midrule
-    \diffsym      & : & \pairsym \to \List{e} \\
-    \extractsym   & : & \List{e} \to \errorrulessym \\
-    \trainsym     & : & \List{\abstractdatasetsym \times \errorrulessym} \to \Model \\
-    \midrule
-    \predictsym   & : & \datasetsym \to \Model \to \List{e} \\
+    \systemsym     & : & \datasetsym \to (e_{\bot} \to e) \\
   \end{array}
   }
   \]
   \lstMakeShortInline[mathescape=true]{|}
   \captionof{figure}{
-    A high-level API for converting program pairs to
-    feature vectors and template labels.
+  A high-level API for building a \toolname system that learns parse error
+  repair function $e_{\bot} \to e$ from a $\datasetsym$ of program pairs.
   }
   \label{fig:api}
 \end{minipage}
