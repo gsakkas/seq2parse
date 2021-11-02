@@ -20,10 +20,10 @@
     \midrule
     \ecepsym       & : & e_{\bot} \to \errorrulessym \to e \\
     \learnPCFGsym  & : & \List{e} \to \pcfgsym \\
-    \partialsym    & : & \pcfgsym \to e_{\bot} \to \hat{e}_{\bot}  \\
+    \partialsym    & : & \pcfgsym \to e_{\bot} \to t_a  \\
     \midrule
-    \trainDLsym    & : & \List{\hat{e}_{\bot} \times \errorrulessym} \to \Model \\
-    \predictDLsym  & : & \Model \to \hat{e}_{\bot} \to \errorrulessym \\
+    \trainDLsym    & : & \List{t_a \times \errorrulessym} \to \Model \\
+    \predictDLsym  & : & \Model \to t_a \to \errorrulessym \\
     \midrule
     \diffsym       & : & \pairsym \to \errorrulessym \\
     \trainsym      & : & \datasetsym \to \Model \\

@@ -88,7 +88,7 @@ We used as a heuristic to choose the longest possible partial parses to abstract
 our erroneous programs and thus limiting the size of the program token sequence
 $t_i$ as much as possible. However, it is possible that we have two or more such
 parses in $S(k)$, where they have the same length, \eg $\{(X \rightarrow \alpha
-\cdot \beta, i),\ (X' \rightarrow \alpha' \cdot \beta', i)\} \in S(k)$.
+\cdot \beta,\ i),\ (X' \rightarrow \alpha' \cdot \beta',\ i)\} \in S(k)$.
 
 
 \mypara{Example}
@@ -96,16 +96,74 @@ parses in $S(k)$, where they have the same length, \eg $\{(X \rightarrow \alpha
 
 \subsection{Probabilistic Context-Free Grammars}
 \label{sec:prog-abstract:pcfg}
+We propose learning a \emph{Probabilistic Context-Free Grammar} (PCFG),
+$\learnPCFGsym$, from a large corpus of programs $\List{e}, e \in L(G)$, that
+belong to a language $L(G)$ that a grammar $G$ defines, as shown in
+\autoref{fig:api}. We use the learned PCFG within an augmented Earley parser in
+$\partialsym$ to abstract a program $e_{\bot}$ into a abstract token sequence
+$t_a$.
 
-\mypara{Constructing a PCFG}
+\mypara{Learning a PCFG}
+A PCFG can be defined similarly to a \emph{context-free grammar} $G \defeq (N,\
+\Sigma,\ P,\ S)$ as a quintuple $(N,\ \Sigma,\ P,\ S,\ W)$, where:
+\begin{itemize}
+    \item $N$ and $\Sigma$ are finite disjoint alphabets of non-terminals and
+    terminals, respectively.
+    \item $P$ is a finite set of production rules of the form $X \rightarrow
+    \alpha$, where $X \in N$ and $\alpha \in (N \cup \Sigma)^{\ast}$.
+    \item $S$ is a distinguished start symbol in $N$.
+    \item $W$ is a finite set of probabilities $p(X \rightarrow \alpha)$ on
+    production rules.
+\end{itemize}
+
+Given a dataset of programs $\List{e}, e \in L(G)$ that can be parsed, let
+$count(X \rightarrow \alpha)$ be the number of times the production rule $X
+\rightarrow \alpha$ has been used to gernerate a final parse, while parsing
+$\List{e}$, and $count(X)$ be the number of times the non-terminal $X$ has been
+seen. The probability for a production $X \rightarrow \alpha$ is then defined
+as:
+
+\begin{equation*}
+    p(X \rightarrow \alpha) = \frac{count(X \rightarrow \alpha)}{count(X)}
+\end{equation*}
+
+Of course, under this definition we have the constraint that for any $X \in N$:
+
+\begin{equation*}
+    \sum_{X \rightarrow \alpha \in P, \alpha \in (N \cup \Sigma)^{\ast}}{p(X \rightarrow \alpha)} = 1
+\end{equation*}
+
+Therefore, $\learnPCFGsym$ invokes an instrumented Earley parser to calculate
+all possible counters $count(X \rightarrow \alpha), \forall X \rightarrow
+\alpha: P$ and $count(X), \forall X: N$. The instrumented Earley parser keeps a
+\emph{global record} for all these counters, while parsing the dataset
+$\List{e}$ of programs. Finally, $\learnPCFGsym$ will output a PCFG that is
+based on the original grammar $G$ that was used to parse the dataset with the
+additional probabilities.
 
 \mypara{Example of PCFG}
 
-\mypara{Example}
-
 \subsection{From Programs to Abstract Token Sequences}
 
-\mypara{Explain Pseudocode combining PCFG + Most Likely}
+Given a program $e_{\bot}$ with a parse error and a learned PCFG, $\partialsym$
+will generate an abstracted token sequence $t_a$. The PCFG will be used with an
+augmented Earley parser to disambiguate partial parses and choose one, in order
+to produce an abstracted token sequence as described in
+\S~\ref{sec:prog-abstract:partial}.
+
+\mypara{Probabilistic Earley Parsing}
+We extend the state $(X \rightarrow \alpha \cdot \beta,\ i)$ that the Earley
+parser holds within its chart to $(X \rightarrow \alpha \cdot \beta,\ i,\ p)$,
+where $p$ is the probability that $X \rightarrow \alpha \cdot \beta$ is a
+correct partial parse. Therefore, when the extended Earley parser, when we have
+two (or more) conflicting partial parses $\{(X \rightarrow \alpha \cdot \beta,\
+i,\ p),\ (X' \rightarrow \alpha' \cdot \beta',\ i,\ p')\} \in S(k)$, we select
+the partial parse that the largest probability $max(p,\ p')$. The extended
+Earley parser calculates the probability $p$ for a partial parse $(X \rightarrow
+\alpha \cdot \beta,\ i,\ p)$ in the state $S(k)$, as the product $p_1 \cdot p_2
+\cdot ... \cdot p_{k-1}$ of the probabilities $p_1,\ p_2,\ ...,\ p_{k-1}$ that
+are associated with the partial parses that have been used so far to parse the
+string of tokens $\alpha$.
 
 \mypara{Example: Selecting Most Likely Partial Parse}
 
