@@ -1,0 +1,25 @@
+\section{Building a fast error-correcting parser}
+\label{sec:whole-system}
+
+We show how $\systemsym$ uses the abstracted token sequences from
+\autoref{sec:prog-abstract} and the trained sequence models from
+\autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
+$(e_{\bot} \to e)$, that takes as input a program $e_{\bot}$ with parse errors,
+parsers it, and produces a correct program $e$.
+
+
+\subsection{Learning Error Production Rules}
+\label{sec:whole-system:error-rules}
+
+\mypara{Extracting error rules efficiently from a dataset}
+
+
+\subsection{Training the Classifier}
+\label{sec:whole-system:training-classifier}
+
+\mypara{Training the Transformer Classifier}
+
+\mypara{Predicting Error Rules}
+
+\subsection{Generating an error-correcting parser}
+\label{sec:whole-system:building-ecp}

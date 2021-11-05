@@ -9,14 +9,13 @@
     \pcfgsym       & \defeq  & (N,\ \Sigma,\ P,\ S, W) \\
     \midrule
     G'             & \defeq  & (N',\ \Sigma,\ P',\ S') \\
-    P'             & \supset & P \\
-    N'             & \supset & N \\
+    P'             & \defeq  & P\ \cup\ \errorrulessym \\
+    N'             & \defeq  & N\ \cup\ \{S',\ H,\ I\}\ \cup\ \{E_a\ |\ a \in \Sigma\} \\
     \midrule
-    \errorrulessym & \in     & P' \\
     e              & \in    & L(G) \\
     e_{\bot}       & \notin & L(G) \\
-    \pairsym      & \defeq & e_{\bot} \times e \\
-    \datasetsym   & \defeq & \List{\pairsym} \\
+    \pairsym       & \defeq & e_{\bot} \times e \\
+    \datasetsym    & \defeq & \List{\pairsym} \\
     \midrule
     \ecepsym       & : & e_{\bot} \to \errorrulessym \to e \\
     \learnPCFGsym  & : & \List{e} \to \pcfgsym \\
