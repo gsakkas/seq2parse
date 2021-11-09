@@ -10,14 +10,85 @@ parsers it, and produces a correct program $e$.
 
 \subsection{Learning Error Production Rules}
 \label{sec:whole-system:error-rules}
+We implement $\diffsym$, a function that extracts the \emph{token differences}
+between an erroneous program $e_{\bot}$ and a fixed program $e$. $\diffsym$
+utilizes an \emph{$O(ND)$ difference algorithm} \citep{Myers_1986} that extracts
+possible \emph{insertions, deletions,} and \emph{replacements} to the original
+program $e_{\bot}$ to produce the fixed program $e$. We can then map these
+changes to the relevant error production rules that are needed to repair
+$e_{\bot}$.
 
 \mypara{Extracting error rules efficiently from a dataset}
+The $\trainDLsym$ method requires a dataset of token sequences $t_a$ that is
+annotated with an \emph{exact and small set} of error production rules, \ie
+$\List{t_a \times \errorrulessym}$. The straightforward approach is to use the
+Error-Correcting Earley parser $\ecepsym$ with all possible error production
+rules $\errorrulessym$ as input for each program $e_{\bot}$. Then, when ECEP
+returns with a successful parse we can extract from it the rules that where used
+to repair and parse the program $e_{\bot}$. This would produce a dataset with
+the most accurate error rules as labels. However, this approach, first,
+completely ignores the programmer's fix, which might not be the minimum-distance
+edit that the ECEP would produce but contains the intended changes, and, second,
+can take an unreasonable amount of time to generate for a dataset with millions
+of programs, due to the inefficient nature of the ECEP.
+
+Therefore, we suggest using an $O(ND)$ difference algorithm to get a small and
+still representative set of error production rules for each program $e$. We
+employ this algorithm to find the differences between, again, the input
+\emph{program token sequence} $t^i$, which is the lexed program $e_{\bot}$ and
+the \emph{fixed token sequence} $t^o$, which is the lexed program $e$. This
+algorithm returns changes between the token sequences in the form of
+\emph{inserted or deleted tokens}. It is possible that this algorithm returns a
+sequence of deletions followed by a sequence of insertions, which can in turn
+interpreted as \emph{replacement}. Therefore, we map these three types of
+changes to the respective error production rules. Let $t^i$ be a sequence
+$t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
+\dots, t^o_k$. We map:
+\begin{itemize}
+    \item an inserted output token $t^o_j$ to a \emph{deletion} error $E_{t^o_j}
+    \rightarrow e$.
+    \item an deleted input token $t^i_k$ to an \emph{insertion} error $I
+    \rightarrow t^i_k$.
+    \item a replaced token $t^i_k$ with $t^o_j$ to a \emph{replacement} error
+    $E_{t^o_j} \rightarrow t^i_k$.
+\end{itemize}
+
+In the case of an insertion error, we include the helper production rules $H
+\rightarrow HI\ \vert\ I$. Since $H$ can derive any nonempty string, the
+production $E_a \rightarrow Ha$ introduces a sequence of one or more insertion
+errors in front of $a$. Therefore, for the case of an insertion error $I
+\rightarrow t^i_k$, we also add $E_{t^i_{k+1}} \rightarrow Ht^i_{k+1}$. To place
+one or more insertion errors at the end of a sentence we also include the
+production $S' \rightarrow SH$.
+
+The above algorithm, so far, adds only the \emph{terminal error productions}. We
+have to also include the \emph{non-terminal error productions} that will invoke
+the terminal ones. If $X \rightarrow a_0b_0a_1b_1 \dots a_mb_m,\ m \geq 0$, is a
+production in $P$ such that $a_i$ is in $N^*$ and $b_i$ is in $\Sigma$, then we
+add the error production $X \rightarrow a_0X_{b_0}a_1X_{b_1} \dots a_mX_{b_m},\
+m \geq 0$ to $P'$, where each $X_{b_i}$, is either a new non-terminal $E_{b_i}$
+that was added with the above algorithm, or just $b_i$ again if it was not
+added.
+
+Finally, we further refine the new small set of error productions for each
+program $e_{\bot}$ with ECEP, in order to create the final annotated dataset
+$\List{t_a \times \errorrulessym}$. The changes that we extracted from the
+programmers' fixes might include irrelevant changes to the parse error fix.
+Therefore, running ECEP is still essential to annotate each program with the
+appropriate error production rules as described before. However, limiting the
+error rules to only the extracted small set instead of every possible error
+rule, makes the process of generating this dataset a much more tractable and
+efficient process.
 
 
 \subsection{Training the Classifier}
 \label{sec:whole-system:training-classifier}
 
 \mypara{Training the Transformer Classifier}
+- $\trainsym$ uses error-rule-annotated $\datasetsym$ to learn the $\Model$
+- uses $\diffsym$ and $\trainDLsym$ internally
+- $\diffsym$ produces the $\List{t_a \times \errorrulessym}$ dataset
+- $\trainDLsym$ trains the Transformer classifier
 
 \mypara{Predicting Error Rules}
 
