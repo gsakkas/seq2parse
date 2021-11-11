@@ -84,7 +84,7 @@ efficient process.
 \subsection{Training the Classifier}
 \label{sec:whole-system:training-classifier}
 
-\input{training-classifier.tex}
+\input{training-classifier-algo.tex}
 
 \mypara{Training the Transformer Classifier}
 - $\trainsym$ uses error-rule-annotated $\datasetsym$ to learn the $\Model$
@@ -93,6 +93,8 @@ efficient process.
 - $\trainDLsym$ trains the Transformer classifier
 
 \mypara{Predicting Error Rules}
+
+\input{predict-algo.tex}
 
 \subsection{Generating an error-correcting parser}
 \label{sec:whole-system:building-ecp}

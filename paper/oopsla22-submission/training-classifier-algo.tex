@@ -1,17 +1,15 @@
 \begin{algorithm}[t]
-    \caption{Training the $\systemsym$ model}
-    \label{algo:training-classifier}
+    \caption{Training $\systemsym$'s model $\Model$}
+    \label{algo:training-classifier-algo}
     \renewcommand{\algorithmicrequire}{\textbf{Input:}}
     \renewcommand{\algorithmicensure}{\textbf{Output:}}
     \begin{algorithmic}[1]
-    \Require{Grammar $G$, $\datasetsym\ Ds$}
+    \Require{Probabilistic Grammar $G$, $\datasetsym\ Ds$}
     \Ensure{Classifier $Model$}
     \Procedure{Train}{$G,\,Ds$}
-    \State $ps \gets$ \Call{Map}{$\lambda.d \to$ \Call{Snd}{$d$}$,\,Ds$}
-    \State $PCFG \gets$ \Call{LearnPCFG}{$G,\,ps$}
     \State $D_{ML} \gets \emptyset$
     \ForAll{$\pbad \times \pfix \in Ds$}
-      \State $t_a \gets$ \Call{PartialParse}{$PCFG,\,\pbad$}
+      \State $t^a \gets$ \Call{PartialParse}{$G,\,\pbad$}
       \State $rules \gets$ \Call{DiffRules}{$\pbad \times \pfix$}
       \State $D_{ML} \gets D_{ML}\,\cup\ (t_a \times rules)$
     \EndFor

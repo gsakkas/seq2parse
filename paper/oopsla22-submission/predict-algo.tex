@@ -1,0 +1,15 @@
+\begin{algorithm}[t]
+    \caption{Predicting error production rules with $\systemsym$'s model $\Model$}
+    \label{algo:predict-algo}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}[1]
+    \Require{Classifier $Model$, Probabilistic Grammar $G$, Program $P$}
+    \Ensure{Error Production Rules $Rls$}
+    \Procedure{Predict}{$Model,\,G,\,P$}
+    \State $t^a \gets$ \Call{PartialParse}{$PCFG,\,\pbad$}
+    \State $Rls \gets$ \Call{PredictDL}{$Model,\,t_a$}
+    \State \Return{$Rls$}
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
