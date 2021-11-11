@@ -1,0 +1,16 @@
+\begin{algorithm}[t]
+    \caption{Generating the final ECEP}
+    \label{algo:ecep-algo}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}[1]
+    \Require{Grammar $G$, $\datasetsym\ Ds$}
+    \Ensure{Error Correcting Parser $Prs$}
+    \Procedure{Seq2Parse}{$G,\,Ds$}
+    \State $Model \gets$ \Call{Train}{$G,\,Ds$}
+    \State \textsc{ERulePredictor} $\gets$ \Call{Predict}{$Model$}
+    \State $Prs \gets (\lambda.\pbad \to$ \Call{EarleyECParse}{\Call{ERulePredictor}{$\pbad$}$,\,\pbad$}$)$
+    \State \Return{$Prs$}
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}

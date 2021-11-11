@@ -17,8 +17,8 @@
     \pairsym       & \defeq & e_{\bot} \times e \\
     \datasetsym    & \defeq & \List{\pairsym} \\
     \midrule
-    \ecepsym       & : & e_{\bot} \to \errorrulessym \to e \\
-    \learnPCFGsym  & : & \List{e} \to \pcfgsym \\
+    \ecepsym       & : & \errorrulessym \to e_{\bot} \to e \\
+    \learnPCFGsym  & : & G \to \List{e} \to \pcfgsym \\
     \partialsym    & : & \pcfgsym \to e_{\bot} \to t_a  \\
     \midrule
     \trainDLsym    & : & \List{t_a \times \errorrulessym} \to \Model \\
@@ -28,7 +28,7 @@
     \trainsym      & : & \datasetsym \to \Model \\
     \predictsym    & : & \Model \to e_{\bot} \to \errorrulessym \\
     \midrule
-    \systemsym     & : & \datasetsym \to (e_{\bot} \to e) \\
+    \systemsym     & : & G \to \datasetsym \to (e_{\bot} \to e) \\
   \end{array}
   }
   \]
