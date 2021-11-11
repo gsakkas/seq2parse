@@ -1,0 +1,22 @@
+\begin{algorithm}[t]
+    \caption{Predicting Templates Algorithm}
+    \label{algo:predict-algo}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}[1]
+    \Require{$\datasetsym\ Ds$}
+    \Ensure{Classifier $\Model$}
+    \Procedure{Train}{$Ds$}
+    \State $ps \gets$ \Call{Map}{$\lambda.d \to$ \Call{Snd}{$d$}$,\,Ds$}
+    \State $PCFG \gets$ \Call{LearnPCFG}{$ps$}
+    \State $D_{ML} \gets \emptyset$
+    \ForAll{$\pbad \times \pfix \in Ds$}
+      \State $t_a \gets$ \Call{PartialParse}{$PCFG,\,\pbad$}
+      \State $rules \gets$ \Call{DiffRules}{$\pbad \times \pfix$}
+      \State $D_{ML} \gets D_{ML}\,\cup\ (t_a \times rules)$
+    \EndFor
+    \State $\Model \gets$ \Call{TrainDL}{$D_{ML}$}
+    \State \Return{$\Model$}
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
