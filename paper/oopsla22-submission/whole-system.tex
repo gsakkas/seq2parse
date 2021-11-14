@@ -87,16 +87,54 @@ efficient process.
 \input{training-classifier-algo.tex}
 
 \mypara{Training the Transformer Classifier}
-- $\trainsym$ uses error-rule-annotated $\datasetsym$ to learn the $\Model$
-- uses $\diffsym$ and $\trainDLsym$ internally
-- $\diffsym$ produces the $\List{t_a \times \errorrulessym}$ dataset
-- $\trainDLsym$ trains the Transformer classifier
+We describe in \autoref{algo:training-classifier-algo} how we use a
+(probabilistic) grammar $G$ and a dataset $Ds$ to train a Transformer classifier
+$Model$ that can be used to predict error production rules for erroneous
+programs $\pbad$. We define the $\trainsym$ procedure in
+\autoref{algo:training-classifier-algo} that is responsible for extracting a
+machine-learning-appropriate dataset $D_{ML}$ in order to train the Transformer
+classifier with $\trainDLsym$.
 
-\mypara{Predicting Error Rules}
+The dataset $D_{ML}$ starts as an empty set. Then we perform the following steps
+for each pair $\pbad \times \pfix$: First, we employ $\partialsym$ with input
+grammar $G$ and the erroneous program $\pbad$ to extract the abstracted token
+sequence $t^a$. Second, we use the token difference algorithm $\diffsym$ to
+extract the specific error production $rules$ that are needed to fix $\pbad$ and
+will be used as the training labels of the $D_{ML}$ dataset. Finally, the
+abstract sequence $t^a$ is annotated with the label $rules$ and is added to
+$D_{ML}$.
+
+A trained Transformer classifier is then learned by $\trainDLsym$ that uses the
+newly extracted dataset $D_{ML}$. The learned classifier $Model$ is returned in
+order to be used later on to fix new erroneous programs. This whole procedure
+happens offline and therefore it won't affect the performance of a final repair.
 
 \input{predict-algo.tex}
+
+\mypara{Predicting Error Rules}
+Having trained a Transformer classifier $Model$, we can now predict error rules
+$Rls$, that will be used by an ECEP, by using the $\predictsym$ procedure
+defined in \autoref{algo:predict-algo}. $\predictsym$ uses the same input
+grammar $G$ to generate an abstracted token sequence $t^a$ for the program $P$
+with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure can
+predict a small set of error production rules $Rls$ for the abstracted sequence
+$t^a$ given the pre-trained $Model$.
 
 \subsection{Generating an error-correcting parser}
 \label{sec:whole-system:building-ecp}
 
 \input{ecep-algo.tex}
+
+We now describe our approach for $\systemsym$ in \autoref{algo:ecep-algo}. This
+is the high-level algorithm that combines everything that we described so far in
+the last three sections.
+
+In the first offline step, q$\systemsym$ first extracts the fixed programs $ps$
+from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$ for
+the input grammar $G$. Then it $\trainsym$s the $Model$ to predict error
+production rules. Then we define an error rule predictor function
+\textsc{ERulePredictor} using the $\predictsym$ from \autoref{algo:predict-algo}
+withe the pre-trained $Model$ and grammar $PCFG$. Finally, we return the error
+correcting parser $Prs$, which we define as a function here that takes as input
+an erroneous program $\pbad$, used \textsc{ERulePredictor} to get the set of
+error rules needed by $\ecepsym$ to parse and repair the program $\pbad$.

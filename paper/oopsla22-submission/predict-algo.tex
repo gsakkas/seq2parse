@@ -7,8 +7,8 @@
     \Require{Classifier $Model$, Probabilistic Grammar $G$, Program $P$}
     \Ensure{Error Production Rules $Rls$}
     \Procedure{Predict}{$Model,\,G,\,P$}
-    \State $t^a \gets$ \Call{PartialParse}{$PCFG,\,\pbad$}
-    \State $Rls \gets$ \Call{PredictDL}{$Model,\,t_a$}
+    \State $t^a \gets$ \Call{PartialParse}{$G,\,P$}
+    \State $Rls \gets$ \Call{PredictDL}{$Model,\,t^a$}
     \State \Return{$Rls$}
     \EndProcedure
     \end{algorithmic}
