@@ -5,7 +5,7 @@ We start by introducing our approach for abstracting programs with parse errors
 into a suitable sequence of tokens for training sequence classifiers. We explain
 how a traditional Earley parser can be used to extract partial parses, along
 with a Probabilistic Context-Free Grammar (PCFG), in order to get a better level
-of abstraction with richer context information than the simple \emph{Lexer}
+of abstraction with richer context information than a simple \emph{Lexer}
 output.
 
 \input{api.tex}
@@ -15,28 +15,28 @@ output.
 sequence of characters \ie a program into a sequence of tokens (strings with an
 assigned and thus identified meaning). The program that performs lexical
 analysis is called a \emph{lexer} and is usually combined with a parser, which
-together analyze the syntax of a programming language $L$. However, when a
-program has a syntax error, the output token sequence of the lexer is the only
-level of abstraction that we can acquire for such a program, since the parser
-returns an error.
+together analyze the syntax of a programming language $L(G)$, defined by the
+grammar $G$. When a program has a syntax error, the output token sequence of the
+lexer is the highest level of abstraction that we can acquire for such a
+program, since the parser returns an error.
 
 \mypara{Token Sequences}
 Our goal is to repair a \emph{program token sequence} $t^i$, which is a lexed
-program with parse errors (\ie $t^i \notin L$), into a \emph{fixed token
-sequence} $t^o \in L$ that can be used to return a repaired program without
+program with parse errors (\ie $t^i \notin L(G)$), into a \emph{fixed token
+sequence} $t^o \in L(G)$ that can be used to return a repaired program without
 syntax errors. Let $t^i$ be a sequence $t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be
 the updated sequence $t^o_1, t^o_2, \dots, t^o_i, \dots, t^o_j, \dots, t^o_k$.
 The subsequence $t^o_i, \dots, t^o_j$ is a part of $t^i$ that has been replaced,
 deleted or inserted in order to generate the $t^o$. It can be the whole program,
 part of it or multiple parts of it. The $t^o$ will finally be a token sequence
-that can be parsed by the original language's $L$ parser.
+that can be parsed by the original language's $L(G)$ parser.
 
 However, programs can be large, \ie $n$ can take a really large value, which
 makes it unsuitable for training effectively sequence models. These large
 programs can also contain a lot of irrelevant information for fixing a specific
 parse error, \eg if in our running example in \autoref{fig:orig-prog} there was
 another correct function definition before the one with the parse error.
-Therefore, our goal is to first generate a \emph{abstracted token sequence}
+Therefore, our goal is to first generate an \emph{abstracted token sequence}
 $t^a$ that removes all irrelevant information from $t^i$ and gives hints for the
 parse error fix by using the internal states of an \emph{Earley} parser.
 
@@ -50,7 +50,7 @@ internally a \emph{chart} data structure, \ie \emph{a list of partial parses}.
 Given a production rule $X \rightarrow \alpha \beta$, the notation $X
 \rightarrow \alpha \cdot \beta$ represents a condition in which $\alpha$ has
 already been parsed and $\beta$ is expected and both are sequences of terminal
-and non-terminal symbols.
+and non-terminal symbols (tokens).
 
 Each state is a tuple $(X \rightarrow \alpha \cdot \beta,\ j)$, consisting of
 \begin{itemize}
@@ -58,7 +58,7 @@ Each state is a tuple $(X \rightarrow \alpha \cdot \beta,\ j)$, consisting of
     \item the current position in that production (represented by the dot
     $\cdot$)
     \item the position $j$ in the input at which the matching of this production
-    began: the origin position
+    began, \ie the origin position
 \end{itemize}
 
 The state set at input position $k$ is called $S(k)$. The parser is seeded with
@@ -66,9 +66,9 @@ $S(0)$ consisting of only the top-level rule. The parser then repeatedly
 executes three operations: \emph{prediction, scanning,} and \emph{completion}.
 There exists a \emph{complete parse} if $(X \rightarrow \gamma \cdot, 0)$ ends
 up in $S(n)$, where $(X \rightarrow \gamma)$ is the top level-rule and $n$ the
-input length. We define as a \emph{partial parse} any partially completed rule,
-\ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state $S(k)$,
-where $i < k < n$.
+input length. We define a \emph{partial parse} to be any partially completed
+rules, \ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state
+$S(k)$, where $i < k < n$.
 
 Let, again, $t^i_1, t^i_2, \dots, t^i_j, \dots, t^i_k, \dots, t^i_n$ be the
 input token sequence $t^i$, where in location $k$ there is a parse error and the
