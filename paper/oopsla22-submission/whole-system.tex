@@ -4,8 +4,8 @@
 We show how $\systemsym$ uses the abstracted token sequences from
 \autoref{sec:prog-abstract} and the trained sequence models from
 \autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
-$(e_{\bot} \to e)$, that takes as input a program $e_{\bot}$ with parse errors,
-parsers it, and produces a correct program $e$.
+$(e_{\bot} \to e)$, that will take as input a program $e_{\bot}$ with parse
+errors, parse it, and produce a correct program $e$.
 
 
 \subsection{Learning Error Production Rules}
@@ -14,25 +14,27 @@ We implement $\diffsym$, a function that extracts the \emph{token differences}
 between an erroneous program $e_{\bot}$ and a fixed program $e$. $\diffsym$
 utilizes an \emph{$O(ND)$ difference algorithm} \citep{Myers_1986} that extracts
 possible \emph{insertions, deletions,} and \emph{replacements} to the original
-program $e_{\bot}$ to produce the fixed program $e$. We can then map these
+program $e_{\bot}$ to produce the fixed program $e$. We can map the extracted
 changes to the relevant error production rules that are needed to repair
 $e_{\bot}$.
 
 \mypara{Extracting error rules efficiently from a dataset}
-The $\trainDLsym$ method requires a dataset of token sequences $t_a$ that is
+The $\trainDLsym$ method requires a dataset of token sequences $t^a$ that is
 annotated with an \emph{exact and small set} of error production rules, \ie
-$\List{t_a \times \errorrulessym}$. The straightforward approach is to use the
-Error-Correcting Earley parser $\ecepsym$ with all possible error production
-rules $\errorrulessym$ as input for each program $e_{\bot}$. Then, when ECEP
-returns with a successful parse we can extract from it the rules that where used
-to repair and parse the program $e_{\bot}$. This would produce a dataset with
-the most accurate error rules as labels. However, this approach, first,
-completely ignores the programmer's fix, which might not be the minimum-distance
-edit that the ECEP would produce but contains the intended changes, and, second,
-can take an unreasonable amount of time to generate for a dataset with millions
-of programs, due to the inefficient nature of the ECEP.
+$\List{t^a \times \errorrulessym}$. These error productions are just a subset of
+all the possible $\errorrulessym$ that are needed to parse and fix $t^a$. The
+straight-forward approach is to use the Error-Correcting Earley parser
+$\ecepsym$ with all possible error production rules $\errorrulessym$ as input
+for each program $e_{\bot}$. Then, when $\ecepsym$ returns with a successful
+parse we can extract from it the rules that where used to repair and parse the
+program $e_{\bot}$. This would produce a dataset with the most accurate error
+rules as labels. However, this approach, first, completely ignores the
+programmer's fix, which might not be the minimum-distance edit that the ECEP
+would produce but contains the intended changes, and, second, can take an
+unreasonable amount of time to generate for a dataset with millions of programs,
+due to the inefficient nature of the ECEP.
 
-Therefore, we suggest using an $O(ND)$ difference algorithm to get a small and
+Therefore, we suggest using an $O(ND)$ difference algorithm to get a small but
 still representative set of error production rules for each program $e$. We
 employ this algorithm to find the differences between, again, the input
 \emph{program token sequence} $t^i$, which is the lexed program $e_{\bot}$ and
@@ -54,11 +56,11 @@ $t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
 \end{itemize}
 
 In the case of an insertion error, we include the helper production rules $H
-\rightarrow HI\ \vert\ I$. Since $H$ can derive any nonempty string, the
-production $E_a \rightarrow Ha$ introduces a sequence of one or more insertion
-errors in front of $a$. Therefore, for the case of an insertion error $I
-\rightarrow t^i_k$, we also add $E_{t^i_{k+1}} \rightarrow Ht^i_{k+1}$. To place
-one or more insertion errors at the end of a sentence we also include the
+\rightarrow HI$ and $H \rightarrow I$. Since $H$ can derive any nonempty string,
+the production $E_a \rightarrow Ha$ introduces a sequence of one or more
+insertion errors in front of $a$. Therefore, for the case of an insertion error
+$I \rightarrow t^i_k$, we also add $E_{t^i_{k+1}} \rightarrow Ht^i_{k+1}$. To
+place one or more insertion errors at the end of a sentence we also include the
 production $S' \rightarrow SH$.
 
 The above algorithm, so far, adds only the \emph{terminal error productions}. We
@@ -72,7 +74,7 @@ added.
 
 Finally, we further refine the new small set of error productions for each
 program $e_{\bot}$ with ECEP, in order to create the final annotated dataset
-$\List{t_a \times \errorrulessym}$. The changes that we extracted from the
+$\List{t^a \times \errorrulessym}$. The changes that we extracted from the
 programmers' fixes might include irrelevant changes to the parse error fix.
 Therefore, running ECEP is still essential to annotate each program with the
 appropriate error production rules as described before. However, limiting the
@@ -92,7 +94,7 @@ We describe in \autoref{algo:training-classifier-algo} how we use a
 $Model$ that can be used to predict error production rules for erroneous
 programs $\pbad$. We define the $\trainsym$ procedure in
 \autoref{algo:training-classifier-algo} that is responsible for extracting a
-machine-learning-appropriate dataset $D_{ML}$ in order to train the Transformer
+machine-learning appropriate dataset $D_{ML}$ in order to train the Transformer
 classifier with $\trainDLsym$.
 
 The dataset $D_{ML}$ starts as an empty set. Then we perform the following steps
@@ -129,12 +131,12 @@ We now describe our approach for $\systemsym$ in \autoref{algo:ecep-algo}. This
 is the high-level algorithm that combines everything that we described so far in
 the last three sections.
 
-In the first offline step, q$\systemsym$ first extracts the fixed programs $ps$
+In the first offline step, $\systemsym$ first extracts the fixed programs $ps$
 from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$ for
 the input grammar $G$. Then it $\trainsym$s the $Model$ to predict error
 production rules. Then we define an error rule predictor function
 \textsc{ERulePredictor} using the $\predictsym$ from \autoref{algo:predict-algo}
-withe the pre-trained $Model$ and grammar $PCFG$. Finally, we return the error
+with the pre-trained $Model$ and grammar $PCFG$. Finally, we return the error
 correcting parser $Prs$, which we define as a function here that takes as input
-an erroneous program $\pbad$, used \textsc{ERulePredictor} to get the set of
+an erroneous program $\pbad$ that uses \textsc{ERulePredictor} to get the set of
 error rules needed by $\ecepsym$ to parse and repair the program $\pbad$.
