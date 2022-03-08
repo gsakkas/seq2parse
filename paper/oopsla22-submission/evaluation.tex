@@ -1,22 +1,20 @@
 \section{Evaluation}
 \label{sec:eval}
 
-\lstMakeShortInline[mathescape=true]{|}
-
-We have implemented analytic program repair in \toolname: a system for
-repairing type errors for a purely functional subset of \ocaml. Next,
+We have implemented our approach in \toolname: a system for
+repairing parse errors for \python at its entirety. Next,
 we describe our implementation and an evaluation that addresses three
 questions:
 
 \begin{itemize}
-    \item \textbf{RQ1}: How \emph{accurate} are \toolname's predicted repairs?
+    \item \textbf{RQ1}: How \emph{accurate} are \toolname's predicted error production rules?
                         (\S~\ref{sec:eval:accuracy})
-    \item \textbf{RQ2}: How \emph{efficiently} can \toolname synthesize fixes?
+    \item \textbf{RQ2}: How \emph{efficiently} can \toolname repair parse errors?
                         (\S~\ref{sec:eval:efficiency})
-    \item \textbf{RQ3}: How \emph{useful} are \toolname's error messages?
+    \item \textbf{RQ3}: How \emph{useful} are \toolname's suggested repairs?
                         (\S~\ref{sec:eval:useful})
-    \item \textbf{RQ4}: How \emph{precise} are \toolname's template fixes?
-                        (\S~\ref{sec:eval:template_quality})
+    % \item \textbf{RQ4}: How \emph{precise} are \toolname's template fixes?
+    %                     (\S~\ref{sec:eval:template_quality})
 
 \end{itemize}
 
@@ -24,55 +22,57 @@ questions:
 
 \mypara{Training Dataset}
 %
-For our evaluation, we use an \ocaml dataset gathered from an undergraduate
-Programming Languages university course, previously used in related work
-\citep{Seidel2017-ko,Seidel:2017}. It consists of erroneous programs and their
-subsequent fixes and is divided in two parts; the Spring 2014 class (\SPRING)
-and the Fall 2015 class (\FALL). The homework required students to write 23
-distinct programs that demonstrate a range of functional programming idioms, \eg
-higher-order functions and (polymorphic) algebraic data types.
+For our evaluation, we use a \python dataset gathered from
+PythonTutor.com~\citep{Guo2013} between 2017 and 2018, previously used in
+related work \citep{Endres2019,Cosman2020}. Each program which throws an
+uncaught Python exception is paired with the next program by the same user that
+does not crash, under the assumption that the latter is the fixed version of the
+former. We discard pairs where the difference between crashing and fixed
+versions is too high (more than a standard deviation above average), since these
+are usually unrelated submissions or complete refactorings. We also discard
+submissions that violate PythonTutor's policies (e.g., those using forbidden
+libraries). Ultimately, the dataset used in this evaluation contains almost a
+million usable program pairs, representing students from dozens of universities
+(PythonTutor has been used in many introductory courses~\citep{Guo2013}) as well
+as non-traditional novices.
 
-\mypara{Feature Extraction}
+\mypara{Dataset labeling}
 %
-\toolname represents programs with BOAT vectors of 449 features from each
-expression in a program: 45 local syntactic, 315 contextual, 88 typing features,
-and 1 expression size feature. For contextual features, for each expression we
-extract the local syntactic features of its first 4 (left-to-right) children. In
-addition, we extract those features for its ancestors, starting from its parent
-and going up to two more parent nodes. For typing features, we support |int|s,
-|float|s, |char|s, |string|s, and the user-defined |expr|. These features are
-extracted for each expression and its context.
+\toolname represents each program with its abstracted token sequence $t^a$ for
+the training procedure. For the full set of \python there are \emph{360 terminal
+error production rules} that \toolname's has to predict from.
 
-\mypara{Dataset Cleaning}
-%
-We extract fixes as expressions replacements over a program pair using \diffsym.
-A disadvantage of using \diffsym s with this dataset is that some students may
-have made many, potentially unrelated, changes between compilations; at some
-point the ``fix'' becomes a ``rewrite''. These rewrites can lead to meaningless
-fix templates and error locations. We discard such outliers when the fraction of
-subexpressions that have changed in a program is more than one standard
-deviation above the mean, establishing a \diffsym threshold of 40\%. We also
-discard programs that have changes in 5 or more locations, noting that even
-state-of-the-art multi-location repair techniques cannot reproduce such
-``fixes'' \citep{Saha_2019}. The discarded changes account for roughly 32\% of
-each dataset, leaving 2,475 program pairs for \SPRING and 2,177 pairs for \FALL.
-Throughout, we use \SPRING as a training set and \FALL as a test set.
+% \mypara{Dataset Cleaning}
+% %
+% We extract fixes as expressions replacements over a program pair using
+% $\diffsym$ A disadvantage of using $\diffsym$s with this dataset is that some
+% students may have made many, potentially unrelated, changes between
+% compilations; at some point the ``fix'' becomes a ``rewrite''. These rewrites
+% can lead to meaningless fix templates and error locations. We discard such
+% outliers when the fraction of subexpressions that have changed in a program is
+% more than one standard deviation above the mean, establishing a
+% $\diffsym$ threshold of 40\%. We also discard programs that have changes in 5 or
+% more locations, noting that even state-of-the-art multi-location repair
+% techniques cannot reproduce such ``fixes'' \citep{Saha_2019}. The discarded
+% changes account for roughly 32\% of each dataset, leaving 2,475 program pairs
+% for \SPRING and 2,177 pairs for \FALL. Throughout, we use \SPRING as a training
+% set and \FALL as a test set.
 
-\mypara{\dnn based Classifier}
-%
-\toolname's template prediction uses a multi-layer neural network \dnn based
-classifier with three fully-connected hidden layers of 512 neurons. The neurons
-use rectified linear units (ReLU) as their activation function
-\citep{Nair2010-xg}.
-%
-The \dnn was trained using \emph{early stopping} \citep{Hastie2009-bn}: training
-is stopped when the accuracy on a distinct small part of the training set is not
-improved after a certain amount of epochs (5 epochs, in our implementation).
-%
-We set the maximum number of epochs to 200.
-%
-We used the \textsc{Adam} optimizer \citep{Kingma2014-ng},
-a variant of stochastic gradient descent that converges faster.
+% \mypara{\dnn based Classifier}
+% %
+% \toolname's template prediction uses a multi-layer neural network \dnn based
+% classifier with three fully-connected hidden layers of 512 neurons. The neurons
+% use rectified linear units (ReLU) as their activation function
+% \citep{Nair2010-xg}.
+% %
+% The \dnn was trained using \emph{early stopping} \citep{Hastie2009-bn}: training
+% is stopped when the accuracy on a distinct small part of the training set is not
+% improved after a certain amount of epochs (5 epochs, in our implementation).
+% %
+% We set the maximum number of epochs to 200.
+% %
+% We used the \textsc{Adam} optimizer \citep{Kingma2014-ng},
+% a variant of stochastic gradient descent that converges faster.
 
 \subsection{RQ1: Accuracy}
 
@@ -92,7 +92,7 @@ We compare \toolname's \dnn-based predictor against two baseline classifiers: a
 templates learned from the \SPRING training dataset, and a \popular classifier
 that returns the most popular templates in the training set in decreasing order.
 
-\input{evaluation-accuracy-graph}
+\input{evaluation-classifier-accuracy}
 
 \mypara{Results: Accuracy of Prediction}
 %
@@ -154,261 +154,261 @@ $\hat{t}$.
 \end{framed}
 
 
-\subsection{RQ2: Efficiency}
-\label{sec:eval:efficiency}
-\label{subsec:eval:man_rep_qual_eval}
+% \subsection{RQ2: Efficiency}
+% \label{sec:eval:efficiency}
+% \label{subsec:eval:man_rep_qual_eval}
 
-Next we evaluate \toolname's efficiency by measuring how many programs it is
-able to generate a (well-typed) repair for.
-%
-We limit the synthesizer to 90 seconds. (In general the procedure is
-undecidable, and we conjecture that a longer timeout will diminish the practical
-usability for novices.)
-%
-Recall that the repair synthesis algorithm is guided by the repair template
-predictions.
-%
-We evaluate the efficiency of \toolname by comparing it against a baseline
-\naive implementation that, given the predicted fix location, attempts to
-synthesize a repair from the trivial ``hole'' template.
+% Next we evaluate \toolname's efficiency by measuring how many programs it is
+% able to generate a (well-typed) repair for.
+% %
+% We limit the synthesizer to 90 seconds. (In general the procedure is
+% undecidable, and we conjecture that a longer timeout will diminish the practical
+% usability for novices.)
+% %
+% Recall that the repair synthesis algorithm is guided by the repair template
+% predictions.
+% %
+% We evaluate the efficiency of \toolname by comparing it against a baseline
+% \naive implementation that, given the predicted fix location, attempts to
+% synthesize a repair from the trivial ``hole'' template.
 
-\autoref{fig:rite_naive} shows the cumulative distribution function of
-\toolname's and \naive's repair rates over their synthesis time. We observe that
-using the predicted templates for synthesis allows \toolname to generate
-type-correct repairs for almost 70\% of the programs in under 20 seconds, which
-is nearly 12 points higher than the \naive baseline. We also observe that
-\toolname successfully repairs around 10\% more programs than \naive for times
-greater than 20 seconds. While the \naive approach is still able to synthesize
-well-typed repairs relatively quickly, we will see that these repairs are of
-much lower quality than those generated from the predicted templates
-(\S~\ref{sec:eval:template_quality}).
+% \autoref{fig:rite_naive} shows the cumulative distribution function of
+% \toolname's and \naive's repair rates over their synthesis time. We observe that
+% using the predicted templates for synthesis allows \toolname to generate
+% type-correct repairs for almost 70\% of the programs in under 20 seconds, which
+% is nearly 12 points higher than the \naive baseline. We also observe that
+% \toolname successfully repairs around 10\% more programs than \naive for times
+% greater than 20 seconds. While the \naive approach is still able to synthesize
+% well-typed repairs relatively quickly, we will see that these repairs are of
+% much lower quality than those generated from the predicted templates
+% (\S~\ref{sec:eval:template_quality}).
 
-\begin{framed}
-  \noindent \toolname can generate type-correct repairs for the vast majority of
-  ill-typed programs in under 20 seconds.
-\end{framed}
+% \begin{framed}
+%   \noindent \toolname can generate type-correct repairs for the vast majority of
+%   ill-typed programs in under 20 seconds.
+% \end{framed}
 
-% The 11.85\% of the programs that fail to be repaired within that amount of time
-% fall in the case of the combined failure of our predictive models to give high
-% confidence scores to the correct locations and templates, thus making synthesis
-% very expensive.
+% % The 11.85\% of the programs that fail to be repaired within that amount of time
+% % fall in the case of the combined failure of our predictive models to give high
+% % confidence scores to the correct locations and templates, thus making synthesis
+% % very expensive.
 
-% \begin{table}
+% % \begin{table}
+% %   \centering
+% %   \begin{tabular}{l|ccc}
+% %     Classifier & Completed & Repair Rate & Time (sec) \\
+% %     \hline
+% %     \naive   & 77.86\% & 74.78\% & 11.72 \\
+% %     \toolname & 88.15\% & 84.80\% & 8.81 \\
+% %   \end{tabular}
+% %   \caption{Experimental results of \toolname's synthesis.}
+% %   \label{tab:rite_naive}
+% % \end{table}
+
+% \begin{figure}
 %   \centering
-%   \begin{tabular}{l|ccc}
-%     Classifier & Completed & Repair Rate & Time (sec) \\
-%     \hline
-%     \naive   & 77.86\% & 74.78\% & 11.72 \\
-%     \toolname & 88.15\% & 84.80\% & 8.81 \\
-%   \end{tabular}
-%   \caption{Experimental results of \toolname's synthesis.}
-%   \label{tab:rite_naive}
-% \end{table}
+%   \includegraphics[height=2.3in]{cdf.pdf}
+%   \caption{The proportion of the test set that can be repaired within a given time.}
+%   \label{fig:rite_naive}
+% \end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[height=2.3in]{cdf.pdf}
-  \caption{The proportion of the test set that can be repaired within a given time.}
-  \label{fig:rite_naive}
-\end{figure}
+% \subsection{RQ3: Usefulness}
+% \label{sec:eval:useful}
 
-\subsection{RQ3: Usefulness}
-\label{sec:eval:useful}
+% The primary outcome is whether the repair-based
+% error messages generated by \toolname were actually useful to novices.
+% %
+% To assess the quality of \toolname's repairs, we conducted an online human
+% study with 29 participants.
+% %
+% Each participant was asked to evaluate the quality of the program fixes
+% and their locations against a state-of-the-art baseline
+% (\seminal ~\citep{Lerner2007-dt}).
+% %
+% For each program, beyond the two repairs, participants were presented
+% with the original ill-typed program, along with the standard \ocaml
+% compiler's error message and a short description of what the original
+% author of the program intended it to do.
+% %
+% From this study, we found that both the edit locations and final
+% repairs produced by \toolname were better than
+% \seminal's in a statistically significant manner.
 
-The primary outcome is whether the repair-based
-error messages generated by \toolname were actually useful to novices.
-%
-To assess the quality of \toolname's repairs, we conducted an online human
-study with 29 participants.
-%
-Each participant was asked to evaluate the quality of the program fixes
-and their locations against a state-of-the-art baseline
-(\seminal ~\citep{Lerner2007-dt}).
-%
-For each program, beyond the two repairs, participants were presented
-with the original ill-typed program, along with the standard \ocaml
-compiler's error message and a short description of what the original
-author of the program intended it to do.
-%
-From this study, we found that both the edit locations and final
-repairs produced by \toolname were better than
-\seminal's in a statistically significant manner.
+% \mypara{User Study Setup}
+% %
+% Study participants were recruited from two public research
+% institutes (names elided for blind review), and was advertised on Twitter.
+% %
+% Participants had to assess the quality of, and give comprehensible
+% bug descriptions for, at least 5 / 10 stimuli. The study took around
+% 25 minutes to complete. Participants were compensated by entering a
+% drawing for an Amazon Echo voice assistant. There were 29 valid participants.
+% %
+% We created the stimuli by randomly selecting a corpus of 21 buggy programs
+% from the 1834 programs in our dataset where repairs were synthesized.
+% %
+% From this corpus, each participant was shown 10 randomly-selected buggy
+% programs, and two candidate repairs: one generated by \toolname and one
+% by \seminal.
+% %
+% For both algorithms, we used the highest-ranked solution returned.
+% %
+% Participant were always unaware which tool generated which candidate
+% patch.
+% %
+% Participants were then asked to assess the quality of each
+% candidate repair on a Likert scale of 1 to 5 and were asked
+% for a binary assessment of the quality of each repair's edit
+% location.
+% %
+% We also collected self-reported estimates of both programming and
+% \ocaml-specific experience as well as qualitative data assessing factors
+% influencing each participant's subjective judgment of repair quality.
+% %
+% From the 29 participants, we collected 554 patch quality assessments,
+% 277 each for \toolname and \seminal generated repairs.
 
-\mypara{User Study Setup}
-%
-Study participants were recruited from two public research
-institutes (names elided for blind review), and was advertised on Twitter.
-%
-Participants had to assess the quality of, and give comprehensible
-bug descriptions for, at least 5 / 10 stimuli. The study took around
-25 minutes to complete. Participants were compensated by entering a
-drawing for an Amazon Echo voice assistant. There were 29 valid participants.
-%
-We created the stimuli by randomly selecting a corpus of 21 buggy programs
-from the 1834 programs in our dataset where repairs were synthesized.
-%
-From this corpus, each participant was shown 10 randomly-selected buggy
-programs, and two candidate repairs: one generated by \toolname and one
-by \seminal.
-%
-For both algorithms, we used the highest-ranked solution returned.
-%
-Participant were always unaware which tool generated which candidate
-patch.
-%
-Participants were then asked to assess the quality of each
-candidate repair on a Likert scale of 1 to 5 and were asked
-for a binary assessment of the quality of each repair's edit
-location.
-%
-We also collected self-reported estimates of both programming and
-\ocaml-specific experience as well as qualitative data assessing factors
-influencing each participant's subjective judgment of repair quality.
-%
-From the 29 participants, we collected 554 patch quality assessments,
-277 each for \toolname and \seminal generated repairs.
+% %\begin{figure}
+% %  \includegraphics[width=8cm]{SampleStimuli.png}
+% %  \caption{A sample stimulus used for assessing repair quality.}
+% %  \label{fig:stimulus}
+% %\end{figure}
 
-%\begin{figure}
-%  \includegraphics[width=8cm]{SampleStimuli.png}
-%  \caption{A sample stimulus used for assessing repair quality.}
-%  \label{fig:stimulus}
-%\end{figure}
+% \mypara{Results}
+% %
+% In a statistically-significant manner, humans perceive that
+% \toolname's fault localization and final repairs are both
+% of higher quality than those produced by \seminal ($p=0.030$
+% and $p=0.024$ respectively).\footnote{All tests for statistical
+% significance used the Wilcoxon signed-rank test.}
+% %
+% Regarding fault localization, we find that humans agreed
+% with \toolname-identified edit locations 81.6\% of the time
+% but only agreed with those of \seminal 74.0\% of the time.
+% %
+% % This 10\% increase is important because \ME{You should explain why this matters.}
+% %
+% As for the final repair, humans also preferred \toolname's patches
+% to those produced by \seminal. Specifically, \toolname's repairs
+% achieved an average quality rating of 2.41/5 while \seminal's
+% repairs had an average rating of only 2.11/5, a 14\% increase ($p=0.030$),
+% showing a statistically-significant improvement over \seminal.
 
-\mypara{Results}
-%
-In a statistically-significant manner, humans perceive that
-\toolname's fault localization and final repairs are both
-of higher quality than those produced by \seminal ($p=0.030$
-and $p=0.024$ respectively).\footnote{All tests for statistical
-significance used the Wilcoxon signed-rank test.}
-%
-Regarding fault localization, we find that humans agreed
-with \toolname-identified edit locations 81.6\% of the time
-but only agreed with those of \seminal 74.0\% of the time.
-%
-% This 10\% increase is important because \ME{You should explain why this matters.}
-%
-As for the final repair, humans also preferred \toolname's patches
-to those produced by \seminal. Specifically, \toolname's repairs
-achieved an average quality rating of 2.41/5 while \seminal's
-repairs had an average rating of only 2.11/5, a 14\% increase ($p=0.030$),
-showing a statistically-significant improvement over \seminal.
+% \begin{figure*}
+% \begin{subfigure}[t]{.33\textwidth}
+% \centering
+% \includegraphics[height=1.4in]{comp1.png}
+% \caption{\toolname (4.5/5) better than \seminal(1.1/5) with 12 responses $p=0.002$.}
+% \label{subfig:good1}
+% \end{subfigure}
+% \begin{subfigure}[t]{.33\textwidth}
+% \centering
+% \includegraphics[height=1.4in]{comp2.png}
+% \caption{\toolname (1.5/5) worse than \seminal(4.1/5) with 18 responses $p=0.0002$.}
+% \label{subfig:bad}
+% \end{subfigure}
+% \begin{subfigure}[t]{.29\textwidth}
+% \centering
+% \includegraphics[height=1.4in]{comp3.png}
+% \caption{\toolname (4.8/5) better than \seminal(1.2/5) with 17 responses $p=0.0003$.}
+% \label{subfig:good2}
+% \end{subfigure}
+% \end{figure*}
 
-\begin{figure*}
-\begin{subfigure}[t]{.33\textwidth}
-\centering
-\includegraphics[height=1.4in]{comp1.png}
-\caption{\toolname (4.5/5) better than \seminal(1.1/5) with 12 responses $p=0.002$.}
-\label{subfig:good1}
-\end{subfigure}
-\begin{subfigure}[t]{.33\textwidth}
-\centering
-\includegraphics[height=1.4in]{comp2.png}
-\caption{\toolname (1.5/5) worse than \seminal(4.1/5) with 18 responses $p=0.0002$.}
-\label{subfig:bad}
-\end{subfigure}
-\begin{subfigure}[t]{.29\textwidth}
-\centering
-\includegraphics[height=1.4in]{comp3.png}
-\caption{\toolname (4.8/5) better than \seminal(1.2/5) with 17 responses $p=0.0003$.}
-\label{subfig:good2}
-\end{subfigure}
-\end{figure*}
+% \mypara{Qualitative Comparison}
+% %
+% We consider several case studies where there were
+% statistically-significant differences between
+% the human ratings for \toolname's and \seminal's
+% repairs.
+% %
+% The task in Figure~\ref{subfig:good1} is that
+% \texttt{wwhile(f, b)} should return $x$ where
+% there exist values $v_0,...,v_n$ such that:
+% $b = v_0$, $x = v_n$, and for each $i$ between
+% 0 and $n-2$, we have $f v_i = (v_i+1, true)$
+% and $f v_n-1 = (v_n, false)$.
+% %
+% The task in Figure~\ref{subfig:bad} is to
+% return a list of \texttt{n} copies of \texttt{x}.
+% %
+% The task in Figure~\ref{subfig:good2} is to
+% return the sum of the squares of the numbers
+% in the list \texttt{xs}.
+% %
+% Humans rated \toolname's repairs better
+% for the programs in Fig~\ref{subfig:good1}
+% and~\ref{subfig:good2}.
+% %
+% In both cases, \toolname's found a solution
+% which type-checks and conforms to the problem's
+% semantic specification.
+% %
+% \seminal, however, found a repair that was
+% either incomplete (\ref{subfig:good1}) or
+% semantically incorrect (\ref{subfig:good2}).
+% On the other hand, in ~\ref{subfig:bad}, \toolname
+% does worse as the \emph{second} parameter should
+% be \verb|n-1|. In fact, \toolname's second ranked
+% repair is the correct one, but it is equal
+% to the first in terms of edit distance.
 
-\mypara{Qualitative Comparison}
-%
-We consider several case studies where there were
-statistically-significant differences between
-the human ratings for \toolname's and \seminal's
-repairs.
-%
-The task in Figure~\ref{subfig:good1} is that
-\texttt{wwhile(f, b)} should return $x$ where
-there exist values $v_0,...,v_n$ such that:
-$b = v_0$, $x = v_n$, and for each $i$ between
-0 and $n-2$, we have $f v_i = (v_i+1, true)$
-and $f v_n-1 = (v_n, false)$.
-%
-The task in Figure~\ref{subfig:bad} is to
-return a list of \texttt{n} copies of \texttt{x}.
-%
-The task in Figure~\ref{subfig:good2} is to
-return the sum of the squares of the numbers
-in the list \texttt{xs}.
-%
-Humans rated \toolname's repairs better
-for the programs in Fig~\ref{subfig:good1}
-and~\ref{subfig:good2}.
-%
-In both cases, \toolname's found a solution
-which type-checks and conforms to the problem's
-semantic specification.
-%
-\seminal, however, found a repair that was
-either incomplete (\ref{subfig:good1}) or
-semantically incorrect (\ref{subfig:good2}).
-On the other hand, in ~\ref{subfig:bad}, \toolname
-does worse as the \emph{second} parameter should
-be \verb|n-1|. In fact, \toolname's second ranked
-repair is the correct one, but it is equal
-to the first in terms of edit distance.
+% \begin{framed}
+% \noindent Humans perceive both \toolname's edit locations
+%  and final repair quality to be better than those produced
+%  by \seminal, a state-of-the-art \ocaml repair tool, in a
+%  statistically-significant manner.
+% \end{framed}
 
-\begin{framed}
-\noindent Humans perceive both \toolname's edit locations
- and final repair quality to be better than those produced
- by \seminal, a state-of-the-art \ocaml repair tool, in a
- statistically-significant manner.
-\end{framed}
+% \subsection{RQ4: Impact of Templates on Quality}
+% \label{sec:eval:template_quality}
 
-\subsection{RQ4: Impact of Templates on Quality}
-\label{sec:eval:template_quality}
+% Finally, we seek to evaluate whether \toolname's template-guided
+% approach is really at the heart of its effectiveness. To do so,
+% as in \S~\ref{sec:eval:efficiency}, we
+% compared the results of using \toolname's error messages
+% synthesized from predicted templates to those generated by
+% a \naive synthesizer that returns the first well-typed term
+% (\ie synthesized from the trivial ``hole'' template).
 
-Finally, we seek to evaluate whether \toolname's template-guided
-approach is really at the heart of its effectiveness. To do so,
-as in \S~\ref{sec:eval:efficiency}, we
-compared the results of using \toolname's error messages
-synthesized from predicted templates to those generated by
-a \naive synthesizer that returns the first well-typed term
-(\ie synthesized from the trivial ``hole'' template).
+% \mypara{User Study Setup}
+% %
+% For this user study, we used a corpus of 20 buggy programs randomly chosen in
+% \S~\ref{sec:eval:useful}. For each of the programs we generated three messages:
+% using \toolname, using \seminal, and using the \naive approach but at the
+% \emph{same location} predicted by \toolname. We then randomized and masked the
+% order in which the tools' messages were reported, and asked three experts
+% (authors of this paper who had not seen the output of any tool for any of those
+% instances) to rate the messages as one of ``Good'', ``Ok'' or ``Bad''.
 
-\mypara{User Study Setup}
-%
-For this user study, we used a corpus of 20 buggy programs randomly chosen in
-\S~\ref{sec:eval:useful}. For each of the programs we generated three messages:
-using \toolname, using \seminal, and using the \naive approach but at the
-\emph{same location} predicted by \toolname. We then randomized and masked the
-order in which the tools' messages were reported, and asked three experts
-(authors of this paper who had not seen the output of any tool for any of those
-instances) to rate the messages as one of ``Good'', ``Ok'' or ``Bad''.
+% \mypara{Results}
+% %
+% Figure~\ref{fig:comparison} summarizes the results of the rating.
+% %
+% Since each of 20 programs received 3 ratings, there are a
+% total of 60 ratings per tool.
+% %
+% \toolname dominates with 22 Good, 20 Ok and 18 Bad ratings;
+% \seminal follows with only 12 Good, 11 Ok and 37 Bad; while
+% \naive received no Good scores, 12 Ok scores and a
+% dismal 48 Bad scores.
+% %
+% On average (with Bad = 0, Ok = 0.5, Good = 1),
+% \toolname scored 0.53, \seminal 0.30, and \naive
+% just 0.1.
+% %
+% Our rating agreement kappa is 0.54, which is considered ``moderate agreement''.
 
-\mypara{Results}
-%
-Figure~\ref{fig:comparison} summarizes the results of the rating.
-%
-Since each of 20 programs received 3 ratings, there are a
-total of 60 ratings per tool.
-%
-\toolname dominates with 22 Good, 20 Ok and 18 Bad ratings;
-\seminal follows with only 12 Good, 11 Ok and 37 Bad; while
-\naive received no Good scores, 12 Ok scores and a
-dismal 48 Bad scores.
-%
-On average (with Bad = 0, Ok = 0.5, Good = 1),
-\toolname scored 0.53, \seminal 0.30, and \naive
-just 0.1.
-%
-Our rating agreement kappa is 0.54, which is considered ``moderate agreement''.
+% \begin{framed}
+%   \noindent Repairs generated from predicted
+%   templates were of significantly higher quality
+%   than those from expert-biased enumeration (\seminal)
+%   or \naive enumeration.
+% \end{framed}
 
-\begin{framed}
-  \noindent Repairs generated from predicted
-  templates were of significantly higher quality
-  than those from expert-biased enumeration (\seminal)
-  or \naive enumeration.
-\end{framed}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[height=1.5in]{comparison.png}
-  \caption{Rating the errors generated by \toolname, \seminal and \naive enumeration.}
-  \label{fig:comparison}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[height=1.5in]{comparison.png}
+%   \caption{Rating the errors generated by \toolname, \seminal and \naive enumeration.}
+%   \label{fig:comparison}
+% \end{figure}

@@ -64,7 +64,7 @@ candidate solutions like the one above.
 \mypara{Solution: Error Correcting Parsers}
 One approach to make such erroneous programs parse is to use \emph{Error
 Correcting Parsers} (ECPs) \citep{Aho_1972}. ECPs are based on \emph{dynamic
-programming approaches} and have been used in recent literature to automatically
+programming algorithms} and have been used in recent literature to automatically
 infer the intended parse tree for a program that doesn't belong to a certain
 programming language, \ie a program that has a parse error. These dynamic
 programming parsers have been used along side with \emph{error correcting
@@ -75,19 +75,20 @@ from the original program.
 However, these error-correcting parsers have a time complexity that is cubed on
 the input program size and squared on the grammar size used. Futhermore, there
 is the added cost of the large number of additional production rules these
-parsers have to use. Therefore, they are not tractable or scalable options for
-real-world programming languages and programs.
+parsers have to consider while having an explosion of the internal states by
+maintaining the cost of each possible parse. Therefore, they are not tractable
+or scalable options for real-world programming languages and programs.
 
 
 \mypara{Solution: Train classifier to predict error rules}
 The original Earley parsing is a fairly efficient parsing algorithm
 \citep{Earley_1970} based on dynamic programming. Its error-correcting version
-can be very inefficient though for larger real-world grammars, since it requires
-the addition of a large number of error production rules as mentioned before.
-However, not each erroneous program needs all of those rules to be parsed. In
-this work, we present a novel strategy to selecting just a small set of error
-production rules that can be used with an updated \emph{Error Correcting Earley
-Parser} (ECEP) to repair a program with parse errors.
+becomes very inefficient though for larger real-world grammars, since it
+requires the addition of a large number of error production rules as mentioned
+before. However, not each erroneous program needs all of those rules to be
+parsed. In this work, we present a novel strategy to selecting just a small set
+of error production rules that can be used with an updated \emph{Error
+Correcting Earley Parser} (ECEP) to repair a program with parse errors.
 %
 To enable the efficient usage of a scalable ECEP we decompose the problem into 3
 steps:
