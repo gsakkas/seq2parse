@@ -78,79 +78,62 @@ error production rules} that \toolname's has to predict from.
 
 \label{sec:eval:accuracy}
 
-Most developers will consider around five or six suggestions before falling back
-to manual debugging \citep{Kochhar2016-oc,Parnin2011-ce}.
+% Most developers will consider around five or six suggestions before falling back
+% to manual debugging \citep{Kochhar2016-oc,Parnin2011-ce}.
 %
-Therefore, we consider \toolname's accuracy up to the \emph{top six} fix
-template predictions, \ie predicted fix templates that represent the user's
-actual fix.
-
-\mypara{Baselines}
-%
-We compare \toolname's \dnn-based predictor against two baseline classifiers: a
-\random classifier that returns templates chosen uniformly at random from the 50
-templates learned from the \SPRING training dataset, and a \popular classifier
-that returns the most popular templates in the training set in decreasing order.
+We consider \toolname's transformer classifiers' accuracy up to the \emph{top
+50} error production rules predictions against our original and the final
+version of our approach
 
 \input{evaluation-classifier-accuracy}
 
-\mypara{Results: Accuracy of Prediction}
+\mypara{Results: Accuracy of Error Rule Prediction}
 %
-\autoref{fig:accuracy-results} shows the accuracy results of our template
-prediction experiments. The y-axis describes the fraction of \emph{erroneous}
-sub-terms (locations) for which the actual repair was one of the top-K predicted
-repairs.
+\autoref{fig:accuracy-results} shows the accuracy results of our error
+production rule prediction experiments. The y-axis describes the fraction of
+programs for which the \emph{whole} set of the needed error rules needed to
+repair the \emph{erroneous} program was a complete subset of the top-K predicted
+rules.
 %
-The naive baseline of selecting templates at random achieves \RandomTopOne\%
-Top-1 accuracy (\RandomTopSix\% Top-6), while the \popular classifier achieves a
-Top-1 accuracy of \PopularTopOne\% (\PopularTopSix\% Top-6).
-%
-Our \dnn classifier significantly outperforms these naive classifiers, ranging
-from \DnnTopOne\% Top-1 accuracy to \DnnTopSix\% Top-6 accuracy.
-%
-In fact, even with only \dnn's first prediction one outperforms top 6
-predictions of both \random and \popular.
-%
-The \random classifier's low performance is as expected.
-%
-The \popular classifier performs better: some homework assignments were shared
-between \SPRING and \FALL quarters and, while different groups of students
-solved these problems for each quarter, the novice mistakes that they made seem
-to have a pattern. Thus, the most \emph{popular ``fixes''} (and therefore the
-relevant templates) from \SPRING were also popular in \FALL.
+The \textsc{Original} version of our transformer classifier didn't consider the
+partial parses produced with the PCFG's aid and used the full \textsc{Original}
+token sequences, whose results are presented in the first two bars of
+\autoref{fig:accuracy-results}. The next two bars show our final results using
+the \textsc{Abstracted} token sequences to train the classifier. Finally, the
+last two dotted bars show the results for when a \textsc{Threshold} is set in
+order to select the predicted error rules, instead of picking the static top-K
+ones. The predicted error rule set can have a size anywhere between 1 and a
+maximum of 25 (pre-defined by us based on the top-K results).
 
-\mypara{Results: Template ``Confusion''}
-%
-The \emph{confusion matrix} of the each location's top prediction shows which
-templates our models mix up.
-%
-\autoref{fig:conf-matrix} shows this matrix for the top 30 templates acquired
-from the \SPRING training set and were tested on the \FALL dataset.
-%
-Note that most templates are predicted correctly and only a few of them are
-often mis-predicted for another template.
-%
-For example, we see that programs that require template 20
-(\elet{\hat{z}}{\epcases{\hat{t}}{\hat{x}}{\hat{y}}{\hat{a}}}{\_}) to be fixed,
-almost always are mis-predicted with template 11 (\elet{(\hat{x},\
-\hat{y})}{\hat{t}}{(\_,\ \_)}). We observe that these templates are still very
-similar, with both of them having a top-level |let| that manipulates tuples
-$\hat{t}$.
+The blue bars show the accuracy on the full test set of \textsc{All} 15,000
+programs, while the green bars show the results on the subset of \textsc{Rare}
+programs, \ie the programs that didn't include any of the 50 most popular error
+rules, that amount only for 4.8\% of our test set.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[trim={30 40 100 70},clip,height=2.3in]{evaluation-conf-matrix-no-title.pdf}
-  \caption{The confusion matrix of the \emph{top 30} templates. Bolder parts of
-  the heatmap show templates that are often mis-predicted with another template.
-  The bolder the diagonal is, the more accurate predictions we make.}
-  \label{fig:conf-matrix}
-\end{figure}
+The \textsc{Original} predictor, even with the Top-50 predicted error rules is
+less accurate than the Top-20 predictions of the \textsc{Abstracted}, with an
+accuracy of 73.96\%, which drops to 51.16\% and 32.34\% respectively for the
+Top-20 and Top-10 predictions. The \textsc{Abstracted} predictor significantly
+outperforms the \textsc{Original} predictor with a 72.08\% Top-10 accuracy,
+81.08\% Top-20 accuracy and 92.13\% Top-10 accuracy.
+
+The \textsc{Threshold} predictions are almost as accurate as the
+\textsc{Abstracted} Top-20 predictions with an accuracy of 79.46\% and a median
+number of selected error rules of 12 (average 13.9). This could potentially mean
+that this predictor is a valid alternative for the static Top-20 predictions.
+
+Finally, we observe that our \textsc{Abstracted} classifiers generalize
+efficiently for our dataset of erroneous Python programs and is almost as
+accurate as the rest of the dataset with a 74.11\% Top-20 accuracy (85.69\%
+Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
+72.46\% accuracy.
 
 \begin{framed}
-  \noindent \toolname's learns correlations between program features and repair
-  templates, yielding almost \emph{2x higher} accuracy than the baseline. By
-  abstracting programs into features, \toolname is able to \emph{generalize}
-  across years and different kinds of programs.
+  \noindent \toolname's transformer classifier learns to encode programs with
+  syntax errors and select candidate error production rules for them
+  effectively, yielding \emph{high accuracies}. By abstracting the tokens
+  sequences, \toolname is able to \emph{generalize} better and make more
+  accurate predictions with a \emph{81.08\% Top-20 accuracy}.
 \end{framed}
 
 

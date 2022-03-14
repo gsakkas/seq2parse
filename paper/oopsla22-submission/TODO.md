@@ -7,16 +7,16 @@
 - example parse tree using relevant rules to fix
 - example partial-parse tree
 
-[ ] draft technical section
+[x] draft technical section
 	- figure of whole pipeline
 	- explain the individual steps 1..6
 
-[ ] draft eval
+[x] draft eval
 
-[ ] draft related work
+[x] draft related work
 
-[ ] tweak parser to enable concrete repairs
+[x] tweak parser to enable concrete repairs
 
-[ ] generate examples for in-house (i.e. us) user study
+[x] generate examples for in-house (i.e. us) user study
 
-[ ] generate examples for real user study
+[x] generate examples for real user study
