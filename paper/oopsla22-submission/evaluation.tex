@@ -9,9 +9,11 @@ questions:
 \begin{itemize}
     \item \textbf{RQ1}: How \emph{accurate} are \toolname's predicted error production rules?
                         (\S~\ref{sec:eval:accuracy})
-    \item \textbf{RQ2}: How \emph{efficiently} can \toolname repair parse errors?
+    \item \textbf{RQ2}: How \emph{precisely} can \toolname repair parse errors?
+                        (\S~\ref{sec:eval:precise})
+    \item \textbf{RQ3}: How \emph{efficiently} can \toolname repair parse errors?
                         (\S~\ref{sec:eval:efficiency})
-    \item \textbf{RQ3}: How \emph{useful} are \toolname's suggested repairs?
+    \item \textbf{RQ4}: How \emph{useful} are \toolname's suggested repairs?
                         (\S~\ref{sec:eval:useful})
     % \item \textbf{RQ4}: How \emph{precise} are \toolname's template fixes?
     %                     (\S~\ref{sec:eval:template_quality})
@@ -137,6 +139,23 @@ Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
 \end{framed}
 
 
+\subsection{RQ2: Repaired Program Preciseness}
+\label{sec:eval:precise}
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{l||cccc}
+    Approach            & Parse Accuracy & User Parse Rate & Parse time & Median speedup \\
+    \hline
+    Top-3 \& 20 Preds   & 79.18\% & 36.40\% & 3.3 sec  & 46.3 sec \\
+    Top-1 \& 20 Preds   & 91.57\% & 19.03\% & 42.4 sec & 12.9 sec \\
+    Top-1 \& 20 Popular & 76.84\% & N/A     & 8.2 sec  & 38.6 sec \\
+    Top-1 \& 50 Popular & 83.24\% & N/A     & 13.8 sec & 29.2 sec \\
+  \end{tabular}
+  \caption{Experimental results of \toolname's repair approaches.}
+  \label{tab:seq2parse_full_results}
+\end{table}
+
 % \subsection{RQ2: Efficiency}
 % \label{sec:eval:efficiency}
 % \label{subsec:eval:man_rep_qual_eval}
@@ -170,23 +189,6 @@ Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
 %   \noindent \toolname can generate type-correct repairs for the vast majority of
 %   ill-typed programs in under 20 seconds.
 % \end{framed}
-
-% % The 11.85\% of the programs that fail to be repaired within that amount of time
-% % fall in the case of the combined failure of our predictive models to give high
-% % confidence scores to the correct locations and templates, thus making synthesis
-% % very expensive.
-
-% % \begin{table}
-% %   \centering
-% %   \begin{tabular}{l|ccc}
-% %     Classifier & Completed & Repair Rate & Time (sec) \\
-% %     \hline
-% %     \naive   & 77.86\% & 74.78\% & 11.72 \\
-% %     \toolname & 88.15\% & 84.80\% & 8.81 \\
-% %   \end{tabular}
-% %   \caption{Experimental results of \toolname's synthesis.}
-% %   \label{tab:rite_naive}
-% % \end{table}
 
 % \begin{figure}
 %   \centering
