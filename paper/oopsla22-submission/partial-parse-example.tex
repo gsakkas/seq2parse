@@ -6,7 +6,7 @@
     circle, minimum size=9mm, draw=black!75,
     thick, drop shadow, align=center},
     edge from parent/.style={draw=black!75,thick},
-    level distance=2cm]
+    level distance=1.6cm, xscale=1.3]
     \node (func) {Funcdef}
         child {
             node (def) {\texttt{\bfseries def}}
@@ -29,14 +29,14 @@
         child {
             node (colon) {\texttt{\bfseries :}}
         }
-        child {
-            node (suite) {\texttt{Suite}}
-            child {
+        child [level distance=0.3cm, xscale=1.35] {
+            node  (suite) {\texttt{Suite}}
+            child [level distance=1.3cm] {
                 node (etc) {\texttt{...}}
             }
-            child {
-                node (ReturnStmt) {\texttt{ReturnStmt}}
-                % node (ReturnStmt) {\texttt{\begin{tabular}{c}
+            child [level distance=1.3cm] {
+                node (RetStmt) {\texttt{RetStmt}}
+                % node (RetStmt) {\texttt{\begin{tabular}{c}
                 %                                 Return\\
                 %                                 Stmt
                 %                             \end{tabular}}}
@@ -45,12 +45,12 @@
                 }
                 child {
                     node (ArgList) {\texttt{ArgList}}
-                    child {
-                        node (ArithExpr1) {\texttt{ArithExpr}}
-                        child {
-                            node (ArithExpr2) {\texttt{Literal}}
+                    child [level distance=1.6cm] {
+                        node (ArExpr1) {\texttt{ArExpr}}
+                        child [level distance=1.3cm] {
+                            node (ArExpr2) {\texttt{Literal}}
                         }
-                        child {
+                        child [level distance=1.3cm] {
                             node (plus) {\texttt{\bfseries +}}
                         }
                     }
