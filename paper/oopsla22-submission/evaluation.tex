@@ -77,12 +77,8 @@ error production rules} that \toolname's has to predict from.
 % a variant of stochastic gradient descent that converges faster.
 
 \subsection{RQ1: Accuracy}
-
 \label{sec:eval:accuracy}
 
-% Most developers will consider around five or six suggestions before falling back
-% to manual debugging \citep{Kochhar2016-oc,Parnin2011-ce}.
-%
 We consider \toolname's transformer classifiers' accuracy up to the \emph{top
 50} error production rules predictions against our original and the final
 version of our approach
@@ -145,16 +141,61 @@ Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
 \begin{table}[t]
   \centering
   \begin{tabular}{l||cccc}
-    Approach            & Parse Accuracy & User Parse Rate & Parse time & Median speedup \\
+    Rules Approach                 & Parse Accuracy & User Parse Rate & Parse time & Speedup \\
     \hline
-    Top-3 \& 20 Preds   & 79.18\% & 36.40\% & 3.3 sec  & 46.3 sec \\
-    Top-1 \& 20 Preds   & 91.57\% & 19.03\% & 42.4 sec & 12.9 sec \\
-    Top-1 \& 20 Popular & 76.84\% & N/A     & 8.2 sec  & 38.6 sec \\
-    Top-1 \& 50 Popular & 83.24\% & N/A     & 13.8 sec & 29.2 sec \\
+    20 Most Popular                & 76.84\% & N/A     & 8.2 sec  & 38.6 sec \\
+    50 Most Popular                & 83.24\% & N/A     & 13.8 sec & 29.2 sec \\
+    Top-20 (\textsc{All-Parses})   & 79.18\% & 36.40\% & 3.3 sec  & 46.3 sec \\
+    Top-20 (\textsc{Minimum-Cost}) & 91.57\% & 19.03\% & 42.4 sec & 12.9 sec \\
   \end{tabular}
   \caption{Experimental results of \toolname's repair approaches.}
   \label{tab:seq2parse_full_results}
 \end{table}
+
+Next we evaluate \toolname's end-to-end accuracy and preciseness in generating
+valid parses for programs with syntax errors. For all of our tests we limit the
+\toolname's parsing to \emph{5 mins} and run our experiments on \emph{15,000
+erroneous programs} from our dataset. The rest of the dataset was used to train
+our transformer classifiers, and specifically here the \textsc{Abstracted}
+classifier.
+
+We compare our \emph{two versions} of our implementation of \toolname
+(\textsc{All-Parses} and \textsc{Minimum-Cost}) against two versions of the
+error-correcting parser with a static selection of the 20 and 50 most popular
+error production rules in our training set. We make this comparison because we
+observe in our training set that the 50 most of popular error rules are used for
+parsing as much as \emph{86\%} of the dataset.
+
+Our \textsc{All-Parses} ECEP and \textsc{Minimum-Cost} ECEP both use the
+\emph{Top-20 predictions} from our \textsc{Abstracted} classifier to generate
+parses and thus generate full program repairs. The \textsc{All-Parses} ECEP
+keeps internally all possible states that arise from using the predicted error
+rules and having a maximum repair cost of 2 edits (\ie a maximum of 2
+insertions, deletions or replacements). The \textsc{Minimum-Cost} version
+however keeps always the minimum-edit repair and discards all other states that
+may lead to a higher cost. This allows for a higher maximum cost of 10 edits.
+Finally, while \textsc{All-Parses} can generate a large number of repairs, we
+keep only the top 3 repairs after filtering with a static code checker
+(\textsc{Pylint} \citep{pylint2022}) as most developers will consider at most five
+suggestions before falling back to manual debugging \citep{Kochhar2016-oc,
+Parnin2011-ce}.
+
+\autoref{tab:seq2parse_full_results} shows the percentage of test programs that
+each of these four versions can parse successfully (\ie the parse accuracy) and
+the amount of parses that match the one that user compiled. We observe that both
+of the Top-20 predictions versions outperform the 20 most popular ECEP
+(76.84\%), while 50 most popular falls in between them with 83.24\% parse
+accuracy. The \textsc{All-Parses} ECEP achieves slightly less pase accuracy with
+79.18\%, however it manages to generate the user fix 36.40\% of the times, \ie
+more than one out of three programs with syntax errors. That number decreases to
+19.03\% when we consider the \textsc{Minimum-Cost} ECEP, which still an amazing
+result, if we also consider the higher total parse accuracy of 91.57\%.
+
+\begin{framed}
+  \noindent \toolname can \emph{generate parses} for \emph{80\%} of our tests
+  within 4 secs for the majority of them, while also generating \emph{the user
+  fix in more than 1 out 3 of the cases}.
+\end{framed}
 
 % \subsection{RQ2: Efficiency}
 % \label{sec:eval:efficiency}
