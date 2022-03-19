@@ -92,9 +92,9 @@ The average token-level changes needed to fix a program with syntax errors, \ie
 the number of changes in the lexed token sequence, is \emph{10.7 token changes},
 while the \emph{median is 4}. A variable rename or a different integer is not
 considered a change as they won't affect the syntax error fix. As shown in
-\autoref{fig:token-changes-ratio}, $14.1\%$ of dataset needs only one token
+\autoref{fig:token-changes-ratio}, $14.2\%$ of dataset needs only one token
 change, $23.2\%$ needs two token changes, $7.0\%$ needs three and $9.0\%$ needs
-four, \ie $53.3\%$ of the dataset needs at most 4 token changes to be fixed.
+four, \ie $53.4\%$ of the dataset needs at most 4 token changes to be fixed.
 This shows that the majority of the syntax errors can be fixed with only a few
 changes in their token sequences. But it is also important to see how long it
 takes the users on average to make those changes.
@@ -104,8 +104,8 @@ their programs with syntax errors per the number of token-level changes in their
 programs. As expected, with an increasing number of changes needed at program to
 fix all parse errors, more time is needed for the programmers to make those
 changes. Most importantly, even for one or two token changes the average user
-spends 25.8 and 24.7 sec respectively, which is still a considerable amount of
-time for these simple and short fixes.
+spends 26 and 25 sec respectively, which is still a considerable amount of time
+for these simple and short fixes, and jumps to 56 sec for three token changes.
 
 These results further indicate that, while simple syntax errors can easily and
 quickly be fixed by the programmers and the compiler error messages can be
