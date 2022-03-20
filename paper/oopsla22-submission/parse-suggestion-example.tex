@@ -5,7 +5,7 @@
         \begin{tikzpicture}
         [font=\small, edge from parent,
         every node/.style={top color=white, bottom color=black!15,
-        circle, minimum size=9mm, draw=black!75,
+        circle, minimum size=11mm, draw=black!75,
         thick, drop shadow, align=center},
         edge from parent/.style={draw=black!75,thick},
         level distance=1.3cm, xscale=1.35]
@@ -20,12 +20,12 @@
                     child [level distance=1.3cm] {
                         node (ArExpr2) {\texttt{Literal}}
                     }
-                    child [level distance=1.3cm] {
+                    child [level distance=1.4cm] {
                         node (plus) {\texttt{\bfseries +}}
                     }
                     child [level distance=1.3cm] {
                         node [style={top color=white, bottom color=blue!45,
-                        circle, minimum size=9mm, draw=blue!55,
+                        circle, minimum size=11mm, draw=blue!55,
                         thick, drop shadow, align=center}] (ArExpr3) {\texttt{ArExpr}}
                     }
                 }
@@ -39,7 +39,7 @@
         \begin{tikzpicture}
             [font=\small, edge from parent,
             every node/.style={top color=white, bottom color=black!15,
-            circle, minimum size=9mm, draw=black!75,
+            circle, minimum size=11mm, draw=black!75,
             thick, drop shadow, align=center},
             edge from parent/.style={draw=black!75,thick},
             level distance=1.3cm, xscale=1.35]
@@ -56,7 +56,7 @@
                         }
                         child [level distance=1.3cm] {
                             node (plus) [style={top color=white, bottom color=red!45,
-                            circle, minimum size=9mm, draw=red!55,
+                            circle, minimum size=11mm, draw=red!55,
                             thick, drop shadow, align=center}] {\texttt{\bfseries +}}
                         }
                     }

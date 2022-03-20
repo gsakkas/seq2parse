@@ -52,7 +52,7 @@ variable \texttt{a} and tries to return it. However, there is an extra
 \texttt{+} operator after the \texttt{return} statement. The extra \texttt{+}
 can either be deleted or the programmer most likely intended to add another
 number like the fix shown in the bottom of \autoref{fig:orig-prog}. This is a
-\emph{parse error} and such parse errors can easily go unnoticed
+\emph{syntax or parse error} and such parse errors can easily go unnoticed
 \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when they are
 part of bigger programs.
 %
@@ -66,10 +66,10 @@ One approach to make such erroneous programs parse is to use \emph{Error
 Correcting Parsers} (ECPs) \citep{Aho_1972}. ECPs are based on \emph{dynamic
 programming algorithms} and have been used in recent literature to automatically
 infer the intended parse tree for a program that doesn't belong to a certain
-programming language, \ie a program that has a parse error. These dynamic
+programming language, \ie a program that has a syntax error. These dynamic
 programming parsers have been used along side with \emph{error correcting
-production rules} \citep{Aho_1972} to generate a parse with the minimal edits
-from the original program.
+production rules} \citep{Aho_1972} to generate a valid parse by making minimal
+edits to the original program.
 
 \mypara{Another Problem}
 However, these error-correcting parsers have a time complexity that is cubed on
@@ -85,7 +85,7 @@ The original Earley parsing is a fairly efficient parsing algorithm
 \citep{Earley_1970} based on dynamic programming. Its error-correcting version
 becomes very inefficient though for larger real-world grammars, since it
 requires the addition of a large number of error production rules as mentioned
-before. However, not each erroneous program needs all of those rules to be
+before. However, not every erroneous program needs all of those rules to be
 parsed. In this work, we present a novel strategy to selecting just a small set
 of error production rules that can be used with an updated \emph{Error
 Correcting Earley Parser} (ECEP) to repair a program with parse errors.
@@ -124,23 +124,23 @@ of our approach by describing how to:
 \mypara{Earley Parsing} Earley parsing has been a touch-stone algorithm in the
 history of parsing \citep{Earley_1970}. An Earley parser is a \emph{top-down
 chart parser} that uses dynamic programming, meaning that partial parses are
-stored in a data structure called a chart, which can later be re-used, and the
-parse tree is built from the top down. This eliminates backtracking and prevents
-a combinatorial explosion. Worst case, it has a time complexity of $O(n^3 G^2)$
-for generic context-free grammars, where $n$ is the number of \emph{tokens} of
-the input program and $G$ is the grammar size, \ie the number of
-\emph{production rules} it includes. However, this parsing algorithm has limited
-use in large real-world programming languages, \eg Python or Java, and more
-time- and memory-efficient parsing algorithms are used, \eg LR parsing \etc
+stored in a data structure called a \emph{chart}, which can later be re-used,
+and the parse tree is built from the top down. This eliminates backtracking and
+prevents a combinatorial explosion. Worst case, it has a time complexity of
+$O(n^3 G^2)$ for generic context-free grammars, where $n$ is the number of
+\emph{tokens} of the input program and $G$ is the grammar size, \ie the number
+of \emph{production rules} it includes. However, this parsing algorithm has
+limited use in large real-world programming languages, \eg Python or Java, and
+more time- and memory-efficient parsing algorithms are used, \eg LR parsing \etc
 \citep{Knuth_1965, Chapman_1987}. \autoref{fig:production-rules} presents for
 example some production rules for the Python language. \emph{Terms} in the
 grammar starting with a capital letter here represent \emph{non-terminal}
 symbols while the rest are \emph{terminals} that could appear in a Python
 program. For example, the non-terminal \texttt{Stmt} defines all the possible
-Python statements for example, \ie expressions (\texttt{Expr\_Stmt}), imports
+Python statements, \ie expressions (\texttt{Expr\_Stmt}), imports
 (\texttt{Import\_Stmt}), \etc.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 \begin{ecode}
 S -> Stmts_Or_Newlines Endmarker
 ...
@@ -156,7 +156,7 @@ Arg_List -> Expr_Stmt | Expr_Stmt , Arg_List
 \label{fig:production-rules}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[h]
 \begin{ecode}
 Suite -> Err_Newline Err_Indent Stmts_Or_Newlines Err_Dedent
 Return_Stmt -> ... | Err_Return | Err_Return Arg_List
@@ -191,7 +191,7 @@ parsing algorithm is executed. These rules are for example in lines 1 and 2 of
 grammar $G'$ is introduced that is at least 3 times larger than $G$, making ECEP
 not scalable for large programs or programs with a lot of parse errors.
 
-When for example, a \texttt{Return\_Stmt} is added to the ECEP's chart at some
+When, for example, a \texttt{Return\_Stmt} is added to the ECEP's chart at some
 location $i$, then the next four options are considered:
 \begin{itemize}
   \item There is a \texttt{\bfseries return} at location $i+1$ of the tokenized
@@ -225,39 +225,6 @@ errors. A straight-forward approach to keep ECEP tractable is to only add a
 small set of error production rules, \ie keep the size of $G'$ limited and
 slightly larger than the original grammar $G$.
 
-% Our notion of a fix is defined as a \emph{replacement} of an existing expression
-% with a new \emph{candidate} expression at a specific program location. For
-% example, the \mbd program is fixed by replacing |(hd * i)| with the expression
-% |[hd * i]| on line 4. We focus on AST-level replacements as they are compact yet
-% expressive enough to represent fixes.
-
-
-% \mypara{Generic Abstract Syntax Trees}
-% %
-% We represent the different possible candidate expressions via abstract fix
-% templates called \emph{Generic Abstract Syntax Trees} (GAST) which each
-% correspond to many possible expressions.
-% %
-% GASTs are obtained from concrete ASTs in two steps.
-% %
-% First, we abstract concrete variable, function, and operator names.
-% %
-% Next, we prune GASTs at a certain depth $d$ to keep only the top-level changes
-% of the fix. Pruned sub-trees are replaced with \emph{holes}, which can represent
-% \emph{any} possible expression in our language.
-
-
-% Together, these steps ensure that GASTs only contain information about a fix's
-% \emph{structure} rather than the specific changes in variables and functions.
-% %
-% For example, the fix |[hd * i]| in the \mbd example is represented by the GAST
-% of the expression |[_ $\oplus$ _]|, where variables |hd| and |i| are abstracted
-% into holes (\eg by pruning the GAST at a depth $d=2$) and |*| is represented by
-% an abstract binary operator |$\oplus$|. Our approach is similar to that of
-% Lerner \emph{et al.}~\citep{Lerner2007-dt}, where AST-level modifications are
-% used, however, our proposed GASTs represent more abstract fix schemas.
-
-
 \subsection{Abstracting program token sequences}
 \label{sec:overview:abstraction}
 
@@ -268,11 +235,11 @@ Martinez_2013,Gulwani_2018, Wang_2018} and program analysis in general.
 %
 The highest form of abstraction that we can use is the output of the
 \emph{lexer}. The lexer tokenizes the program and returns a program \emph{token
-sequence} with some form of abstractions, \eg no variable names, defining the
-underlying statement blocks \etc, as shown in \autoref{fig:abstract-prog}.
-This token sequence is appropriate for training our sequence classifier models,
-but as we will show later on, they can contain a lot of irrelevant context for
-the parse error at hand and can lead to very large sequences for our models.
+sequence} with minimal abstractions, \eg no variable names, defining the
+underlying statement blocks \etc, as shown in \autoref{fig:abstract-prog}. This
+token sequence is appropriate for training our sequence classifier models, but
+as we will show later on, they can contain a lot of irrelevant context for the
+parse error at hand and can lead to very large sequences for our models.
 
 \mypara{Solution: Abstract with partial parses} A \emph{parser} will hold some
 internal state of the partial parses it has generated until a parse error is
@@ -294,12 +261,17 @@ high-level non-terminal.
 \mypara{Probabilistic Context-Free Grammars} Even if the original grammar $G$ is
 not ambiguous, generating partial parses can be ambiguous. Earley parsing is an
 dynamic programming technique and internally keeps all possible parses from the
-begging of the token sequence until position $i$ in its charts. Therefore, when
-there is a parse error at token $i$, it is possible to have more than one
+begging of the token sequence until a position $i$ in its charts. Therefore,
+when there is a parse error at token $i$, it is possible to have more than one
 partial parses to choose from in order to generate the abstracted token
 sequence. For the running example, if we focus on the \texttt{return} statement
 of the program, there are two possible partial parses in the parser chart, as
-shown in \autoref{fig:two-partial-parses} for example, that we can use to repair the program. \autoref{fig:adding-partial} would lead to a solution that completes the returned arithmetic expression by adding the blue node, while the \autoref{fig:deleting-partial} would produce a solution that returns just the number by deleting the arithmetic expression
+shown in \autoref{fig:two-partial-parses} for example, that we can use to repair
+the program. \autoref{fig:adding-partial} would lead to a solution that
+completes the returned arithmetic expression by adding the blue node, which is
+another arithmetic expression and possibly just another number, while the
+\autoref{fig:deleting-partial} would produce a solution that returns just the
+number by deleting the arithmetic operator in the red node.
 
 In that aid, Probabilistic Context-Free Grammars (PCFGs) have been used in
 previous work \citep{Collins_2013, Jelinek_1992} to select \emph{complete}
@@ -319,7 +291,7 @@ used to generate an abstracted token sequence.
 \subsection{Training Sequence Classifiers}
 \label{sec:overview:train}
 The abstracted token sequences we extracted from the partial parses present us
-with small abstracted sequences that maintain a lot of the program's context
+with shorter abstracted sequences that maintain a lot of the program's context
 along with some hints of the user's intended behavior for the program due to the
 PCFG usage. Additionally, recent work on machine learning, and especially on
 Natural Language Processing (NLP) \citep{Sutskever_2014, Hardalov_2018}, have
@@ -357,12 +329,18 @@ make predictions.
 
 \mypara{Predicting Error Rules via MCC}
 Given a dataset of fixed parse errors, we can extract the small set of error
-rules needed for each program to make it parse with an ECEP. We then train a
-Transformer classifier on a new updated error-rule-labeled data set. Futhermore,
-Neural networks have the advantage of associating each class with a
-\emph{confidence score} that can be interpreted as the model's confidence of
-each class being correct for a given input. Therefore, confidence scores can be
-used to rank error rule predictions for new programs and select the top-$N$ ones
-that will maintain a decent performance when used with the ECEP. Exploiting
+rules needed for each program to make it parse with an ECEP. Running ECEP on
+every program in the dataset is prohibitively slow. Therefore, we extract the
+erroneous and fixed program token-level differences or \emph{token diffs} and
+map them to error production rules. After this prodecure, we run ECEP with the
+learned error rules to confirm which ones would make the program parse and
+assign them as \emph{labels}.
+
+We then train a Transformer classifier on a new updated error-rule-labeled data
+set. Futhermore, Neural networks have the advantage of associating each class
+with a \emph{confidence score} that can be interpreted as the model's confidence
+of each class being correct for a given input. Therefore, confidence scores can
+be used to rank error rule predictions for new programs and select the top-$N$
+ones that will maintain a decent performance when used with the ECEP. Exploiting
 recent advances in machine learning, we use deep and dense architectures
 \citep{Schmidhuber_2015} for more accurate predictions.
