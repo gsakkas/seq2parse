@@ -143,10 +143,10 @@ Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
   \begin{tabular}{l||cccc}
     Rules Approach                 & Parse Accuracy & User Parse Rate & Parse time & Speedup \\
     \hline
-    20 Most Popular                & 76.84\% & N/A     & 8.2 sec  & 38.6 sec \\
-    50 Most Popular                & 83.24\% & N/A     & 13.8 sec & 29.2 sec \\
-    Top-20 (\textsc{All-Parses})   & 79.18\% & 36.40\% & 3.3 sec  & 46.3 sec \\
-    Top-20 (\textsc{Minimum-Cost}) & 91.57\% & 19.03\% & 42.4 sec & 12.9 sec \\
+    20 Most Popular                & 79.81\% & 16.31\% & 4.8 sec  & 45.8 sec \\
+    50 Most Popular                & 90.03\% & 18.55\% & 10.6 sec & 37.1 sec \\
+    Top-20 (\textsc{All-Parses})   & 59.31\% & 30.57\% & 15.6 sec & 57.4 sec \\
+    Top-20 (\textsc{Minimum-Cost}) & 92.45\% & 19.95\% & 4.1 sec  & 68.0 sec \\
   \end{tabular}
   \caption{Experimental results of \toolname's repair approaches.}
   \label{tab:seq2parse_full_results}
@@ -182,19 +182,25 @@ Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the parse accuracy) and
-the amount of parses that match the one that user compiled. We observe that both
-of the Top-20 predictions versions outperform the 20 most popular ECEP
-(76.84\%), while 50 most popular falls in between them with 83.24\% parse
-accuracy. The \textsc{All-Parses} ECEP achieves slightly less pase accuracy with
-79.18\%, however it manages to generate the user fix 36.40\% of the times, \ie
-more than one out of three programs with syntax errors. That number decreases to
-19.03\% when we consider the \textsc{Minimum-Cost} ECEP, which still an amazing
-result, if we also consider the higher total parse accuracy of 91.57\%.
+the amount of parses that match the one that user compiled. We observe that the
+Top-20 predictions with the \textsc{Minimum-Cost} ECEP \emph{outperforms} every
+other option in parse accuracy and parse time, with 92.45\% and 4.1 seconds
+respectively. It also achieves to generate the intended parse for 19.95\% of the
+set, \ie in almost 1 out 5 of the cases. The 20 most popular ECEP with 79.81\%
+parse accuracy and 4.8 seconds parse time is less accurate while a bit slower in
+general, and achieves 3.64\% less times to generate the user parse, while the 50
+most popular is slightly less accurate with 90.03\%, but a lot slower in general
+with 10.6 seconds parse time. The 50 most popular ECEP also almost achieves the
+\textsc{Minimum-Cost} ECEPs with a 18.55\% user parse rate. The
+\textsc{All-Parses} ECEP has a smaller parse accuracy of 59.31\%, however it
+manages to generate the user fix 30.57\% of the times, \ie almost one out of
+three programs with syntax errors, with the cost that is also the slowest
+version with a parse time of 15.6 seconds.
 
 \begin{framed}
-  \noindent \toolname can \emph{generate parses} for \emph{80\%} of our tests
-  within 4 secs for the majority of them, while also generating \emph{the user
-  fix in more than 1 out 3 of the cases}.
+  \noindent \toolname can \emph{generate parses} for \emph{92\%} of our tests
+  within 4.1 secs for the majority of them, while also generating \emph{the user
+  fix in almost 1 out 5 of the cases}.
 \end{framed}
 
 \subsection{RQ3: Efficiency}
