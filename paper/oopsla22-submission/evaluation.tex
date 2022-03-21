@@ -215,31 +215,26 @@ version with a parse time of 15.6 seconds.
 \end{figure}
 
 Next we evaluate \toolname's efficiency by measuring how many programs it is
-able to generate a (well-typed) repair for.
-%
-We limit the synthesizer to 90 seconds. (In general the procedure is
+able to parse. We limit each ECEP to 180 seconds. (In general the procedure is
 undecidable, and we conjecture that a longer timeout will diminish the practical
-usability for novices.)
-%
-Recall that the repair synthesis algorithm is guided by the repair template
-predictions.
-%
-We evaluate the efficiency of \toolname by comparing it against a baseline
-\naive implementation that, given the predicted fix location, attempts to
-synthesize a repair from the trivial ``hole'' template.
+usability for novices.) We compare the efficiency of \toolname for all the
+versions of \autoref{tab:seq2parse_full_results}.
 
-\autoref{fig:rite_naive} shows the cumulative distribution function of
-\toolname's and \naive's repair rates over their synthesis time. We observe that
-using the predicted templates for synthesis allows \toolname to generate
-type-correct repairs for almost 70\% of the programs in under 20 seconds, which
-is nearly 12 points higher than the \naive baseline. We also observe that
-\toolname successfully repairs around 10\% more programs than \naive for times
-greater than 20 seconds. While the \naive approach is still able to synthesize
-well-typed repairs relatively quickly, we will see that these repairs are of
-much lower quality than those generated from the predicted templates
-(\S~\ref{sec:eval:template_quality}).
+\autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
+\toolname approaches' repair rates over their parse time. We observe that using
+the 20 most popular error production rules is almost as efficient as using a
+fixed set of 20 rules for \toolname to parse programs with syntax errors. We
+observe that they repair 80.6\% and 83.9\% respectively within 20 seconds.
+
+The 50 most popular ECEP is obviously less efficient and parses 66.9\% of the
+programs in under 20 seconds, which is nearly 13 points less than the top-20
+approach. We also observe that \toolname successfully parses around 52.73\%
+programs with its \textsc{All-Parses} approach in 20 seconds. While this
+approach is less efficient that the others, it is able to generate the human
+repair in 1 out of 3 times which makes still a very valuable approach
+(\S~\ref{sec:eval:precise}).
 
 \begin{framed}
-  \noindent \toolname can generate type-correct repairs for the vast majority of
-  ill-typed programs in under 20 seconds.
+  \noindent \toolname can parse programs with syntax for the vast majority of
+  the test set in under 20 seconds.
 \end{framed}
