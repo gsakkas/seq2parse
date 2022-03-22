@@ -27,38 +27,24 @@ questions:
 For our evaluation, we use a \python dataset gathered from
 PythonTutor.com~\citep{Guo2013} between 2017 and 2018, previously used in
 related work \citep{Endres2019,Cosman2020}. Each program which throws an
-uncaught Python exception is paired with the next program by the same user that
+uncaught \python exception is paired with the next program by the same user that
 does not crash, under the assumption that the latter is the fixed version of the
 former. We discard pairs where the difference between crashing and fixed
 versions is too high (more than a standard deviation above average), since these
 are usually unrelated submissions or complete refactorings. We also discard
 submissions that violate PythonTutor's policies (e.g., those using forbidden
-libraries). Ultimately, the dataset used in this evaluation contains almost a
+libraries). Ultimately, the dataset used in this evaluation contains more than a
 million usable program pairs, representing students from dozens of universities
 (PythonTutor has been used in many introductory courses~\citep{Guo2013}) as well
 as non-traditional novices.
 
-\mypara{Dataset labeling}
-%
-\toolname represents each program with its abstracted token sequence $t^a$ for
-the training procedure. For the full set of \python there are \emph{360 terminal
-error production rules} that \toolname's has to predict from.
-
-% \mypara{Dataset Cleaning}
-% %
-% We extract fixes as expressions replacements over a program pair using
-% $\diffsym$ A disadvantage of using $\diffsym$s with this dataset is that some
-% students may have made many, potentially unrelated, changes between
-% compilations; at some point the ``fix'' becomes a ``rewrite''. These rewrites
-% can lead to meaningless fix templates and error locations. We discard such
-% outliers when the fraction of subexpressions that have changed in a program is
-% more than one standard deviation above the mean, establishing a
-% $\diffsym$ threshold of 40\%. We also discard programs that have changes in 5 or
-% more locations, noting that even state-of-the-art multi-location repair
-% techniques cannot reproduce such ``fixes'' \citep{Saha_2019}. The discarded
-% changes account for roughly 32\% of each dataset, leaving 2,475 program pairs
-% for \SPRING and 2,177 pairs for \FALL. Throughout, we use \SPRING as a training
-% set and \FALL as a test set.
+We first learn a PCFG on the corpus of fixed programs in order to learn the
+probabilities for each production rule in the \emph{full set of the \python
+grammar}. \toolname represents each program with its abstracted token sequence
+$t^a$ for each program in the training set. For the full set of \python there
+are \emph{360 possible terminal error production rules} that \toolname's has to
+predict from. Each program is a assigned as labels the error rules that make
+ECEP parse and get the user fixed parse.
 
 % \mypara{\dnn based Classifier}
 % %
@@ -121,7 +107,7 @@ number of selected error rules of 12 (average 13.9). This could potentially mean
 that this predictor is a valid alternative for the static Top-20 predictions.
 
 Finally, we observe that our \textsc{Abstracted} classifiers generalize
-efficiently for our dataset of erroneous Python programs and is almost as
+efficiently for our dataset of erroneous \python programs and is almost as
 accurate as the rest of the dataset with a 74.11\% Top-20 accuracy (85.69\%
 Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
 72.46\% accuracy.
