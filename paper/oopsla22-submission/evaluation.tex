@@ -222,19 +222,24 @@ versions of \autoref{tab:seq2parse_full_results}.
 
 \autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
 \toolname approaches' repair rates over their parse time. We observe that using
-the 20 most popular error production rules is almost as efficient as using a
-fixed set of 20 rules for \toolname to parse programs with syntax errors. We
-observe that they repair 80.6\% and 83.9\% respectively within 20 seconds.
+the top 20 error production rule predictions is the most efficient while
+maintaining the highest parse accuracy at all times, with a repair rate of
+80.3\% within 20 seconds.
 
-The 50 most popular ECEP is obviously less efficient and parses 66.9\% of the
-programs in under 20 seconds, which is nearly 13 points less than the top-20
-approach. We also observe that \toolname successfully parses around 52.73\%
-programs with its \textsc{All-Parses} approach in 20 seconds. While this
-approach is less efficient that the others, it is able to generate the human
+We observe that, using a fixed set of the 20 and 50 most popular rules for
+\toolname to parse programs with syntax errors, a 67.9\% and 64.5\% respectively
+within 20 seconds. The 50 most popular ECEP is parses less programs until the 45
+seconds but the extra number of error rules aids the ECEP to parse more after
+that point and outperform the 20 most popular ECEP.
+
+We also observe that \toolname successfully parses around 33.0\% of the programs
+with its \textsc{All-Parses} approach in 20 seconds. While this approach is much
+less efficient that the others. due to the vast amount of states is keeps
+internally in its data structure, it is also able to generate the exact human
 repair in 1 out of 3 times which makes still a very valuable approach
 (\S~\ref{sec:eval:precise}).
 
 \begin{framed}
   \noindent \toolname can parse programs with syntax for the vast majority of
-  the test set in under 20 seconds.
+  the test set in under 25 seconds.
 \end{framed}
