@@ -83,23 +83,36 @@ the Transformer significantly more easy to parallelize and has as a result a
 higher quality of predictions and sequence translations after only being trained
 for a small amount of time.
 
-The Transformer follows this overall architecture using stacked self-attention
-and point-wise, fully connected layers for both the encoder and decoder, shown
-in the left and right halves of Figure 1, respectively.
+The Transformer's architecture is structured as a \emph{stack of $N$ identical
+layers}. Each layer has two main sub-layers. The first is a \emph{multi-head
+self-attention mechanism}, and the second is a position-wise fully connected
+neural network. The output of each sub-layer is $LayerNorm(x + Sublayer(x))$,
+where $Sublayer(x)$ is the function implemented by each sub-layer, followed by a
+residual connection around each of the two sub-layers and  by layer
+normalization $LayerNorm(x)$. To facilitate these residual connections, all
+sub-layers in the model, as well as the embedding layers, produce outputs of the
+same dimension $d_{model}$.
 
-Scaled Dot-Product Attention, computes the attention function on a set of
-queries simultaneously, packed together into a matrix.
+This architecture is used as described above in a seq2seq model
+\citep{Vaswani_2017} for the encoder. The decoder would require an extra third
+sub-layer, which performs multi-head attention over the output of the encoder
+stack. However, in our task we need to learn sets of error production rules,
+which is formed as classic \emph{classification} problem. However, we are
+dealing with input sequences of varied sizes, where no straightforward feature
+extraction technique exists. Therefore, we utilize the effectiveness of the
+state-of-the-art \emph{Transformer encoder} to summarize the programs into
+fixed-length vectors that can then be fed into classic \dnn{}s.
 
-Multi-head attention, allows the model to jointly attend to information from
-different representation subspaces at different positions.
-
-A self-attention layer connects all positions with a constant number of
-sequentially executed operations, whereas a recurrent layer requires O(n)
-sequential operations.
-
-In terms of computational complexity, self-attention layers are faster than
-recurrent layers when the sequence length is smaller than the representation
-dimensionality, which is often the case with machine translations.
+% TODO: Update the paragraph below
+% Scaled Dot-Product Attention, computes the attention function on a set of
+% queries simultaneously, packed together into a matrix. Multi-head attention,
+% allows the model to jointly attend to information from different representation
+% subspaces at different positions. A self-attention layer connects all positions
+% with a constant number of sequentially executed operations, whereas a recurrent
+% layer requires O(n) sequential operations. In terms of computational complexity,
+% self-attention layers are faster than recurrent layers when the sequence length
+% is smaller than the representation dimensionality, which is often the case with
+% machine translations.
 
 \subsection{Transformer Classifier}
 \label{sec:seq-classifiers:location-rank}
