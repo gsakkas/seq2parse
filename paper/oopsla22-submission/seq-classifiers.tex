@@ -37,49 +37,51 @@ case these models consist of two major layers, an \emph{encoder} and a
 x_n$ into a \emph{abstract vector} $V \in \R^k$ that captures all the essence
 and context of the input sequence. This vector doesn't necessarily have some
 physical meaning and is just an internal representation of the input sequence
-into a higher dimensional space. The abstract vector is given as an input to the
-decoder, which in turn transforms it into a output sequence $y_1, y_2, \dots,
-y_n$. The simplest approach historically uses a Recurrent Neural Network (RNN)
-\citep{Rumelhart1986, Werbos1990, Hochreiter_1997}, which is a natural step from
-the classical neural networks. Each RNN unit however operates on each input
+into a higher dimensional space. The abstract vector is then given as an input
+to the decoder, which in turn transforms it into an output sequence $y_1, y_2,
+\dots, y_n$.
+
+\begin{align}
+    h_t &= f(W^{h\times x} x_t + W^{h\times h} h_{t-1}) \label{eq:1} \\
+    y_t &= g(W^{y\times h} h_t) \label{eq:2}
+\end{align}
+
+The simplest approach historically uses a Recurrent Neural Network (RNN)
+\citep{Rumelhart1986, Werbos1990, Hochreiter_1997}, which is a natural next step
+from the classic neural networks. Each RNN unit however operates on each input
 token $x_t$ separately. It keeps an internal \emph{hidden state} $h_t$ that is
-calculated as the equation below, as a function of the input token $x_t$ and the
-previous hidden state $h_{t-1}$. The function $f$ is a \emph{non-linear
-activation} function such as \emph{tanh, sigmoid, ReLU}. The output $y_t$ at
-position $t$ is calculated as the product of the current hidden state $h_t$ and
-the weight matrix $W^{y\times h}$. The activation function $g$ is usually chosen
-as the standard \emph{softmax} function, which, for an output vector $y = (y_1,
-\dots, y_N) \in \R^{N}$, is defined as:
-\[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N
-\] The weight matrices $W^{h\times x}$ and $W^{h\times h}$ parametrize the
-input-to-hidden and the hidden-to-hidden connections respectively.
+calculated as in \autoref{eq:1}, as a function of the input token $x_t$ and the
+previous hidden state $h_{t-1}$. The weight matrices $W^{h\times x}$ and
+$W^{h\times h}$ parametrize the input-to-hidden and the hidden-to-hidden
+connections respectively. The function $f$ is a \emph{non-linear activation}
+function such as \emph{tanh, sigmoid, ReLU}. The output $y_t$ at position $t$ is
+calculated as the product of the current hidden state $h_t$ and the weight
+matrix $W^{y\times h}$ (\autoref{eq:2}). The activation function $g$ is usually
+chosen as the standard \emph{softmax} function, which, for an output vector $y =
+(y_1, \dots, y_N) \in \R^{N}$, is defined as:
+\[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N.
+\] Finally, the loss function at all steps of the RNN is typically calculated
+as the sum of the cross-entropy loss of each step.
 
-\begin{align*}
-    h_t &= f(W^{h\times x} x_t + W^{h\times h} h_{t-1}) \\
-    y_t &= g(W^{y\times h} h_t)
-\end{align*}
-
-However, a more state-of-the-art approach for the seq2seq architecture is the
-newer \emph{Transformer} model \citep{Vaswani_2017} that replaces the classical
-RNN.
+The recurrent models such as the RNN, have to generate the sequence of hidden
+states $h_t$, as a function of the previous hidden state $h_{t-1}$ and the input
+for position $t$. This sequential generation of hidden states limits
+parallelization within training examples and causes training problems when
+dealing with longer sequences, as memory constraints limit batching across
+examples. However, the latest state-of-the-art approach for the seq2seq
+architecture is the newer \emph{Transformer} model \citep{Vaswani_2017} that
+replaces the classic RNN unit in the encoder and decoder and solves these
+problems due to its \emph{attention mechanisms}.
 
 \mypara{Transformers}
-Recurrent models typically factor computation along the symbol positions of the
-input and output sequences. Aligning the positions to steps in computation time,
-they generate a sequence of hidden states $h_t$, as a function of the previous
-hidden state $h_{t-1}$ and the input for position $t$. This inherently
-sequential nature precludes parallelization within training examples, which
-becomes critical at longer sequence lengths, as memory constraints limit
-batching across examples.
-
-Attention mechanisms have become an integral part of compelling sequence
-modeling and transduction models in various tasks, allowing modeling of
-dependencies without regard to their distance in the input or output sequences.
-the Transformer, a model architecture eschewing recurrence and instead relying
-entirely on an attention mechanism to draw global dependencies between input and
-output. The Transformer allows for significantly more parallelization and can
-reach a new state of the art in translation quality after being trained for as
-little time.
+Attention mechanisms have been of interest lately \citep{Bahdanau2015, Kim2017,
+Vaswani_2017} mainly due to their ability to detect dependencies in the input or
+output sequences regardless the distance of the tokens. The Transformer is a
+model architecture that deviates from the recurrent pattern (\eg RNNs) and is
+solely relying on attention mechanisms. The nature of this architecture makes
+the Transformer significantly more easy to parallelize and has as a result a
+higher quality of predictions and sequence translations after only being trained
+for a small amount of time.
 
 The Transformer follows this overall architecture using stacked self-attention
 and point-wise, fully connected layers for both the encoder and decoder, shown
