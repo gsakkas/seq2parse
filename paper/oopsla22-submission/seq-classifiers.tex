@@ -1,17 +1,180 @@
 \section{Training Sequence Classifiers}
 \label{sec:seq-classifiers}
 
+Our next task is to \emph{train} a model that can predict which error production
+rules a program (with syntax errors) needs to get parsed accordingly with the
+given grammar, given its (abstracted) program token sequence.
+%
+We do so by defining a function $\predictDLsym$ which takes as input a
+\emph{pre-trained Deep Neural Network (\dnn)} model $\Model$ and an abstracted
+token sequence $t^a$.
+%
+It returns as output a \emph{fixed set of error production rules}
+$\errorrulessym$ which can be used along with an error correcting parser (ECEP)
+(\autoref{sec:whole-system}) to successfully parse the program.
+%
+We acquire the pre-trained $\Model$ using the $\trainDLsym$ method.
+$\trainDLsym$ gets a dataset of token sequences $t^a$ and the \emph{exact small
+set} of error production rules that the ECEP needs to generate the intended user
+parse, \ie $\List{t^a \times \errorrulessym}$.
+
+Next, we provide some necessary background about \dnn{}s and the
+\emph{Sequence-to-sequence (seq2seq) models} and describe how we incorporate
+them in our problem, framing it as a instance of \emph{multi-class
+classification}. We leave the high level details of acquiring the dataset of
+labeled token sequences and using the predictor for new erroneous programs for
+\autoref{sec:whole-system}.
+
+
 \subsection{Sequence Models}
 \label{sec:seq-classifiers:seq-models}
 
-\mypara{Sequence-To-Sequence}
+\mypara{Background: Sequence-To-Sequence Models}
+Sequence-to-sequence (seq2seq) models aim to transform input sequences of one
+domain into sequences of another domain \citep{Sutskever_2014}. In the general
+case these models consist of two major layers, an \emph{encoder} and a
+\emph{decoder}. The encoder transforms an input token sequence $x_1, x_2, \dots,
+x_n$ into a \emph{abstract vector} $V \in \R^k$ that captures all the essence
+and context of the input sequence. This vector doesn't necessarily have some
+physical meaning and is just an internal representation of the input sequence
+into a higher dimensional space. The abstract vector is given as an input to the
+decoder, which in turn transforms it into a output sequence $y_1, y_2, \dots,
+y_n$. The simplest approach historically uses a Recurrent Neural Network (RNN)
+\citep{Rumelhart1986, Werbos1990, Hochreiter_1997}, which is a natural step from
+the classical neural networks. Each RNN unit however operates on each input
+token $x_t$ separately. It keeps an internal \emph{hidden state} $h_t$ that is
+calculated as the equation below, as a function of the input token $x_t$ and the
+previous hidden state $h_{t-1}$. The function $f$ is a \emph{non-linear
+activation} function such as \emph{tanh, sigmoid, ReLU}. The output $y_t$ at
+position $t$ is calculated as the product of the current hidden state $h_t$ and
+the weight matrix $W^{y\times h}$. The activation function $g$ is usually chosen
+as the standard \emph{softmax} function, which, for an output vector $y = (y_1,
+\dots, y_N) \in \R^{N}$, is defined as:
+\[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N
+\] The weight matrices $W^{h\times x}$ and $W^{h\times h}$ parametrize the
+input-to-hidden and the hidden-to-hidden connections respectively.
+
+\begin{align*}
+    h_t &= f(W^{h\times x} x_t + W^{h\times h} h_{t-1}) \\
+    y_t &= g(W^{y\times h} h_t)
+\end{align*}
+
+However, a more state-of-the-art approach for the seq2seq architecture is the
+newer \emph{Transformer} model \citep{Vaswani_2017} that replaces the classical
+RNN.
 
 \mypara{Transformers}
+Recurrent models typically factor computation along the symbol positions of the
+input and output sequences. Aligning the positions to steps in computation time,
+they generate a sequence of hidden states $h_t$, as a function of the previous
+hidden state $h_{t-1}$ and the input for position $t$. This inherently
+sequential nature precludes parallelization within training examples, which
+becomes critical at longer sequence lengths, as memory constraints limit
+batching across examples.
 
+Attention mechanisms have become an integral part of compelling sequence
+modeling and transduction models in various tasks, allowing modeling of
+dependencies without regard to their distance in the input or output sequences.
+the Transformer, a model architecture eschewing recurrence and instead relying
+entirely on an attention mechanism to draw global dependencies between input and
+output. The Transformer allows for significantly more parallelization and can
+reach a new state of the art in translation quality after being trained for as
+little time.
+
+The Transformer follows this overall architecture using stacked self-attention
+and point-wise, fully connected layers for both the encoder and decoder, shown
+in the left and right halves of Figure 1, respectively.
+
+Scaled Dot-Product Attention, computes the attention function on a set of
+queries simultaneously, packed together into a matrix.
+
+Multi-head attention, allows the model to jointly attend to information from
+different representation subspaces at different positions.
+
+A self-attention layer connects all positions with a constant number of
+sequentially executed operations, whereas a recurrent layer requires O(n)
+sequential operations.
+
+In terms of computational complexity, self-attention layers are faster than
+recurrent layers when the sequence length is smaller than the representation
+dimensionality, which is often the case with machine translations.
 
 \subsection{Transformer Classifier}
 \label{sec:seq-classifiers:location-rank}
 
+Our goal with the $\trainsym$ function is to train two separate
+\emph{classifiers} given a training set $\List{\datasym \times
+\labelsym{\ConfBin}}$ of labeled examples. $\Model$ predicts error locations and
+$\Model$ predicts fix templates for a new input program $\pbad$. Critically, we
+require that the error localization classifier output a \emph{confidence score}
+$\Conf$ that represents the probability that a subexpression is the error that
+needs to be fixed. We also require that the fix template classifier output a
+confidence score $\Conf$ for each fix template that measures
+how sure the classifier is that the template can be used to repair the
+associated location of the input program $\pbad$.
+
+We consider a standard learning algorithm to generate our models: \emph{neural
+networks}. A thorough introduction to neural networks is
+beyond the scope of this work~\citep{Hastie2009-bn,Nielsen2015-pu}.
+
+\mypara{Neural Networks}
+The model that we use is a type of neural network called a \emph{multi-layer
+perceptron}. A multi-layer perceptron can be represented as a directed acyclic
+graph whose nodes are arranged in layers that are fully connected by weighted
+edges. The first layer corresponds to the input features, and the final to the
+output. The output of an internal node is the sum of the weighted
+outputs of the previous layer passed to a non-linear function, called the
+activation function. The number of layers,
+the number of nodes per layer, and the connections between layers constitute the
+\emph{architecture} of a neural network. In this work, we use relatively
+\emph{deep neural networks} (\dnn). We can train a \dnn $\Model$ as a
+binary classifier, which will predict whether a location in a program $\pbad$
+has to be fixed or not.
+
+\mypara{Multi-class \dnn{}s}
+While the above model is enough for error localization, in the case of template
+prediction we have to select from more than two \emph{classes}. We again use a
+\dnn for our template prediction $\Model$, but we adjust the output layer to
+have $N$ nodes for the $N$ chosen template-classes. For multi-class
+classification problems solved with neural networks, usually a \emph{softmax}
+function is used at output layer \citep{Goodfellow-et-al-2016,Bishop-book-2006}.
+Softmax assigns probabilities to each class that must add up to 1.
+This additional constraint speeds up training.
+
 \mypara{Training Multi-class Transformer Classifiers}
 
 \mypara{Predicting Error Rules}
+
+Our ultimate goal is to be able to pinpoint what parts of an erroneous program
+should be repaired and what fix templates should be used for that purpose.
+Therefore, the $\predictsym$ function uses $\ranksym$ to predict all
+subexpressions' confidence scores $\Conf$ to be an error location and confidence
+scores $\Tmap{\Conf}$ for each fix template. We show here how all the functions
+in our high-level API in \autoref{fig:api} are combined to produce a final list
+of confidence scores for a new program $p$. \autoref{algo:predict-algo} presents
+our high-level $\predictsym$ algorithm.
+
+\mypara{The Prediction Algorithm}
+Our algorithm first extracts the machine-learning-amenable dataset $D_{ML}$
+from the program pairs dataset $D$. For each program pair in $D$,
+\textsc{Extract} returns a mapping from the erroneous program's subexpressions
+to features and labels. Then, \textsc{InSlice} keeps only the expressions in
+the the type-error slice and evaluates to a list of the respective feature and
+label vectors, which is added to the $D_{ML}$ dataset. This dataset
+is used by the \textsc{Train} function to generate our predictive $Models$, \ie
+$\Model$ and $\Model$.
+
+At this point we want to generate a $\predictorsym$ for a new unknown program
+$p$. We perform feature extraction for $p$ with \textsc{Extract}, and use
+\textsc{InSlice} to restrict to expressions in $p$'s type-error slice.
+The result is given by $Data(p)$.
+
+\textsc{Rank} is then applied to all subexpressions produced by $Data(p)$ with
+$\textsc{Map}$, which will create a mapping of the type
+$\Emap{(\labelsym{\Conf})}$ associating expressions with confidence scores. We
+apply \textsc{Rank} to each feature vector that corresponds to an expression in
+the type-error slice of $p$. These vectors are the first elements of $\tilde{p}
+\in Data(p)$, which are of type $\datasym \times \labelsym{\ConfBin}$. Finally,
+$\predictorsym\ Pr$ is returned, which is used by our synthesis algorithm in
+\autoref{sec:synthesis} to correlate subexpressions in $p$ with their confidence
+scores.
