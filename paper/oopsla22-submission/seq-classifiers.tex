@@ -86,8 +86,8 @@ for a small amount of time.
 The Transformer's architecture is structured as a \emph{stack of $N$ identical
 layers}. Each layer has two main sub-layers. The first is a \emph{multi-head
 self-attention mechanism}, and the second is a position-wise fully connected
-neural network. The output of each sub-layer is $LayerNorm(x + Sublayer(x))$,
-where $Sublayer(x)$ is the function implemented by each sub-layer, followed by a
+neural network. The output of each sub-layer is $LayerNorm(x + SubLayer(x))$,
+where $SubLayer(x)$ is the function implemented by each sub-layer, followed by a
 residual connection around each of the two sub-layers and  by layer
 normalization $LayerNorm(x)$. To facilitate these residual connections, all
 sub-layers in the model, as well as the embedding layers, produce outputs of the
@@ -117,44 +117,42 @@ fixed-length vectors that can then be fed into classic \dnn{}s.
 \subsection{Transformer Classifier}
 \label{sec:seq-classifiers:location-rank}
 
-Our goal with the $\trainsym$ function is to train two separate
-\emph{classifiers} given a training set $\List{\datasym \times
-\labelsym{\ConfBin}}$ of labeled examples. $\Model$ predicts error locations and
-$\Model$ predicts fix templates for a new input program $\pbad$. Critically, we
-require that the error localization classifier output a \emph{confidence score}
-$\Conf$ that represents the probability that a subexpression is the error that
-needs to be fixed. We also require that the fix template classifier output a
-confidence score $\Conf$ for each fix template that measures
-how sure the classifier is that the template can be used to repair the
-associated location of the input program $\pbad$.
+Our goal with the $\trainDLsym$ function is to train a \emph{classifier} given a
+training set $\List{t^a \times \errorrulessym}$ of labeled token sequences.
+$\Model$ is used to predict error production rules for a new input program
+$t^a$. Critically, we require that the classifier outputs a \emph{confidence
+score} $\Conf$ for each possible error rule that measures how sure the
+classifier is that the rule can be used to parse the associated input program
+$e_{\bot}$.
 
-We consider a standard learning algorithm to generate our models: \emph{neural
-networks}. A thorough introduction to neural networks is
-beyond the scope of this work~\citep{Hastie2009-bn,Nielsen2015-pu}.
+We consider a Transformer encoder for the varied-sized programs and standard
+learning algorithms to generate our model: \emph{neural networks}. A thorough
+introduction to neural networks is beyond the scope of this
+work~\citep{Hastie2009-bn, Nielsen2015-pu}.
 
-\mypara{Neural Networks}
-The model that we use is a type of neural network called a \emph{multi-layer
-perceptron}. A multi-layer perceptron can be represented as a directed acyclic
-graph whose nodes are arranged in layers that are fully connected by weighted
-edges. The first layer corresponds to the input features, and the final to the
-output. The output of an internal node is the sum of the weighted
-outputs of the previous layer passed to a non-linear function, called the
-activation function. The number of layers,
-the number of nodes per layer, and the connections between layers constitute the
-\emph{architecture} of a neural network. In this work, we use relatively
-\emph{deep neural networks} (\dnn). We can train a \dnn $\Model$ as a
-binary classifier, which will predict whether a location in a program $\pbad$
-has to be fixed or not.
+% \mypara{Neural Networks}
+% The model that we use is a type of neural network called a \emph{multi-layer
+% perceptron}. A multi-layer perceptron can be represented as a directed acyclic
+% graph whose nodes are arranged in layers that are fully connected by weighted
+% edges. The first layer corresponds to the input features, and the final to the
+% output. The output of an internal node is the sum of the weighted
+% outputs of the previous layer passed to a non-linear function, called the
+% activation function. The number of layers,
+% the number of nodes per layer, and the connections between layers constitute the
+% \emph{architecture} of a neural network. In this work, we use relatively
+% \emph{deep neural networks} (\dnn). We can train a \dnn $\Model$ as a
+% binary classifier, which will predict whether a location in a program $\pbad$
+% has to be fixed or not.
 
-\mypara{Multi-class \dnn{}s}
-While the above model is enough for error localization, in the case of template
-prediction we have to select from more than two \emph{classes}. We again use a
-\dnn for our template prediction $\Model$, but we adjust the output layer to
-have $N$ nodes for the $N$ chosen template-classes. For multi-class
-classification problems solved with neural networks, usually a \emph{softmax}
-function is used at output layer \citep{Goodfellow-et-al-2016,Bishop-book-2006}.
-Softmax assigns probabilities to each class that must add up to 1.
-This additional constraint speeds up training.
+% \mypara{Multi-class \dnn{}s}
+% While the above model is enough for error localization, in the case of template
+% prediction we have to select from more than two \emph{classes}. We again use a
+% \dnn for our template prediction $\Model$, but we adjust the output layer to
+% have $N$ nodes for the $N$ chosen template-classes. For multi-class
+% classification problems solved with neural networks, usually a \emph{softmax}
+% function is used at output layer \citep{Goodfellow-et-al-2016,Bishop-book-2006}.
+% Softmax assigns probabilities to each class that must add up to 1.
+% This additional constraint speeds up training.
 
 \mypara{Training Multi-class Transformer Classifiers}
 
