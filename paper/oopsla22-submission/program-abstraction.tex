@@ -86,14 +86,18 @@ from the chart to abstract $t^i_{j+1}, \dots, t^i_k$.
 
 \mypara{Problem: Multiple Partial Parses} Each of the states $S(j)$, where $0
 \leq j \leq k$, holds a large number of uncompleted rules, \ie partial parses.
-Our heuristic is to choose the longest possible partial parses to abstract our
-erroneous programs and thus limiting the size of the program token sequence
-$t^i$ as much as possible. However, it is possible that we have two or more such
-parses in $S(k)$, where they have the same length, \eg $\{(X \rightarrow \alpha
+Our heuristic is to choose the longest possible partial parse to abstract our
+erroneous programs and thus limit the size of the program token sequence $t^i$
+as much as possible. However, it is possible that there are two or more such
+parses in $S(k)$, which they have the same length, \eg $\{(X \rightarrow \alpha
 \cdot \beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ j)\} \in S(k)$.
 
 
-\mypara{Example}
+\mypara{Example} For the running example in \autoref{fig:orig-prog},
+$\{(Arith\_Expr\ \rightarrow\ Literal\ Arith\_Op\ \cdot\ Arith\_Expr,\ j)$,
+$(Arith\_Expr\ \rightarrow\ Literal\ \cdot,\ j)\} \in S(17)$, where $S(17)$ is
+the state after the $+$ operator in line 3. Both of those states can lead in
+valid parses, depending how a candidate repair would complete them.
 
 
 \subsection{Probabilistic Context-Free Grammars}
@@ -143,7 +147,6 @@ $\List{e}$ of programs. Finally, $\learnPCFGsym$ will output a PCFG that is
 based on the original grammar $G$ that was used to parse the dataset with the
 additional probabilities.
 
-\mypara{Example of PCFG}
 \begin{figure}[t]
     \begin{ecode}
     [P = 100.0%] S -> Stmts_Or_Newlines Endmarker
@@ -161,6 +164,13 @@ additional probabilities.
     their learned probabilities.}
     \label{fig:weighted-production-rules}
 \end{figure}
+
+\mypara{Example of PCFG}
+\autoref{fig:weighted-production-rules} has the assigned probabilities for the
+running example grammar. We observe that the \texttt{Return\_Stmt} has 2
+possible production rules and almost 98.6\% of the times a
+\texttt{\textbf{return}} is followed by an argument list.
+
 
 \subsection{From Programs to Abstract Token Sequences}
 
