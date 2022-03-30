@@ -2,8 +2,8 @@
 \label{sec:seq-classifiers}
 
 Our next task is to \emph{train} a model that can predict which error production
-rules are needed to parse a given program (with syntax errors) accordingly with
-the given grammar, given its (abstracted) program token sequence.
+rules are needed to parse a given program (with syntax errors) according to a
+given grammar, given its (abstracted) program token sequence.
 %
 We do so by defining a function $\predictDLsym$ which takes as input a
 \emph{pre-trained Deep Neural Network (\dnn)} model $\Model$ and an abstracted
@@ -144,10 +144,8 @@ $\Model$ is used to predict error production rules for a new input program
 $t^a$. Critically, we require that the classifier outputs a \emph{confidence
 score} $\Conf$ for each possible error rule that measures how sure the
 classifier is that the rule can be used to parse the associated input program
-$e_{\bot}$.
-
-We consider a Transformer encoder for the varied-sized programs and standard
-learning algorithms to generate our model: \emph{neural networks}.
+$e_{\bot}$. We consider a Transformer encoder for the varied-sized programs and
+standard neural networks to generate our model $\Model$.
 
 \mypara{Multi-class \dnn{}s}
 %
@@ -174,14 +172,10 @@ used per class to assign the loss per training cycle.
 \mypara{Predicting Error Rules}
 %
 Our ultimate goal is to be able to predict the small set of error production
-rules $\errorrulessym$ that a new program with syntax errors needs to get parsed
-according to the given grammar $G$ and get repaired. Therefore, the
-$\predictsym$ function uses $\ranksym$ to predict all subexpressions' confidence
-scores $\Conf$ to be an error location and confidence scores $\Tmap{\Conf}$ for
-each fix template. We show here how all the functions in our high-level API in
-\autoref{fig:api} are combined to produce a final list of confidence scores for
-a new program $p$. \autoref{algo:predict-algo} presents our high-level
-$\predictsym$ algorithm.
+rules $\errorrulessym$ that a new unknown program with syntax errors needs to
+get parsed according to the given grammar $G$ and get repaired. Therefore, the
+$\predictDLsym$ function uses the trained $\Model$ to predict all confidence
+scores $\List{\Conf}$ for each error production rule.
 
 % \mypara{The Prediction Algorithm}
 % Our algorithm first extracts the machine-learning-amenable dataset $D_{ML}$
