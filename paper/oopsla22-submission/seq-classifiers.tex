@@ -18,8 +18,8 @@ $\trainDLsym$ gets a dataset of token sequences $t^a$ and the \emph{exact small
 set} of error production rules that the ECEP needs to generate the intended user
 parse, \ie the dataset $\List{t^a \times \errorrulessym}$.
 
-Next, we provide some necessary background about \dnn{}s and the
-\emph{Sequence-to-sequence (seq2seq) models} and describe how we incorporate
+Next, we provide some necessary background about \emph{\dnn{}s} and
+\emph{Sequence-to-sequence (seq2seq)} models and describe how we incorporate
 them in the problem of selecting a small set of error production rules, which we
 frame as a instance of \emph{multi-class classification}. We leave the high
 level details of acquiring the dataset of labeled token sequences and using the
@@ -38,10 +38,10 @@ nodes $l$ is given as:
 \end{equation*}
 where $W_{l-1}$ is the weight matrix for the edges between layers $l$ and $l-1$
 and $y_{l-1}$ is the output of the previous layer. The input $y_0 = x$ is the
-input of the neural network and, finally, g is the activation function, which in
-recent work is commonly chosen to be the rectified linear unit (ReLU), defined
-as $g(x) = max(0, x)$ \citep{Nair2010-xg}.  The number of layers, the number of
-nodes per layer, and the connections between layers constitute the
+input features of the neural network and, finally, g is the activation function,
+which in recent work is commonly chosen to be the rectified linear unit (ReLU),
+defined as $g(x) = max(0, x)$ \citep{Nair2010-xg}.  The number of layers, the
+number of nodes per layer, and the connections between layers constitute the
 \emph{architecture} of a neural network. In this work, we use relatively
 \emph{deep neural networks} (\dnn). A thorough introduction to neural networks
 is beyond the scope of this work~\citep{Hastie2009-bn, Nielsen2015-pu}.
@@ -111,16 +111,16 @@ neural network. The output of each sub-layer is $LayerNorm(x + SubLayer(x))$,
 where $SubLayer(x)$ is the function implemented by each sub-layer, followed by a
 residual connection around each of the two sub-layers and  by layer
 normalization $LayerNorm(x)$. To facilitate these residual connections, all
-sub-layers in the model, as well as the embedding layers, produce outputs of the
-same dimension $d_{model}$.
+sub-layers in the model, as well as the input \emph{embedding layers}, produce
+outputs of the same dimension $d_{model}$.
 
 This architecture is used as described above in a seq2seq model
 \citep{Vaswani_2017} for the encoder. The decoder would require an extra third
 sub-layer, which performs multi-head attention over the output of the encoder
 stack. However, in our task we need to learn sets of error production rules,
-which is formed as a classic \emph{classification} problem. We are dealing with
-input sequences of varied sizes, where no straightforward feature extraction
-technique exists. Therefore, we utilize the effectiveness of the
+which can be formed as a classic \emph{classification} problem. We are dealing
+with input sequences of varied sizes, where no straightforward feature
+extraction technique exists. Therefore, we utilize the effectiveness of the
 state-of-the-art \emph{Transformer encoder} to summarize the programs into
 fixed-length vectors that can then be fed into classic \dnn{}s.
 
@@ -154,7 +154,7 @@ input belongs into a class or not. While this model is enough for many tasks,
 \eg error localization \citep{Sakkas_2020}, in the case of error rule prediction
 we have to select from more \emph{classes}. We therefore use a \dnn for our
 error rule prediction $\Model$, but we adjust the output layer to have $N$ nodes
-for the $N$ chosen template-classes. For multi-class classification problems
+for the $N$ chosen error-rule-classes. For multi-class classification problems
 solved with neural networks, usually the \emph{softmax} function is used at
 output layer \citep{Goodfellow-et-al-2016, Bishop-book-2006}. Softmax assigns
 probabilities to each class that must add up to 1. This additional constraint
@@ -164,10 +164,10 @@ speeds up training.
 %
 We use a Transformer encoder to represent an abstracted token sequence $t^a =
 (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V \in \R^k$. The abstract
-vector $V$ is then immediately fed into a \dnn as input and the error production
-labels are used as the ground truth for training this whole architecture, \ie
-the \emph{Transformer classifier}. The binary cross-entropy loss function is
-used per class to assign the loss per training cycle.
+vector $V$ is then immediately fed into the \dnn as input and the error
+production labels are used as the ground truth for training this whole
+architecture, \ie the \emph{Transformer classifier}. The binary cross-entropy
+loss function is used per class to assign the loss per training cycle.
 
 \mypara{Predicting Error Rules}
 %
@@ -175,7 +175,12 @@ Our ultimate goal is to be able to predict the small set of error production
 rules $\errorrulessym$ that a new unknown program with syntax errors needs to
 get parsed according to the given grammar $G$ and get repaired. Therefore, the
 $\predictDLsym$ function uses the trained $\Model$ to predict all confidence
-scores $\List{\Conf}$ for each error production rule.
+scores $\List{\errorrulessym \times \Conf}$ for each error production rule. The
+$\errorrulessym$ are then sorted based on their predicted confidence score
+$\Conf$ and finally the \emph{top-N} rules are returned for error-correcting
+parsing.$N$ is small number in the 10s that will give accurate predictions
+without making the ECEP too slow, as we discuss next in
+\autoref{sec:whole-system}.
 
 % \mypara{The Prediction Algorithm}
 % Our algorithm first extracts the machine-learning-amenable dataset $D_{ML}$
