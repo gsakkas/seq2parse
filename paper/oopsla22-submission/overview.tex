@@ -30,7 +30,7 @@ def bar(a):
   b = foo(a)
   return b + 17
 \end{ecode}
-\subcaption{A possible fixed version for the previous examples that has no parse
+\subcaption{A possible fixed version for the previous example that has no parse
  errors.}
 \label{fig:fixed-prog}
 \end{minipage}
@@ -38,30 +38,30 @@ def bar(a):
 \end{figure}
 
 
-\mypara{The Problem} Consider the simple program \texttt{foo} shown at the top
-of \autoref{fig:bad-prog}. The program adds some number to the argument
-variable \texttt{a} and tries to return it. However, there is an extra
+\mypara{The Problem} Consider the simple program shown in
+\autoref{fig:bad-prog}. The program defines two functions \texttt{foo} and
+\texttt{bar}. Function \texttt{foo} adds some number to the argument variable
+\texttt{a} and returns it. Function \texttt{bar} calls \texttt{foo} with the
+argument variable \texttt{a} and returns the result. However, there is an extra
 \texttt{+} operator after the \texttt{return} statement. The extra \texttt{+}
 can either be deleted or the programmer most likely intended to add another
-number like the fix shown in the bottom of \autoref{fig:bad-prog}. This is a
+number like the fix shown in the bottom of \autoref{fig:fixed-prog}. This is a
 \emph{syntax or parse error} and such parse errors can easily go unnoticed
 \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when they are
-part of bigger programs.
-%
-Our goal is to use historical data of how programmers have fixed similar errors
-in their programs to automatically and rapidly guide programmers to come up with
-candidate solutions like the one above.
+part of bigger programs. Our goal is to use historical data of how programmers
+have fixed similar errors in their programs to automatically and rapidly guide
+programmers to come up with candidate solutions like the one above.
 
 
 \mypara{Solution: Error Correcting Parsers}
 One approach to make such erroneous programs parse is to use \emph{Error
-Correcting Parsers} (ECPs) \citep{Aho_1972}. ECPs are based on \emph{dynamic
-programming algorithms} and have been used in recent literature to automatically
-infer the intended parse tree for a program that doesn't belong to a certain
-programming language, \ie a program that has a syntax error. These dynamic
-programming parsers have been used along side with \emph{error correcting
-production rules} \citep{Aho_1972} to generate a valid parse by making minimal
-edits to the original program.
+Correcting Parsers} (EC-Parsers) \citep{Aho_1972}. EC-Parsers are based on
+\emph{dynamic programming algorithms} and have been used in recent literature to
+automatically infer the intended parse tree for a program that doesn't belong to
+a certain programming language, \ie a program that has a syntax error. These
+dynamic programming parsers have been used along side with \emph{error
+correcting production rules} \citep{Aho_1972} to generate a valid parse by
+making minimal edits to the original program.
 
 \mypara{Another Problem}
 However, these error-correcting parsers have a time complexity that is cubed on
@@ -80,9 +80,9 @@ requires the addition of a large number of error production rules as mentioned
 before. However, not every erroneous program needs all of those rules to be
 parsed. In this work, we present a novel strategy to selecting just a small set
 of error production rules that can be used with an updated \emph{Error
-Correcting Earley Parser} (ECEP) to repair a program with parse errors.
+Correcting Earley Parser} (ECE-Parser) to repair a program with parse errors.
 %
-To enable the efficient usage of a scalable ECEP we decompose the problem into 3
+To enable the efficient usage of a scalable ECE-Parser we decompose the problem into 3
 steps:
 %
 First, \emph{learn} the set of error productions rules each program with a parse
@@ -98,8 +98,8 @@ of our approach by describing how to:
 
 \begin{enumerate}
 
-  \item Use an \emph{Error Correcting Earley Parser} (ECEP) to repair programs
-  with parse errors (\S~\ref{sec:overview:earleyparsing}),
+  \item Use an \emph{Error Correcting Earley Parser} (ECE-Parser) to repair programs
+  with parse errors (\S~\ref{sec:overview:ec-parsing}),
 
   \item Abstract erroneous programs with their \emph{partial parses} by using
   Probabilistic Context-Free Grammars (PCFGs)
@@ -110,27 +110,8 @@ of our approach by describing how to:
 
 \end{enumerate}
 
-\subsection{Background: Earley Parsing}
-\label{sec:overview:earleyparsing}
-
-\mypara{Earley Parsing} Earley parsing has been a touch-stone algorithm in the
-history of parsing \citep{Earley_1970}. An Earley parser is a \emph{top-down
-chart parser} that uses dynamic programming, meaning that partial parses are
-stored in a data structure called a \emph{chart}, which can later be re-used,
-and the parse tree is built from the top down. This eliminates backtracking and
-prevents a combinatorial explosion. Worst case, it has a time complexity of
-$O(n^3 G^2)$ for generic context-free grammars, where $n$ is the number of
-\emph{tokens} of the input program and $G$ is the grammar size, \ie the number
-of \emph{production rules} it includes. However, this parsing algorithm has
-limited use in large real-world programming languages, \eg Python or Java, and
-more time- and memory-efficient parsing algorithms are used, \eg LR parsing \etc
-\citep{Knuth_1965, Chapman_1987}. \autoref{fig:production-rules} presents for
-example some production rules for the Python language. \emph{Terms} in the
-grammar starting with a capital letter here represent \emph{non-terminal}
-symbols while the rest are \emph{terminals} that could appear in a Python
-program. For example, the non-terminal \texttt{Stmt} defines all the possible
-Python statements, \ie expressions (\texttt{Expr\_Stmt}), imports
-(\texttt{Import\_Stmt}), \etc.
+\subsection{Error Correcting Parsing}
+\label{sec:overview:ec-parsing}
 
 \begin{figure}[t]
 \begin{ecode}
@@ -149,6 +130,30 @@ Literal  -> name | number | ...
 \caption{Simplified production rules of the Python grammar}
 \label{fig:production-rules}
 \end{figure}
+
+\mypara{Earley Parsing and Grammars} Earley parsing has been a touch-stone
+algorithm in the history of parsing \citep{Earley_1970}. An Earley parser is a
+\emph{top-down chart parser} that uses dynamic programming, meaning that partial
+parses are stored in a data structure called a \emph{chart}, which can later be
+re-used, and the parse tree is built from the top down. An (Earley) parser
+accepts programs that belong into a language that is defined by a given
+\emph{grammar} $G$. A grammar has a starting symbol \texttt{S} and a set of
+\emph{production rules}. \autoref{fig:production-rules} presents some simplified
+production rules for the Python language that will help parse the program in
+\autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are symbols
+that a Python program consists of and are presented here in lowercase letters.
+Symbols that start with a capital letter here represent \emph{non-terminal}
+symbols. For example, the non-terminal \texttt{Stmt} defines all the possible
+Python statements, \ie expressions (\texttt{ExprStmt}), return statements
+(\texttt{ReturnStmt}), \etc.
+
+% This eliminates backtracking and prevents a combinatorial explosion. Worst case,
+% it has a time complexity of $O(n^3 G^2)$ for generic context-free grammars,
+% where $n$ is the number of \emph{tokens} of the input program and $G$ is the
+% grammar size, \ie the number of \emph{production rules} it includes. However,
+% this parsing algorithm has limited use in large real-world programming
+% languages, \eg Python or Java, and more time- and memory-efficient parsing
+% algorithms are used, \eg LR parsing \etc \citep{Knuth_1965, Chapman_1987}.
 
 \begin{figure}[t]
 \begin{ecode}
@@ -171,13 +176,13 @@ Token     -> return | pass | \n | ... [all terminals]
 \end{figure}
 
 \mypara{Error Correcting Parsing} Recent work has presented an \emph{Error
-Correcting Earley Parser} (ECEP) \citep{Aho_1972}, which extends the original
-algorithm's operations, with the goal to find a minimum-edit parse for a program
-with parse errors. An ECEP also extends the original grammar $G$ with a set of
-\emph{error production rules} to create a new \emph{error grammar} $G'$. This
-grammar contains error rules for the three major types of errors that this
-algorithm considers, \ie it adds error rules for all terminals that account for
-\emph{insertion}, \emph{deletion}, \emph{replacement} errors.
+Correcting Earley Parser} (ECE-Parser) \citep{Aho_1972}, which extends the
+original algorithm's operations, with the goal to find a minimum-edit parse for
+a program with parse errors. An ECE-Parser also extends the original grammar $G$
+with a set of \emph{error production rules} to create a new \emph{error grammar}
+$G'$. This grammar contains error rules for the three major types of errors that
+this algorithm considers, \ie it adds error rules for all terminals that account
+for \emph{insertion}, \emph{deletion}, \emph{replacement} errors.
 \autoref{fig:error-rules} presents \texttt{Err\_Return} that adds these rules
 for the terminal \texttt{return}.
 
@@ -216,10 +221,10 @@ dedent end_marker
 It also adds some non-terminal error rules that introduce these errors when the
 parsing algorithm is executed. These rules are for example in lines 1 and 2 of
 \autoref{fig:error-rules}. Therefore, the new and larger error correcting
-grammar $G'$ is introduced that is at least 3 times larger than $G$, making ECEP
+grammar $G'$ is introduced that is at least 3 times larger than $G$, making ECE-Parser
 not scalable for large programs or programs with a lot of parse errors.
 
-When, for example, a \texttt{Return\_Stmt} is added to the ECEP's chart at some
+When, for example, a \texttt{Return\_Stmt} is added to the ECE-Parser's chart at some
 location $i$, then the next four options are considered:
 \begin{itemize}
   \item There is a \texttt{\bfseries return} at location $i+1$ of the tokenized
@@ -247,9 +252,9 @@ location $i$, then the next four options are considered:
   will replace the program token $t$.
 \end{itemize}
 
-However, ECEP is an effective approach on finding minimum distance parses for
+However, ECE-Parser is an effective approach on finding minimum distance parses for
 programs than don't belong into the given programming language, \ie have parse
-errors. A straight-forward approach to keep ECEP tractable is to only add a
+errors. A straight-forward approach to keep ECE-Parser tractable is to only add a
 small set of error production rules, \ie keep the size of $G'$ limited and
 slightly larger than the original grammar $G$.
 
@@ -357,10 +362,10 @@ make predictions.
 
 \mypara{Predicting Error Rules via MCC}
 Given a dataset of fixed parse errors, we can extract the small set of error
-rules needed for each program to make it parse with an ECEP. Running ECEP on
+rules needed for each program to make it parse with an ECE-Parser. Running ECE-Parser on
 every program in the dataset is prohibitively slow. Therefore, we extract the
 erroneous and fixed program token-level differences or \emph{token diffs} and
-map them to error production rules. After this prodecure, we run ECEP with the
+map them to error production rules. After this prodecure, we run ECE-Parser with the
 learned error rules to confirm which ones would make the program parse and
 assign them as \emph{labels}.
 
@@ -369,6 +374,6 @@ set. Futhermore, Neural networks have the advantage of associating each class
 with a \emph{confidence score} that can be interpreted as the model's confidence
 of each class being correct for a given input. Therefore, confidence scores can
 be used to rank error rule predictions for new programs and select the top-$N$
-ones that will maintain a decent performance when used with the ECEP. Exploiting
+ones that will maintain a decent performance when used with the ECE-Parser. Exploiting
 recent advances in machine learning, we use deep and dense architectures
 \citep{Schmidhuber_2015} for more accurate predictions.
