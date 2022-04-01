@@ -1,13 +1,13 @@
 \begin{figure}
     \centering
     \begin{tikzpicture}
-    [font=\small, edge from parent,
-    every node/.style={top color=white, bottom color=black!20,
-    ellipse, minimum size=8mm, draw=black!75,
-    thick, drop shadow, align=center},
+    [font=\large, edge from parent,
+    % every node/.style={top color=white, bottom color=black!20,
+    % ellipse, minimum size=8mm, draw=black!75,
+    % thick, drop shadow, align=center},
     edge from parent/.style={draw=black!75, thick},
-    level distance=1.2cm, xscale=1.1]
-    \node (func) {Funcdef}
+    level distance=1.0cm]
+    \node (func) {\texttt{Funcdef}}
         child {
             node (def) {\texttt{\bfseries def}}
         }
@@ -29,15 +29,15 @@
         child {
             node (colon) {\texttt{\bfseries :}}
         }
-        child [level distance=0.6cm, xscale=1.55] {
+        child [level distance=0.35cm, xscale=1.4] {
             node (block) {\texttt{Block}}
-            child [level distance=1.2cm, xscale=0.7] {
+            child [level distance=1.0cm, xscale=0.65] {
                 node (newline1) {\texttt{\textbackslash n}}
             }
-            child [level distance=1.2cm, xscale=0.7] {
+            child [level distance=1.0cm, xscale=0.65] {
                 node (indent) {\texttt{indent}}
             }
-            child [level distance=1.2cm, xscale=0.7] {
+            child [level distance=1.0cm, xscale=0.65] {
                 node (stmts1) {\texttt{Stmts}}
                 child {
                     node (stmt1) {\texttt{Stmt}}
@@ -58,7 +58,7 @@
                     }
                 }
             }
-            child [level distance=1.2cm, xscale=0.7] {
+            child [level distance=1.0cm, xscale=0.65] {
                 node (dedent) {\texttt{dedent}}
             }
         };
