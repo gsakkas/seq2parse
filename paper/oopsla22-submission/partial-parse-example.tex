@@ -2,17 +2,17 @@
     \centering
     \begin{tikzpicture}
     [font=\small, edge from parent,
-    every node/.style={top color=white, bottom color=black!15,
-    circle, minimum size=11mm, draw=black!75,
+    every node/.style={top color=white, bottom color=black!20,
+    ellipse, minimum size=8mm, draw=black!75,
     thick, drop shadow, align=center},
-    edge from parent/.style={draw=black!75,thick},
-    level distance=1.6cm, xscale=1.3]
+    edge from parent/.style={draw=black!75, thick},
+    level distance=1.2cm, xscale=1.1]
     \node (func) {Funcdef}
         child {
             node (def) {\texttt{\bfseries def}}
         }
         child {
-            node (name1) {\texttt{Name}}
+            node (name1) {\texttt{name}}
         }
         child {
             node (params) {\texttt{Params}}
@@ -20,7 +20,7 @@
                 node (openParen) {\texttt{\bfseries (}}
             }
             child {
-                node (name2) {\texttt{Name}}
+                node (name2) {\texttt{name}}
             }
             child {
                 node (closeParen) {\texttt{\bfseries )}}
@@ -29,35 +29,41 @@
         child {
             node (colon) {\texttt{\bfseries :}}
         }
-        child [level distance=0.3cm, xscale=1.35] {
-            node  (suite) {\texttt{Suite}}
-            child [level distance=1.3cm] {
-                node (etc) {\texttt{...}}
+        child [level distance=0.6cm, xscale=1.55] {
+            node (block) {\texttt{Block}}
+            child [level distance=1.2cm, xscale=0.7] {
+                node (newline1) {\texttt{\textbackslash n}}
             }
-            child [level distance=1.3cm] {
-                node (RetStmt) {\texttt{RetStmt}}
-                % node (RetStmt) {\texttt{\begin{tabular}{c}
-                %                                 Return\\
-                %                                 Stmt
-                %                             \end{tabular}}}
+            child [level distance=1.2cm, xscale=0.7] {
+                node (indent) {\texttt{indent}}
+            }
+            child [level distance=1.2cm, xscale=0.7] {
+                node (stmts1) {\texttt{Stmts}}
                 child {
-                    node (return) {\texttt{\bfseries return}}
+                    node (stmt1) {\texttt{Stmt}}
+                    child {
+                        node (expr1) {\texttt{ExprStmt}}
+                    }
                 }
                 child {
-                    node (ArgList) {\texttt{ArgList}}
-                    child [level distance=1.6cm] {
-                        node (ArExpr1) {\texttt{ArExpr}}
-                        child [level distance=1.3cm] {
-                            node (ArExpr2) {\texttt{Literal}}
-                        }
-                        child [level distance=1.3cm] {
-                            node (plus) {\texttt{\bfseries +}}
-                        }
+                    node (newline2) {\texttt{\textbackslash n}}
+                }
+                child {
+                    node (stmts2) {\texttt{Stmts$^1$}}
+                    child {
+                        node (stmt2) {\texttt{Stmt}}
+                    }
+                    child {
+                        node (newline3) {\texttt{\textbackslash n}}
                     }
                 }
             }
+            child [level distance=1.2cm, xscale=0.7] {
+                node (dedent) {\texttt{dedent}}
+            }
         };
     \end{tikzpicture}
-    \caption{The partial parse tree generated for the example at \autoref{fig:orig-prog}}
-    \label{fig:partial-parse-tree}
+    \caption{The partial parse tree generated for the example at
+    \autoref{fig:bad-prog}}
+    \label{fig:partial-parse-tree-1}
 \end{figure}

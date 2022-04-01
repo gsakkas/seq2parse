@@ -1,70 +1,184 @@
 \begin{figure}
     \centering
-    \begin{minipage}[c]{0.49\linewidth}
+    \begin{minipage}[t]{0.32\linewidth}
         \centering
+        \resizebox{\linewidth}{!}{
         \begin{tikzpicture}
         [font=\small, edge from parent,
-        every node/.style={top color=white, bottom color=black!15,
-        circle, minimum size=11mm, draw=black!75,
+        every node/.style={top color=white, bottom color=black!20,
+        ellipse, minimum size=8mm, draw=black!75,
         thick, drop shadow, align=center},
-        edge from parent/.style={draw=black!75,thick},
-        level distance=1.3cm, xscale=1.35]
-        \node (RetStmt) {\texttt{RetStmt}}
+        edge from parent/.style={draw=black!75, thick},
+        level distance=1.0cm, xscale=1.1]
+        \node (stmts2) {\texttt{Stmts$^1$}}
+        child {
+            node (stmt2) {\texttt{Stmt}}
             child {
-                node (return) {\texttt{\bfseries return}}
+                node (RetStmt) {\texttt{RetStmt}}
+                child [xscale=1.55] {
+                    node (return) {\texttt{\bfseries return}}
+                    }
+                    child {
+                        node (expr2) {\texttt{ExprStmt}}
+                        child [xscale=1.1] {
+                            node (arexpr1) {\texttt{ArExpr}}
+                            child {
+                                node (arexpr2) {\texttt{ArExpr}}
+                                child {
+                                    node (literal) {\texttt{Literal}}
+                                    child {
+                                        node (name3) {\texttt{name}}
+                                    }
+                                }
+                            }
+                            child {
+                                node (binop) {\texttt{BinOp}}
+                                child {
+                                    node (plus) {\texttt{\bfseries +}}
+                                }
+                            }
+                            child {
+                                node (empty) {\texttt{\_}}
+                            }
+                        }
+                    }
+            }
+        }
+        child {
+            node (newline3) {\texttt{\textbackslash n}}
+        };
+        \end{tikzpicture}
+        }
+        \subcaption{The partial parse tree generated for the example at
+        \autoref{fig:bad-prog}.}
+        \label{fig:partial-parse-tree-2}
+    \end{minipage}
+    \begin{minipage}[t]{0.32\linewidth}
+        \centering
+        \resizebox{\linewidth}{!}{
+            \begin{tikzpicture}
+            [font=\small, edge from parent,
+            every node/.style={top color=white, bottom color=black!20,
+            ellipse, minimum size=8mm, draw=black!75,
+            thick, drop shadow, align=center},
+            edge from parent/.style={draw=black!75, thick},
+            level distance=1.0cm, xscale=1.1]
+            \node (stmts2) {\texttt{Stmts$^1$}}
+            child {
+                node (stmt2) {\texttt{Stmt}}
+                child {
+                    node (RetStmt) {\texttt{RetStmt}}
+                    child [xscale=1.55] {
+                        node (return) {\texttt{\bfseries return}}
+                        }
+                        child {
+                            node (expr2) {\texttt{ExprStmt}}
+                            child [xscale=1.1] {
+                                node (arexpr1) {\texttt{ArExpr}}
+                                child {
+                                    node (arexpr2) {\texttt{ArExpr}}
+                                    child {
+                                        node (literal1) {\texttt{Literal}}
+                                        child {
+                                            node (name3) {\texttt{name}}
+                                        }
+                                    }
+                                }
+                                child {
+                                    node (binop) {\texttt{BinOp}}
+                                    child {
+                                        node (plus) {\texttt{\bfseries +}}
+                                        }
+                                }
+                                child {
+                                    node [style={top color=white, bottom color=black!35!green,
+                                    ellipse, minimum size=8mm, draw=black!30!green,
+                                    thick, drop shadow, align=center}] (literal2) {\texttt{Literal}}
+                                    child [edge from parent/.style={draw=black!50!green, thick}] {
+                                        node [style={top color=white, bottom color=black!35!green,
+                                        ellipse, minimum size=8mm, draw=black!30!green,
+                                        thick, drop shadow, align=center}] (enumber) {\texttt{E\_number}}
+                                        child {
+                                            node [style={top color=white, bottom color=black!35!green,
+                                            ellipse, minimum size=8mm, draw=black!30!green,
+                                            thick, drop shadow, align=center}] (eps) {\texttt{$\epsilon$}}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                }
             }
             child {
-                node (ArgList) {\texttt{ArgList}}
-                child [level distance=1.6cm] {
-                    node (ArExpr1) {\texttt{ArExpr}}
-                    child [level distance=1.3cm] {
-                        node (ArExpr2) {\texttt{Literal}}
-                    }
-                    child [level distance=1.4cm] {
-                        node (plus) {\texttt{\bfseries +}}
-                    }
-                    child [level distance=1.3cm] {
-                        node [style={top color=white, bottom color=blue!45,
-                        circle, minimum size=11mm, draw=blue!55,
-                        thick, drop shadow, align=center}] (ArExpr3) {\texttt{ArExpr}}
-                    }
-                }
+                node (newline3) {\texttt{\textbackslash n}}
             };
-        \end{tikzpicture}
+            \end{tikzpicture}
+        }
         \subcaption{Adding the blue node}
         \label{fig:adding-partial}
     \end{minipage}
-    \begin{minipage}[c]{0.49\linewidth}
+    \begin{minipage}[t]{0.34\linewidth}
         \centering
-        \begin{tikzpicture}
+        \resizebox{1.1\linewidth}{!}{
+            \begin{tikzpicture}
             [font=\small, edge from parent,
-            every node/.style={top color=white, bottom color=black!15,
-            circle, minimum size=11mm, draw=black!75,
+            every node/.style={top color=white, bottom color=black!20,
+            ellipse, minimum size=8mm, draw=black!75,
             thick, drop shadow, align=center},
-            edge from parent/.style={draw=black!75,thick},
-            level distance=1.3cm, xscale=1.35]
-            \node (RetStmt) {\texttt{RetStmt}}
-                child {
-                    node (return) {\texttt{\bfseries return}}
+            edge from parent/.style={draw=black!75, thick},
+            level distance=1.0cm, xscale=2.4]
+            \node (stmts2) {\texttt{Stmts$^1$}}
+            child {
+                node (stmt2) {\texttt{Stmt}}
+                child [xscale=0.6] {
+                    node (RetStmt) {\texttt{RetStmt}}
+                    child {
+                        node (return) {\texttt{\bfseries return}}
+                        }
+                        child {
+                            node (expr2) {\texttt{ExprStmt}}
+                            child {
+                            node (arexpr1) {\texttt{ArExpr}}
+                                child {
+                                    node [style={top color=white, bottom color=black!35!green,
+                                    ellipse, minimum size=8mm, draw=black!30!green,
+                                    thick, drop shadow, align=center}] (literal1) {\texttt{Literal}}
+                                    child [edge from parent/.style={draw=black!50!green, thick}] {
+                                        node [style={top color=white, bottom color=black!35!green,
+                                        ellipse, minimum size=8mm, draw=black!30!green,
+                                        thick, drop shadow, align=center}] (name3) {\texttt{name}}
+                                    }
+                                }
+                            }
+                        }
                 }
-                child {
-                    node (ArgList) {\texttt{ArgList}}
-                    child [level distance=1.6cm] {
-                        node (ArExpr1) {\texttt{ArExpr}}
-                        child [level distance=1.3cm] {
-                            node (ArExpr2) {\texttt{Literal}}
-                        }
-                        child [level distance=1.3cm] {
-                            node (plus) [style={top color=white, bottom color=red!45,
-                            circle, minimum size=11mm, draw=red!55,
-                            thick, drop shadow, align=center}] {\texttt{\bfseries +}}
-                        }
+            }
+            child {
+                node [style={top color=white, bottom color=red!55,
+                ellipse, minimum size=8mm, draw=red!65,
+                thick, drop shadow, align=center}] (enewline) {\texttt{E\_\textbackslash n}}
+                child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
+                    node [style={top color=white, bottom color=red!55,
+                    ellipse, minimum size=8mm, draw=red!65,
+                    thick, drop shadow, align=center}] (insert) {\texttt{Insert}}
+                    child {
+                        node [style={top color=white, bottom color=red!55,
+                        ellipse, minimum size=8mm, draw=red!65,
+                        thick, drop shadow, align=center}] (plus) {\texttt{\bfseries +}}
                     }
-                };
+                }
+                child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
+                    node [style={top color=white, bottom color=red!55,
+                    ellipse, minimum size=8mm, draw=red!65,
+                    thick, drop shadow, align=center}] (newline3) {\texttt{\textbackslash n}}
+                }
+            };
             \end{tikzpicture}
+        }
         \subcaption{Deleting the red node}
         \label{fig:deleting-partial}
     \end{minipage}
-    \caption{Two possible partial parse tree suggestion for the tree at \autoref{fig:partial-parse-tree}}
+    \caption{Two possible partial parse tree suggestion for the tree at
+    \autoref{fig:partial-parse-tree-2}}
     \label{fig:two-partial-parses}
 \end{figure}
