@@ -81,14 +81,6 @@
   mathescape=true
 }
 
-\lstnewenvironment{code}{
-\lstset{
-  language=Caml,
-  basicstyle=\ttfamily,
-  keywordstyle=\ttfamily,
-}}
-{}
-
 \lstnewenvironment{ecode}{
 \lstset{
   language=Python,
@@ -96,31 +88,6 @@
   keywordstyle=\ttfamily\bfseries,
   numbers=left,
   xleftmargin=5.5mm,
-  moredelim=[is][\bfseries]{==}{==},
-  moredelim=[is][\underbar]{__}{__},
-  moredelim=[is][\bfseries\underbar]{_=}{=_},
-  escapeinside={(*@}{@*)}
-}}
-{}
-
-\lstnewenvironment{compactcode}{
-\lstset{
-  language=Caml,
-  basicstyle=\small\ttfamily,
-  keywordstyle=\ttfamily\bfseries,
-  xleftmargin=0mm,
-  moredelim=[is][\bfseries]{==}{==},
-  moredelim=[is][\underbar]{__}{__},
-  moredelim=[is][\bfseries\underbar]{_=}{=_},
-  escapeinside={(*@}{@*)}
-}}
-{}
-
-\lstnewenvironment{haskellcode}{
-\lstset{
-  language=haskell,
-  basicstyle=\small\ttfamily,
-  keywordstyle=\ttfamily\bfseries,
   moredelim=[is][\bfseries]{==}{==},
   moredelim=[is][\underbar]{__}{__},
   moredelim=[is][\bfseries\underbar]{_=}{=_},

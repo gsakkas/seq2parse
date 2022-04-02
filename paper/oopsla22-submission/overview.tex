@@ -148,34 +148,26 @@ Python statements, \ie expressions (\texttt{ExprStmt}), return statements
 (\texttt{ReturnStmt}), \etc
 
 \input{partial-parse-example}
-
-% This eliminates backtracking and prevents a combinatorial explosion. Worst case,
-% it has a time complexity of $O(n^3 G^2)$ for generic context-free grammars,
-% where $n$ is the number of \emph{tokens} of the input program and $G$ is the
-% grammar size, \ie the number of \emph{production rules} it includes. However,
-% this parsing algorithm has limited use in large real-world programming
-% languages, \eg Python or Java, and more time- and memory-efficient parsing
-% algorithms are used, \eg LR parsing \etc \citep{Knuth_1965, Chapman_1987}.
-
-\begin{figure}[t]
-\begin{ecode}
-New_S     -> S | S Insert
-...
-Block     -> E_\n E_indent Stmts E_dedent
-RetStmt   -> ... | E_return | E_return Args
-...
-E_return  -> return | (*@$\epsilon$@*) | Replace | Insert return
-E_number  -> number | (*@$\epsilon$@*) | Replace | Insert number
-E_\n      -> \n | (*@$\epsilon$@*) | Replace | Insert \n
-...
-Replace   -> return | pass | \n | ... [all terminals]
-Insert    -> Token | Insert Token
-Token     -> return | pass | \n | ... [all terminals]
-\end{ecode}
-\caption{Error production rules for the simplified Python grammar presented in
-\autoref{fig:production-rules}}
-\label{fig:error-rules}
-\end{figure}
+%
+% \begin{figure}[t]
+% \begin{ecode}
+% New_S     -> S | S Insert
+% ...
+% Block     -> E_\n E_indent Stmts E_dedent
+% RetStmt   -> ... | E_return | E_return Args
+% ...
+% E_return  -> return | (*@$\epsilon$@*) | Replace | Insert return
+% E_number  -> number | (*@$\epsilon$@*) | Replace | Insert number
+% E_\n      -> \n | (*@$\epsilon$@*) | Replace | Insert \n
+% ...
+% Replace   -> return | pass | \n | ... [all terminals]
+% Insert    -> Token | Insert Token
+% Token     -> return | pass | \n | ... [all terminals]
+% \end{ecode}
+% \caption{Error production rules for the simplified Python grammar presented in
+% \autoref{fig:production-rules}}
+% \label{fig:error-rules}
+% \end{figure}
 
 \mypara{Error Correcting Parsing} Recent work has presented an \emph{Error
 Correcting Earley Parser} (ECE-Parser) \citep{Aho_1972}, which extends the
@@ -205,9 +197,6 @@ example, the |Block| and |RetStmt| rules are updated as:
   \item \lstinline{Block    -> ... | E_\n E_indent Stmts E_dedent}
   \item \lstinline{RetStmt  -> ... | E_return | E_return Args}
 \end{itemize}
-% Therefore, the new and larger error correcting grammar $G'$ is introduced that
-% is at least 3 times larger than $G$, making ECE-Parser not scalable for large
-% programs or programs with a lot of parse errors.
 Next, for each terminal |t|, we add four error rules of the type:
 \begin{itemize}
   \item \lstinline{E_t -> t | $\epsilon$ | Replace | Insert t}
@@ -257,6 +246,40 @@ These four new error rules has the following usage for each terminal |t|:
 %   At the final stage, the relevant terminal (here a \texttt{\textbf{return}})
 %   will replace the program token $t$.
 % \end{enumerate}
+
+For example, for the terminal tokens |return|, |number| and |\n| (a new line)
+the relevant error production rules are:
+\begin{itemize}
+  \item \lstinline{E_return  -> return | $\epsilon$ | Replace | Insert return}
+  \item \lstinline{E_number  -> number | $\epsilon$ | Replace | Insert number}
+  \item \lstinline{E_\n      -> \n | $\epsilon$ | Replace | Insert \n}
+\end{itemize}
+Finally, the |Replace| non-terminal can match any possible terminal in $G$ to
+introduce replacement errors, the |Insert| non-terminal will introduce a
+sequence of insertion errors by using |Token| which also matches every terminal
+and we just differentiate the name in order be able to distinguish the different
+types of errors.
+\begin{itemize}
+  \item \lstinline{Replace  -> return | pass | \n | ... [all terminals]}
+  \item \lstinline{Insert   -> Token | Insert Token}
+  \item \lstinline{Token    -> return | pass | \n | ... [all terminals]}
+\end{itemize}
+
+\input{parse-suggestion-example.tex}
+
+
+
+% This eliminates backtracking and prevents a combinatorial explosion. Worst case,
+% it has a time complexity of $O(n^3 G^2)$ for generic context-free grammars,
+% where $n$ is the number of \emph{tokens} of the input program and $G$ is the
+% grammar size, \ie the number of \emph{production rules} it includes. However,
+% this parsing algorithm has limited use in large real-world programming
+% languages, \eg Python or Java, and more time- and memory-efficient parsing
+% algorithms are used, \eg LR parsing \etc \citep{Knuth_1965, Chapman_1987}.
+
+% Therefore, the new and larger error correcting grammar $G'$ is introduced that
+% is at least 3 times larger than $G$, making ECE-Parser not scalable for large
+% programs or programs with a lot of parse errors.
 
 However, ECE-Parser is an effective approach on finding minimum distance parses for
 programs than don't belong into the given programming language, \ie have parse
@@ -324,8 +347,6 @@ dedent end_marker
 \end{minipage}
 \caption{A simple Python program example}
 \end{figure}
-
-\input{parse-suggestion-example.tex}
 
 \mypara{Probabilistic Context-Free Grammars} Even if the original grammar $G$ is
 not ambiguous, generating partial parses can be ambiguous. Earley parsing is an

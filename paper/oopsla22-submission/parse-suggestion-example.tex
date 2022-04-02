@@ -4,18 +4,18 @@
         \centering
         \resizebox{\linewidth}{!}{
         \begin{tikzpicture}
-        [font=\small, edge from parent,
-        every node/.style={top color=white, bottom color=black!20,
-        ellipse, minimum size=8mm, draw=black!75,
-        thick, drop shadow, align=center},
+        [font=\large, edge from parent,
+        % every node/.style={top color=white, bottom color=black!20,
+        % ellipse, minimum size=8mm, draw=black!75,
+        % thick, drop shadow, align=center},
         edge from parent/.style={draw=black!75, thick},
-        level distance=1.0cm, xscale=1.1]
+        level distance=0.8cm, xscale=1.0]
         \node (stmts2) {\texttt{Stmts$^1$}}
         child {
             node (stmt2) {\texttt{Stmt}}
             child {
                 node (RetStmt) {\texttt{RetStmt}}
-                child [xscale=1.55] {
+                child [xscale=1.2] {
                     node (return) {\texttt{\bfseries return}}
                     }
                     child {
@@ -57,12 +57,12 @@
         \centering
         \resizebox{\linewidth}{!}{
             \begin{tikzpicture}
-            [font=\small, edge from parent,
-            every node/.style={top color=white, bottom color=black!20,
-            ellipse, minimum size=8mm, draw=black!75,
-            thick, drop shadow, align=center},
+            [font=\large, edge from parent,
+            % every node/.style={top color=white, bottom color=black!20,
+            % ellipse, minimum size=8mm, draw=black!75,
+            % thick, drop shadow, align=center},
             edge from parent/.style={draw=black!75, thick},
-            level distance=1.0cm, xscale=1.1]
+            level distance=0.9cm, xscale=1.0]
             \node (stmts2) {\texttt{Stmts$^1$}}
             child {
                 node (stmt2) {\texttt{Stmt}}
@@ -91,17 +91,11 @@
                                         }
                                 }
                                 child {
-                                    node [style={top color=white, bottom color=black!35!green,
-                                    ellipse, minimum size=8mm, draw=black!30!green,
-                                    thick, drop shadow, align=center}] (literal2) {\texttt{Literal}}
+                                    node [style={minimum size=6.5mm, draw=black!30!green, thick}] (literal2) {\texttt{Literal}}
                                     child [edge from parent/.style={draw=black!50!green, thick}] {
-                                        node [style={top color=white, bottom color=black!35!green,
-                                        ellipse, minimum size=8mm, draw=black!30!green,
-                                        thick, drop shadow, align=center}] (enumber) {\texttt{E\_number}}
+                                        node [style={minimum size=6.5mm, draw=black!30!green, thick}] (enumber) {\texttt{E\_number}}
                                         child {
-                                            node [style={top color=white, bottom color=black!35!green,
-                                            ellipse, minimum size=8mm, draw=black!30!green,
-                                            thick, drop shadow, align=center}] (eps) {\texttt{$\epsilon$}}
+                                            node [style={minimum size=6.5mm, draw=black!30!green, thick}] (eps) {\texttt{$\epsilon$}}
                                         }
                                     }
                                 }
@@ -121,10 +115,10 @@
         \centering
         \resizebox{1.1\linewidth}{!}{
             \begin{tikzpicture}
-            [font=\small, edge from parent,
-            every node/.style={top color=white, bottom color=black!20,
-            ellipse, minimum size=8mm, draw=black!75,
-            thick, drop shadow, align=center},
+            [font=\large, edge from parent,
+            % every node/.style={top color=white, bottom color=black!20,
+            % ellipse, minimum size=8mm, draw=black!75,
+            % thick, drop shadow, align=center},
             edge from parent/.style={draw=black!75, thick},
             level distance=1.0cm, xscale=2.4]
             \node (stmts2) {\texttt{Stmts$^1$}}
@@ -140,13 +134,9 @@
                             child {
                             node (arexpr1) {\texttt{ArExpr}}
                                 child {
-                                    node [style={top color=white, bottom color=black!35!green,
-                                    ellipse, minimum size=8mm, draw=black!30!green,
-                                    thick, drop shadow, align=center}] (literal1) {\texttt{Literal}}
+                                    node [style={minimum size=6.5mm, draw=black!30!green, thick}] (literal1) {\texttt{Literal}}
                                     child [edge from parent/.style={draw=black!50!green, thick}] {
-                                        node [style={top color=white, bottom color=black!35!green,
-                                        ellipse, minimum size=8mm, draw=black!30!green,
-                                        thick, drop shadow, align=center}] (name3) {\texttt{name}}
+                                        node [style={minimum size=6.5mm, draw=black!30!green, thick}] (name3) {\texttt{name}}
                                     }
                                 }
                             }
@@ -154,23 +144,15 @@
                 }
             }
             child {
-                node [style={top color=white, bottom color=red!55,
-                ellipse, minimum size=8mm, draw=red!65,
-                thick, drop shadow, align=center}] (enewline) {\texttt{E\_\textbackslash n}}
+                node [style={minimum size=6.5mm, draw=red!65, thick}] (enewline) {\texttt{E\_\textbackslash n}}
                 child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
-                    node [style={top color=white, bottom color=red!55,
-                    ellipse, minimum size=8mm, draw=red!65,
-                    thick, drop shadow, align=center}] (insert) {\texttt{Insert}}
+                    node [style={minimum size=6.5mm, draw=red!65, thick}] (insert) {\texttt{Insert}}
                     child {
-                        node [style={top color=white, bottom color=red!55,
-                        ellipse, minimum size=8mm, draw=red!65,
-                        thick, drop shadow, align=center}] (plus) {\texttt{\bfseries +}}
+                        node [style={minimum size=6.5mm, draw=red!65, thick}] (plus) {\texttt{\bfseries +}}
                     }
                 }
                 child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
-                    node [style={top color=white, bottom color=red!55,
-                    ellipse, minimum size=8mm, draw=red!65,
-                    thick, drop shadow, align=center}] (newline3) {\texttt{\textbackslash n}}
+                    node [style={minimum size=6.5mm, draw=red!65, thick}] (newline3) {\texttt{\textbackslash n}}
                 }
             };
             \end{tikzpicture}
