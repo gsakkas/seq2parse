@@ -35,6 +35,7 @@ def bar(a):
 \label{fig:fixed-prog}
 \end{minipage}
 \caption{A simple Python program example}
+\label{fig:example-prog}
 \end{figure}
 
 
@@ -46,7 +47,7 @@ argument variable \texttt{a} and returns the result. However, there is an extra
 \texttt{+} operator after the \texttt{return} statement. The extra \texttt{+}
 can either be deleted or the programmer most likely intended to add another
 number like the fix shown in the bottom of \autoref{fig:fixed-prog}. This is a
-\emph{syntax or parse error} and such parse errors can easily go unnoticed
+\emph{syntax (or parse) error} and such parse errors can easily go unnoticed
 \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when they are
 part of bigger programs. Our goal is to use historical data of how programmers
 have fixed similar errors in their programs to automatically and rapidly guide
@@ -101,8 +102,8 @@ of our approach by describing how to:
   \item Use an \emph{Error Correcting Earley Parser} (ECE-Parser) to repair programs
   with parse errors (\S~\ref{sec:overview:ec-parsing}),
 
-  \item Abstract erroneous programs with their \emph{partial parses} by using
-  Probabilistic Context-Free Grammars (PCFGs)
+  \item Abstract erroneous programs with their \emph{partial parses} and the
+  usage of Probabilistic Context-Free Grammars (PCFGs)
   (\S~\ref{sec:overview:abstraction}),
 
   \item Train \emph{sequence classifiers} on the abstracted programs to predict
@@ -269,23 +270,44 @@ types of errors.
 
 
 
-% This eliminates backtracking and prevents a combinatorial explosion. Worst case,
-% it has a time complexity of $O(n^3 G^2)$ for generic context-free grammars,
-% where $n$ is the number of \emph{tokens} of the input program and $G$ is the
-% grammar size, \ie the number of \emph{production rules} it includes. However,
-% this parsing algorithm has limited use in large real-world programming
-% languages, \eg Python or Java, and more time- and memory-efficient parsing
-% algorithms are used, \eg LR parsing \etc \citep{Knuth_1965, Chapman_1987}.
+% This eliminates backtracking and prevents a combinatorial explosion. Worst
+% case, it has a time complexity of $O(n^3 G^2)$ for generic context-free
+% grammars, where $n$ is the number of \emph{tokens} of the input program and
+% $G$ is the grammar size, \ie the number of \emph{production rules} it
+% includes.
 
 % Therefore, the new and larger error correcting grammar $G'$ is introduced that
 % is at least 3 times larger than $G$, making ECE-Parser not scalable for large
 % programs or programs with a lot of parse errors.
 
-However, ECE-Parser is an effective approach on finding minimum distance parses for
+For example, \autoref{fig:partial-parse-tree-2} presents a \emph{partial parse}
+of the problematic statements |Stmts|$^1$ of \autoref{fig:partial-parse-tree-1}.
+Considering a deletion error, the |E_number ->| $\epsilon$ error rule is used to
+match the empty symbol and generate a parser that suggests that a \emph{number}
+is missing after the |+| operator. On the other hand, the |E_\n -> Insert \n|
+error rule can be used to consider a insertion error before the new line
+character, basically \emph{deleting} the |+| operator. In this case,
+|ArExpr -> Literal| is used to parse the program instead of
+|ArExpr -> ArExpr BinOp Literal|.
+
+The ECE-Parser is an effective approach on finding minimum distance parses for
 programs than don't belong into the given programming language, \ie have parse
-errors. A straight-forward approach to keep ECE-Parser tractable is to only add a
-small set of error production rules, \ie keep the size of $G'$ limited and
-slightly larger than the original grammar $G$.
+errors. However, this parsing algorithm has limited use in large real-world
+programming languages, \eg Python or Java, and more time- and memory-efficient
+parsing algorithms are used, \eg LR parsing \etc \citep{Knuth_1965,
+Chapman_1987}. Even after certain optimizations such as the usage of |Replace|
+and |Insert| a large amount of error productions rules is added making an
+ECE-Parser not scalable for large programs or programs with a lot of parse
+errors.
+
+A straight-forward approach to keep ECE-Parser tractable is to only add a small
+set of error production rules, \ie keep the size of $G'$ limited and slightly
+larger than the original grammar $G$. This can be achieved by \emph{training
+classifiers} to select a small set of error rules relevant to the parse error.
+However, the program token sequences that we can use have too much irrelevant
+information, \eg the |foo| function in our example in \autoref{fig:example-prog}
+that doesn't contribute to the parse error. The solution to this problem, is to
+further \emph{abstract} our program token sequences.
 
 \subsection{Abstracting program token sequences}
 \label{sec:overview:abstraction}
@@ -298,23 +320,40 @@ Martinez_2013,Gulwani_2018, Wang_2018} and program analysis in general.
 The highest form of abstraction that we can use is the output of the
 \emph{lexer}. The lexer tokenizes the program and returns a program \emph{token
 sequence} with minimal abstractions, \eg no variable names, defining the
-underlying statement blocks \etc, as shown in \autoref{fig:fixed-prog}. This
-token sequence is appropriate for training our sequence classifier models, but
-as we will show later on, they can contain a lot of irrelevant context for the
-parse error at hand and can lead to very large sequences for our models.
+underlying statement blocks \etc, as shown in \autoref{fig:prog-seq}. This token
+sequence is appropriate for training our sequence classifier models, but as we
+discussed already, they can contain a lot of irrelevant context for repairing
+the parse error at hand and can lead to very large sequences for our models.
 
 \mypara{Solution: Abstract with partial parses} A \emph{parser} will hold some
 internal state of the partial parses it has generated until a parse error is
 encountered. The parser will then fail and return an error pointing to the
 location that lead to that parse error. However, these partial parses provide
-useful information and abstraction for the program at hand. For example, the
-partial parse tree shown in \autoref{fig:partial-parse-tree} can be generated by
-an Earley parser for the running example program. Using this partial parse tree
-we can extract the \emph{abstracted token sequence} shown in the bottom of
-\autoref{fig:fixed-prog}. Any \emph{completed} production rules, \eg the
-one for \texttt{Params}, can be used to replace the relevant non-terminals,
-\eg the parenthesis with the function arguments in this example, with the
-high-level non-terminal.
+useful information and abstraction for the program at hand. In our example, the
+partial parse tree shown in \autoref{fig:partial-parse-tree-1} can be generated
+by an Earley parser. Using this partial parse tree we can extract the
+\emph{abstracted token sequence} shown in the bottom of
+\autoref{fig:abstract-prog-seq}. Any \emph{completed} production rules can be
+used to replace the relevant \emph{token sub-sequences} with the high-level
+\emph{non-terminal}. For example, the function |foo| is completely parsed, since
+it had no parse errors and the highest level rule that can be used to abstract
+it is |Stmt -> FuncDef|. On another example in
+\autoref{fig:partial-parse-tree-1}, we observed that |Params -> ( name )| is
+another completed production rule, therefore the parameters in the |bar|
+function can be replaced with |Params|. The production rule for |FuncDef|,
+however, is \emph{incomplete} since the last statement |Stmt| (under
+|Stmts|$^1$) has a parse error as shown in \autoref{fig:partial-parse-tree-2}.
+
+The generation of this abstraction, however, poses another difficulty. Earley
+parsing collects a large amount of partial parses until the program is fully
+parses. That means at each program location of the program multiple can be
+chosen to abstract our programs. This \emph{ambiguity} can be seen even in the
+two suggested repairs in \autoref{fig:two-partial-parses}, where if we delete
+the colored nodes in \autoref{fig:adding-partial} and
+\autoref{fig:deleting-partial} we get two possible partial parses fo our
+program, the first one matching the one in \autoref{fig:partial-parse-tree-2}
+and the second one not shown here.
+
 
 \begin{figure}[t]
 \centering
@@ -335,7 +374,7 @@ dedent end_marker
 \hspace{0.02\linewidth}%
 \begin{minipage}[c]{0.44\linewidth}
 \begin{ecode}
-FuncDef \n
+Stmt \n
 
 def name Params : \n
 indent Stmt \n

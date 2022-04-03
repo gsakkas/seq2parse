@@ -1,6 +1,6 @@
 \begin{figure}
     \centering
-    \begin{minipage}[t]{0.32\linewidth}
+    \begin{minipage}[t]{0.33\linewidth}
         \centering
         \resizebox{\linewidth}{!}{
         \begin{tikzpicture}
@@ -10,7 +10,7 @@
         % thick, drop shadow, align=center},
         edge from parent/.style={draw=black!75, thick},
         level distance=0.8cm, xscale=1.0]
-        \node (stmts2) {\texttt{Stmts$^1$}}
+        \node [style={minimum size=6.5mm, draw=black, thick}] (stmts2) {\texttt{Stmts$^1$}}
         child {
             node (stmt2) {\texttt{Stmt}}
             child {
@@ -38,7 +38,7 @@
                                 }
                             }
                             child {
-                                node (empty) {\texttt{\_}}
+                                node (empty) {\texttt{$\cdots$}}
                             }
                         }
                     }
@@ -53,7 +53,7 @@
         \autoref{fig:bad-prog}.}
         \label{fig:partial-parse-tree-2}
     \end{minipage}
-    \begin{minipage}[t]{0.32\linewidth}
+    \begin{minipage}[t]{0.31\linewidth}
         \centering
         \resizebox{\linewidth}{!}{
             \begin{tikzpicture}
@@ -63,17 +63,17 @@
             % thick, drop shadow, align=center},
             edge from parent/.style={draw=black!75, thick},
             level distance=0.9cm, xscale=1.0]
-            \node (stmts2) {\texttt{Stmts$^1$}}
-            child {
+            \node [style={minimum size=6.5mm, draw=black, thick}] (stmts2) {\texttt{Stmts$^1$}}
+            child [xscale=1.1] {
                 node (stmt2) {\texttt{Stmt}}
                 child {
                     node (RetStmt) {\texttt{RetStmt}}
-                    child [xscale=1.55] {
+                    child {
                         node (return) {\texttt{\bfseries return}}
                         }
                         child {
                             node (expr2) {\texttt{ExprStmt}}
-                            child [xscale=1.1] {
+                            child [xscale=0.9] {
                                 node (arexpr1) {\texttt{ArExpr}}
                                 child {
                                     node (arexpr2) {\texttt{ArExpr}}
@@ -107,8 +107,7 @@
                 node (newline3) {\texttt{\textbackslash n}}
             };
             \end{tikzpicture}
-        }
-        \subcaption{Adding the blue node}
+        } \subcaption{Adding a number with the green \texttt{E\_number} error rule.}
         \label{fig:adding-partial}
     \end{minipage}
     \begin{minipage}[t]{0.34\linewidth}
@@ -120,11 +119,11 @@
             % ellipse, minimum size=8mm, draw=black!75,
             % thick, drop shadow, align=center},
             edge from parent/.style={draw=black!75, thick},
-            level distance=1.0cm, xscale=2.4]
-            \node (stmts2) {\texttt{Stmts$^1$}}
+            level distance=0.9cm, xscale=2.0]
+            \node [style={minimum size=6.5mm, draw=black, thick}] (stmts2) {\texttt{Stmts$^1$}}
             child {
                 node (stmt2) {\texttt{Stmt}}
-                child [xscale=0.6] {
+                child [xscale=0.55] {
                     node (RetStmt) {\texttt{RetStmt}}
                     child {
                         node (return) {\texttt{\bfseries return}}
@@ -148,7 +147,10 @@
                 child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
                     node [style={minimum size=6.5mm, draw=red!65, thick}] (insert) {\texttt{Insert}}
                     child {
-                        node [style={minimum size=6.5mm, draw=red!65, thick}] (plus) {\texttt{\bfseries +}}
+                        node [style={minimum size=6.5mm, draw=red!65, thick}] (token) {\texttt{Token}}
+                        child {
+                            node [style={minimum size=6.5mm, draw=red!65, thick}] (plus) {\texttt{\bfseries +}}
+                        }
                     }
                 }
                 child [edge from parent/.style={draw=red!75, thick}, xscale=0.43] {
@@ -157,10 +159,10 @@
             };
             \end{tikzpicture}
         }
-        \subcaption{Deleting the red node}
+        \subcaption{Deleting the \texttt{+} with red \texttt{E\_\textbackslash n} error rule.}
         \label{fig:deleting-partial}
     \end{minipage}
-    \caption{Two possible partial parse tree suggestion for the tree at
-    \autoref{fig:partial-parse-tree-2}}
+    \caption{The rest of the problematic function in
+    \autoref{fig:partial-parse-tree-1} and two possible error correcting parses}
     \label{fig:two-partial-parses}
 \end{figure}
