@@ -1,6 +1,6 @@
 \begin{figure}
     \centering
-    \begin{minipage}[t]{0.33\linewidth}
+    \begin{minipage}[t]{0.29\linewidth}
         \centering
         \resizebox{\linewidth}{!}{
         \begin{tikzpicture}
@@ -17,7 +17,9 @@
                 node (RetStmt) {\texttt{RetStmt}}
                 child [xscale=1.2] {
                     node (return) {\texttt{\bfseries return}}
-                    }
+                }
+                child {
+                    node (args) {\texttt{Args}}
                     child {
                         node (expr2) {\texttt{ExprStmt}}
                         child [xscale=1.1] {
@@ -38,10 +40,11 @@
                                 }
                             }
                             child {
-                                node (empty) {\texttt{$\cdots$}}
+                                node (empty) {\texttt{$\dots$}}
                             }
                         }
                     }
+                }
             }
         }
         child {
@@ -53,9 +56,11 @@
         \autoref{fig:bad-prog}.}
         \label{fig:partial-parse-tree-2}
     \end{minipage}
-    \begin{minipage}[t]{0.31\linewidth}
+    \hspace{0.02\linewidth}%
+    \begin{minipage}[t]{0.33\linewidth}
         \centering
-        \resizebox{\linewidth}{!}{
+        \hspace*{0.04\linewidth}%
+        \resizebox{1.1\linewidth}{!}{
             \begin{tikzpicture}
             [font=\large, edge from parent,
             % every node/.style={top color=white, bottom color=black!20,
@@ -64,16 +69,18 @@
             edge from parent/.style={draw=black!75, thick},
             level distance=0.9cm, xscale=1.0]
             \node [style={minimum size=6.5mm, draw=black, thick}] (stmts2) {\texttt{Stmts$^1$}}
-            child [xscale=1.1] {
+            child [xscale=1.3] {
                 node (stmt2) {\texttt{Stmt}}
                 child {
                     node (RetStmt) {\texttt{RetStmt}}
                     child {
                         node (return) {\texttt{\bfseries return}}
-                        }
+                    }
+                    child {
+                        node (args) {\texttt{Args}}
                         child {
                             node (expr2) {\texttt{ExprStmt}}
-                            child [xscale=0.9] {
+                            child [level distance=0.8cm, xscale=1.1] {
                                 node (arexpr1) {\texttt{ArExpr}}
                                 child {
                                     node (arexpr2) {\texttt{ArExpr}}
@@ -91,8 +98,8 @@
                                         }
                                 }
                                 child {
-                                    node [style={minimum size=6.5mm, draw=black!30!green, thick}] (literal2) {\texttt{Literal}}
-                                    child [edge from parent/.style={draw=black!50!green, thick}] {
+                                    node (literal2) {\texttt{Literal}}
+                                    child {
                                         node [style={minimum size=6.5mm, draw=black!30!green, thick}] (enumber) {\texttt{E\_number}}
                                         child {
                                             node [style={minimum size=6.5mm, draw=black!30!green, thick}] (eps) {\texttt{$\epsilon$}}
@@ -101,6 +108,7 @@
                                 }
                             }
                         }
+                    }
                 }
             }
             child {
@@ -110,8 +118,10 @@
         } \subcaption{Adding a number with the green \texttt{E\_number} error rule.}
         \label{fig:adding-partial}
     \end{minipage}
-    \begin{minipage}[t]{0.34\linewidth}
+    \hspace{0.01\linewidth}%
+    \begin{minipage}[t]{0.33\linewidth}
         \centering
+        \hspace*{-0.06\linewidth}%
         \resizebox{1.1\linewidth}{!}{
             \begin{tikzpicture}
             [font=\large, edge from parent,
@@ -127,19 +137,22 @@
                     node (RetStmt) {\texttt{RetStmt}}
                     child {
                         node (return) {\texttt{\bfseries return}}
-                        }
+                    }
+                    child {
+                        node (args) {\texttt{Args}}
                         child {
                             node (expr2) {\texttt{ExprStmt}}
                             child {
                             node (arexpr1) {\texttt{ArExpr}}
                                 child {
-                                    node [style={minimum size=6.5mm, draw=black!30!green, thick}] (literal1) {\texttt{Literal}}
-                                    child [edge from parent/.style={draw=black!50!green, thick}] {
-                                        node [style={minimum size=6.5mm, draw=black!30!green, thick}] (name3) {\texttt{name}}
+                                    node (literal1) {\texttt{Literal}}
+                                    child {
+                                        node (name3) {\texttt{name}}
                                     }
                                 }
                             }
                         }
+                    }
                 }
             }
             child {

@@ -13,11 +13,10 @@ def foo(a):
   return a + 42
 
 def bar(a):
-  b = foo(a)
+  b = foo(a) + 17
   return b +
 \end{ecode}
-\subcaption{A Python program with two functions that manipulate an integer,
-where the second one has a parse error.}
+\subcaption{A Python program with two functions that manipulate an integer. The second one has a parse error.}
 \label{fig:bad-prog}
 \end{minipage}%
 \hspace{0.02\linewidth}%
@@ -27,8 +26,8 @@ def foo(a):
   return a + 42
 
 def bar(a):
-  b = foo(a)
-  return b + 17
+  b = foo(a) + 17
+  return b
 \end{ecode}
 \subcaption{A possible fixed version for the previous example that has no parse
  errors.}
@@ -40,13 +39,12 @@ def bar(a):
 
 
 \mypara{The Problem} Consider the simple program shown in
-\autoref{fig:bad-prog}. The program defines two functions \texttt{foo} and
-\texttt{bar}. Function \texttt{foo} adds some number to the argument variable
-\texttt{a} and returns it. Function \texttt{bar} calls \texttt{foo} with the
-argument variable \texttt{a} and returns the result. However, there is an extra
-\texttt{+} operator after the \texttt{return} statement. The extra \texttt{+}
-can either be deleted or the programmer most likely intended to add another
-number like the fix shown in the bottom of \autoref{fig:fixed-prog}. This is a
+\autoref{fig:bad-prog}. The program defines two functions |foo| and |bar|.
+Function |foo| adds some number to the argument variable |a| and returns it.
+Function |bar| calls |foo| with the argument variable |a|, adds another number
+and returns the result. However, there is an extra |+| operator after the
+|return b| statement. The extra |+| mostly likely needs to be deleted, as the
+programmer intended, as shown in the fix in \autoref{fig:fixed-prog}. This is a
 \emph{syntax (or parse) error} and such parse errors can easily go unnoticed
 \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when they are
 part of bigger programs. Our goal is to use historical data of how programmers
@@ -115,7 +113,7 @@ of our approach by describing how to:
 \label{sec:overview:ec-parsing}
 
 \begin{figure}[t]
-\begin{ecode}
+\begin{rules}
 S        (*@$\rightarrow$@*) Stmts end_marker
 Stmts    (*@$\rightarrow$@*) Stmt \n | Stmt \n Stmts
 Stmt     (*@$\rightarrow$@*) FuncDef | ExprStmt | RetStmt | PassStmt | ...
@@ -126,8 +124,7 @@ Args     (*@$\rightarrow$@*) ExprStmt | ExprStmt , Args
 ExprStmt (*@$\rightarrow$@*) ArExpr | ...
 ArExpr   (*@$\rightarrow$@*) Literal | ArExpr BinOp Literal
 Literal  (*@$\rightarrow$@*) name | number | ...
-...
-\end{ecode}
+\end{rules}
 \caption{Simplified production rules of the Python grammar}
 \label{fig:production-rules}
 \end{figure}
@@ -138,32 +135,31 @@ algorithm in the history of parsing \citep{Earley_1970}. An Earley parser is a
 parses are stored in a data structure called a \emph{chart}, which can later be
 re-used, and the parse tree is built from the top down. An (Earley) parser
 accepts programs that belong into a language that is defined by a given
-\emph{grammar} $G$. A grammar has a starting symbol \texttt{S} and a set of
+\emph{grammar} $G$. A grammar has a starting symbol |S| and a set of
 \emph{production rules}. \autoref{fig:production-rules} presents some simplified
 production rules for the Python language that will help parse the program in
 \autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are symbols
 that a Python program consists of and are presented here in lowercase letters.
 Symbols that start with a capital letter here represent \emph{non-terminal}
-symbols. For example, the non-terminal \texttt{Stmt} defines all the possible
-Python statements, \ie expressions (\texttt{ExprStmt}), return statements
-(\texttt{ReturnStmt}), \etc
+symbols. For example, the non-terminal |Stmt| defines all the possible Python
+statements, \ie expressions (|ExprStmt|), return statements (|ReturnStmt|), \etc
 
 \input{partial-parse-example}
 %
 % \begin{figure}[t]
 % \begin{ecode}
-% New_S     -> S | S Insert
+% New_S     (*@$$\rightarrow$@*) S | S Insert
 % ...
-% Block     -> E_\n E_indent Stmts E_dedent
-% RetStmt   -> ... | E_return | E_return Args
+% Block     (*@$$\rightarrow$@*) E_\n E_indent Stmts E_dedent
+% RetStmt   (*@$$\rightarrow$@*) ... | E_return | E_return Args
 % ...
-% E_return  -> return | (*@$\epsilon$@*) | Replace | Insert return
-% E_number  -> number | (*@$\epsilon$@*) | Replace | Insert number
-% E_\n      -> \n | (*@$\epsilon$@*) | Replace | Insert \n
+% E_return  (*@$$\rightarrow$@*) return | (*@$\epsilon$@*) | Replace | Insert return
+% E_number  (*@$$\rightarrow$@*) number | (*@$\epsilon$@*) | Replace | Insert number
+% E_\n      (*@$$\rightarrow$@*) \n | (*@$\epsilon$@*) | Replace | Insert \n
 % ...
-% Replace   -> return | pass | \n | ... [all terminals]
-% Insert    -> Token | Insert Token
-% Token     -> return | pass | \n | ... [all terminals]
+% Replace   (*@$$\rightarrow$@*) return | pass | \n | ... [all terminals]
+% Insert    (*@$$\rightarrow$@*) Token | Insert Token
+% Token     (*@$$\rightarrow$@*) return | pass | \n | ... [all terminals]
 % \end{ecode}
 % \caption{Error production rules for the simplified Python grammar presented in
 % \autoref{fig:production-rules}}
@@ -189,34 +185,34 @@ Next, in addition to the existing production rules, the error grammar $G'$ has
 the following error rules. The new start symbols uses the old one with the
 option of an insertion error at the end:
 \begin{itemize}
-  \item \lstinline{New_S  -> S | S Indent}
+  \item \lstinline{New_S  $\rightarrow$ S | S Indent}
 \end{itemize}
 Also, for each non-terminal |T| it adds some non-terminal error rules that
 introduce the terminal errors when the parsing algorithm is executed. For
 example, the |Block| and |RetStmt| rules are updated as:
 \begin{itemize}
-  \item \lstinline{Block    -> ... | E_\n E_indent Stmts E_dedent}
-  \item \lstinline{RetStmt  -> ... | E_return | E_return Args}
+  \item \lstinline{Block    $\rightarrow$ ... | E_\n E_indent Stmts E_dedent}
+  \item \lstinline{RetStmt  $\rightarrow$ ... | E_return | E_return Args}
 \end{itemize}
 Next, for each terminal |t|, we add four error rules of the type:
 \begin{itemize}
-  \item \lstinline{E_t -> t | $\epsilon$ | Replace | Insert t}
+  \item \lstinline{E_t $\rightarrow$ t | $\epsilon$ | Replace | Insert t}
 \end{itemize}
 These four new error rules has the following usage for each terminal |t|:
 \begin{enumerate}
-  \item The |E_t -> t| rule will match the original terminal |t| without any
+  \item The |E_t $\rightarrow$ t| rule will match the original terminal |t| without any
   errors. This error rule is used in cases that the \emph{non-error} version of
   the rule is needed. For example, in \break
-  |Block -> E_\n E_indent Stmts E_dedent| it can be the case that only
+  |Block $\rightarrow$ E_\n E_indent Stmts E_dedent| it can be the case that only
   |E_dedent| is needed to match the error and |E_\n| and |E_indent| can match
   their respective symbols.
-  \item Using |E_t ->| $\epsilon$ a \emph{deletion} error is considered. The
+  \item Using |E_t $\rightarrow$ $\epsilon$| a \emph{deletion} error is considered. The
   error rule will match \emph{nothing} or the \emph{empty token} $\epsilon$ in
   the program, meaning the terminal is missing.
-  \item Using |E_t -> Replace| a \emph{replacement} error is considered.
+  \item Using |E_t $\rightarrow$ Replace| a \emph{replacement} error is considered.
   |Replace| will match any terminal token that is \emph{different} than |t|,
   making a replacement possible.
-  \item  The rules |E_t -> Insert t| will introduce a \emph{insertion} error,
+  \item  The rules |E_t $\rightarrow$ Insert t| will introduce a \emph{insertion} error,
   \ie |Insert| will match any \emph{sequence} of |Token|s that are not supposed
   to precede |t| in order to make the program parse.
 \end{enumerate}
@@ -228,22 +224,22 @@ These four new error rules has the following usage for each terminal |t|:
 %   to and are added to the chart at location $i+1$.
 %   \item An \emph{insertion} error is considered, \ie there is a token at program
 %   location $i$ that doesn't match any of the production rules. Then
-%   \texttt{Err\_Return -> H return} is used to introduce one or more of these
-%   insertion errors together with the rules \texttt{H -> H \textbar\ H Insert}
-%   and \texttt{Insert -> \textbf{pass} \textbar\ \textbf{raise} \textbar\
+%   \texttt{Err\_Return $\rightarrow$ H return} is used to introduce one or more of these
+%   insertion errors together with the rules \texttt{H $\rightarrow$ H \textbar\ H Insert}
+%   and \texttt{Insert $\rightarrow$ \textbf{pass} \textbar\ \textbf{raise} \textbar\
 %   \textbf{return} \textbar\ ...}. When \texttt{Insert} will match an
 %   extraneous token $t$ in the program, then $t$ will be ignored in the final
 %   parse repair.
 %   \item A \emph{deletion} error is considered when an incomplete non-terminal
 %   production rule is in the chart at location $i$ and the next symbol is a
 %   terminal in the rule but is not present in the token sequence. Then
-%   \texttt{Err\_Return -> e} is used to match an \emph{empty} token. At the final
+%   \texttt{Err\_Return $\rightarrow$ e} is used to match an \emph{empty} token. At the final
 %   stage, the relevant terminal (here a \texttt{\textbf{return}}) will be added
 %   at location $i+1$ to generate a repaired program.
 %   \item A \emph{replacement} error is considered here when an incomplete
 %   non-terminal production rule is in the chart at location $i$ and the next
 %   symbol is a terminal in the rule but is not the same in the token sequence.
-%   Then \texttt{Err\_Return -> Err\_Tag} is used to match the program token $t$.
+%   Then \texttt{Err\_Return $\rightarrow$ Err\_Tag} is used to match the program token $t$.
 %   At the final stage, the relevant terminal (here a \texttt{\textbf{return}})
 %   will replace the program token $t$.
 % \end{enumerate}
@@ -251,9 +247,9 @@ These four new error rules has the following usage for each terminal |t|:
 For example, for the terminal tokens |return|, |number| and |\n| (a new line)
 the relevant error production rules are:
 \begin{itemize}
-  \item \lstinline{E_return  -> return | $\epsilon$ | Replace | Insert return}
-  \item \lstinline{E_number  -> number | $\epsilon$ | Replace | Insert number}
-  \item \lstinline{E_\n      -> \n | $\epsilon$ | Replace | Insert \n}
+  \item \lstinline{E_return  $\rightarrow$ return | $\epsilon$ | Replace | Insert return}
+  \item \lstinline{E_number  $\rightarrow$ number | $\epsilon$ | Replace | Insert number}
+  \item \lstinline{E_\n      $\rightarrow$ \n | $\epsilon$ | Replace | Insert \n}
 \end{itemize}
 Finally, the |Replace| non-terminal can match any possible terminal in $G$ to
 introduce replacement errors, the |Insert| non-terminal will introduce a
@@ -261,9 +257,9 @@ sequence of insertion errors by using |Token| which also matches every terminal
 and we just differentiate the name in order be able to distinguish the different
 types of errors.
 \begin{itemize}
-  \item \lstinline{Replace  -> return | pass | \n | ... [all terminals]}
-  \item \lstinline{Insert   -> Token | Insert Token}
-  \item \lstinline{Token    -> return | pass | \n | ... [all terminals]}
+  \item \lstinline{Replace  $\rightarrow$ return | pass | \n | + | ... [all terminals]}
+  \item \lstinline{Insert   $\rightarrow$ Token | Insert Token}
+  \item \lstinline{Token    $\rightarrow$ return | pass | \n | + | ... [all terminals]}
 \end{itemize}
 
 \input{parse-suggestion-example.tex}
@@ -282,13 +278,14 @@ types of errors.
 
 For example, \autoref{fig:partial-parse-tree-2} presents a \emph{partial parse}
 of the problematic statements |Stmts|$^1$ of \autoref{fig:partial-parse-tree-1}.
-Considering a deletion error, the |E_number ->| $\epsilon$ error rule is used to
-match the empty symbol and generate a parser that suggests that a \emph{number}
-is missing after the |+| operator. On the other hand, the |E_\n -> Insert \n|
-error rule can be used to consider a insertion error before the new line
-character, basically \emph{deleting} the |+| operator. In this case,
-|ArExpr -> Literal| is used to parse the program instead of
-|ArExpr -> ArExpr BinOp Literal|.
+Considering a deletion error, the |E_number $\rightarrow$ $\epsilon$| error rule
+is used to match the empty symbol and generate a parser that suggests that a
+\emph{number} is missing after the |+| operator. On the other hand, the
+%
+|E_\n $\rightarrow$ Insert \n| error rule can be used to consider a insertion
+error before the new line character, basically \emph{deleting} the |+| operator.
+In this case, |ArExpr $\rightarrow$ Literal| is used to parse the program
+instead of |ArExpr $\rightarrow$ ArExpr BinOp Literal|.
 
 The ECE-Parser is an effective approach on finding minimum distance parses for
 programs than don't belong into the given programming language, \ie have parse
@@ -337,12 +334,14 @@ by an Earley parser. Using this partial parse tree we can extract the
 used to replace the relevant \emph{token sub-sequences} with the high-level
 \emph{non-terminal}. For example, the function |foo| is completely parsed, since
 it had no parse errors and the highest level rule that can be used to abstract
-it is |Stmt -> FuncDef|. On another example in
-\autoref{fig:partial-parse-tree-1}, we observed that |Params -> ( name )| is
-another completed production rule, therefore the parameters in the |bar|
-function can be replaced with |Params|. The production rule for |FuncDef|,
-however, is \emph{incomplete} since the last statement |Stmt| (under
-|Stmts|$^1$) has a parse error as shown in \autoref{fig:partial-parse-tree-2}.
+it is |Stmt $\rightarrow$ FuncDef|. On another example in
+\autoref{fig:partial-parse-tree-1}, we observed that
+%
+|Params $\rightarrow$ ( name )| is another completed production rule, therefore
+the parameters in the |bar| function can be replaced with |Params|. The
+production rule for |FuncDef|, however, is \emph{incomplete} since the last
+statement |Stmt| (under |Stmts|$^1$) has a parse error as shown in
+\autoref{fig:partial-parse-tree-2}.
 
 The generation of this abstraction, however, poses another difficulty. Earley
 parsing collects a large amount of partial parses until the program is fully
@@ -357,14 +356,14 @@ and the second one not shown here.
 
 \begin{figure}[t]
 \centering
-\begin{minipage}[c]{0.54\linewidth}
+\begin{minipage}[c]{0.56\linewidth}
 \begin{ecode}
-def name ( name ) : \n
+def name(name): \n
 indent return name + number \n
 dedent \n
 
-def name ( name ) : \n
-indent name = name + number \n
+def name(name): \n
+indent name = name(name) + number \n
 return name + \n
 dedent end_marker
 \end{ecode}
@@ -372,11 +371,11 @@ dedent end_marker
 \label{fig:prog-seq}
 \end{minipage}%
 \hspace{0.02\linewidth}%
-\begin{minipage}[c]{0.44\linewidth}
+\begin{minipage}[c]{0.42\linewidth}
 \begin{ecode}
 Stmt \n
 
-def name Params : \n
+def name Params: \n
 indent Stmt \n
 return Expr BinOp \n
 dedent end_marker
@@ -388,19 +387,47 @@ dedent end_marker
 \end{figure}
 
 \mypara{Probabilistic Context-Free Grammars} Even if the original grammar $G$ is
-not ambiguous, generating partial parses can be ambiguous. Earley parsing is an
-dynamic programming technique and internally keeps all possible parses from the
-begging of the token sequence until a position $i$ in its charts. Therefore,
-when there is a parse error at token $i$, it is possible to have more than one
-partial parses to choose from in order to generate the abstracted token
-sequence. For the running example, if we focus on the \texttt{return} statement
-of the program, there are two possible partial parses in the parser chart, as
-shown in \autoref{fig:two-partial-parses} for example, that we can use to repair
-the program. \autoref{fig:adding-partial} would lead to a solution that
-completes the returned arithmetic expression by adding the blue node, which is
-another arithmetic expression and possibly just another number, while the
-\autoref{fig:deleting-partial} would produce a solution that returns just the
-number by deleting the arithmetic operator in the red node.
+not ambiguous, generating partial parses can be ambiguous as we've shown. Earley
+parsing is an dynamic programming technique and internally keeps all possible
+parses from the begging of the token sequence until a position $i$ in its
+charts. Therefore, when there is a parse error at token $i$, it is possible to
+have more than one partial parses to choose from in order to generate the
+abstracted token sequence.
+
+% For the running example, if we focus on the \texttt{return} statement of the
+% program, there are two possible partial parses in the parser chart, as shown in
+% \autoref{fig:two-partial-parses} for example, that we can use to repair the
+% program. \autoref{fig:adding-partial} would lead to a solution that completes
+% the returned arithmetic expression by adding the blue node, which is another
+% arithmetic expression and possibly just another number, while the
+% \autoref{fig:deleting-partial} would produce a solution that returns just the
+% number by deleting the arithmetic operator in the red node.
+
+\begin{figure}[t]
+\begin{rules}
+S        (*@$\rightarrow$@*) Stmts end_marker        , $p = 100.0\%$
+Stmts    (*@$\rightarrow$@*) Stmt \n                 , $p = 38.77\%$
+Stmt     (*@$\rightarrow$@*) ExprStmt                , $p = 62.64\%$
+Stmt     (*@$\rightarrow$@*) RetStmt                 , $p =  7.59\%$
+RetStmt  (*@$\rightarrow$@*) return                  , $p =  1.61\%$
+RetStmt  (*@$\rightarrow$@*) return Args             , $p = 98.39\%$
+Args     (*@$\rightarrow$@*) ExprStmt                , $p = 99.20\%$
+ExprStmt (*@$\rightarrow$@*) ArExpr                  , $p = 29.40\%$
+ArExpr   (*@$\rightarrow$@*) Literal                 , $p = 86.89\%$
+ArExpr   (*@$\rightarrow$@*) ArExpr BinOp Literal    , $p = 13.11\%$
+Literal  (*@$\rightarrow$@*) name                    , $p = 64.89\%$
+Literal  (*@$\rightarrow$@*) number                  , $p = 20.17\%$
+\end{rules}
+\caption{The production rules shown in \autoref{fig:production-rules} with
+their learned probabilities.}
+\label{fig:weighted-production-rules}
+\end{figure}
+% Stmts    (*@$\rightarrow$@*) Stmt \n Stmts           , $p = 61.23\%$
+% Stmt     (*@$\rightarrow$@*) FuncDef                 , $p =  7.86\%$
+% Stmt     (*@$\rightarrow$@*) PassStmt                , $p =  0.13\%$
+% FuncDef  (*@$\rightarrow$@*) def name Params : Block , $p = 99.10\%$
+% Block    (*@$\rightarrow$@*) \n indent Stmts dedent  , $p = 99.29\%$
+% Args     (*@$\rightarrow$@*) ExprStmt , Args         , $p =  0.80\%$
 
 In that aid, Probabilistic Context-Free Grammars (PCFGs) have been used in
 previous work \citep{Collins_2013, Jelinek_1992} to select \emph{complete}
@@ -410,12 +437,25 @@ during parsing is also associated with a probability. Finally, the one with the
 highest probability is selected as a final parse tree. A PCFG can simply be
 learned \citep{Collins_2013} by counting the production rules used to parse a
 number of programs belonging to that language for each terminal token.
+\autoref{fig:weighted-production-rules} has the assigned probabilities for the
+running example grammar. We observe, for example, that the |ReturnStmt| has 2
+possible production rules and almost $98.4\%$ of the times a |return| is
+followed by an argument list, and $62.6\%$ of the times a |Stmt| is an
+|ExprStmt|.
 
 We apply this approach to select a partial parse from the Earley parser. The
 probabilities can again be learned from the \emph{fixed} programs of a large
 corpus of erroneous and fixed programs. The selected partial parse can then be
-used to generate an abstracted token sequence.
-
+used to generate an abstracted token sequence. In our example, the probability
+that would be assigned to the partial parse for |Stmts|$^1$ in
+\autoref{fig:adding-partial} (only the sub-tree without the colored error nodes)
+is the product of the probabilities of the production rules |Stmts|
+$\rightarrow$ |Stmt \n|, |Stmt| $\rightarrow$ |RetStmt|, |RetStmt| $\rightarrow$
+|return Args|, |Args| $\rightarrow$ |ExprStmt| \etc which is $38.77\%\ \cdot\
+7.59\%\ \cdot\ 98.39\%\ \cdot\ 99.20\%\ \cdot\ \dots =
+4.57\text{\textperthousand}$, while the partial parse for |Stmts|$^1$ in
+\autoref{fig:deleting-partial} would similarly be calculated as
+$47.61\text{\textperthousand}$.
 
 \subsection{Training Sequence Classifiers}
 \label{sec:overview:train}
@@ -441,35 +481,50 @@ transforms it into a output sequence. Both the encoder and the decoder can be an
 (older) Long-Short-Term-Memory (LSTM)-based model \citep{Hochreiter_1997} or a
 state-of-the-art \emph{Transformer} \citep{Vaswani_2017}.
 
-\mypara{Transformer Classifier} We desire to train a model that can correctly
-predict a small set of error production rules for a given abstracted token
-sequence. We encode this problem into a \emph{supervised multi-class
-classification}. A \emph{supervised} learning problem is one where, given a
-labeled training set, the task is to learn a function that accurately maps the
-inputs to output labels and generalizes to future inputs. In a
-\emph{classification} problem, the function we are trying to learn maps inputs
-to a discrete set of two or more output labels, called \emph{classes}.
-Therefore, we encode the task of learning a function that will map token
-sequences of erroneous programs to a small set of error production rules as a
-\emph{multi-class} classification (MCC) problem. We use an \emph{encoder
-transformer} to encode the input sequences into abstract vectors that we can
-then feed into a \emph{Deep Neural Network (DNN)} classifier to train it and
-make predictions.
+\mypara{Transformer Classifier}
+We desire to train a model that can correctly predict a small set of error
+production rules for a given abstracted token sequence. We encode this problem
+into a \emph{supervised multi-class classification}. A \emph{supervised}
+learning problem is one where, given a labeled training set, the task is to
+learn a function that accurately maps the inputs to output labels and
+generalizes to future inputs. In a \emph{classification} problem, the function
+we are trying to learn maps inputs to a discrete set of two or more output
+labels, called \emph{classes}. Therefore, we encode the task of learning a
+function that will map token sequences of erroneous programs to a small set of
+error production rules as a \emph{multi-class} classification (MCC) problem. We
+use an \emph{encoder transformer} to encode the input sequences into abstract
+vectors that we can then feed into a \emph{Deep Neural Network (DNN)} classifier
+to train it and make predictions.
 
 \mypara{Predicting Error Rules via MCC}
-Given a dataset of fixed parse errors, we can extract the small set of error
-rules needed for each program to make it parse with an ECE-Parser. Running ECE-Parser on
-every program in the dataset is prohibitively slow. Therefore, we extract the
-erroneous and fixed program token-level differences or \emph{token diffs} and
-map them to error production rules. After this prodecure, we run ECE-Parser with the
-learned error rules to confirm which ones would make the program parse and
-assign them as \emph{labels}.
+Given a dataset of fixed parse errors, such as \autoref{fig:example-prog}, we
+extract a small set of error rules needed for each program to make it parse with
+an ECE-Parser. Running ECE-Parser on every program in the dataset is
+prohibitively slow. Therefore, we extract the erroneous and fixed program
+token-level differences or \emph{token diffs} and map them to \emph{terminal
+error production rules}. The non-terminal error rules can be inferred using the
+grammar and the terminal rules. After this prodecure, we run ECE-Parser with the
+extracted error rules to confirm which ones would make the program parse and
+assign them as \emph{labels}. For example, the diff for the program pair in
+\autoref{fig:example-prog} would show the deleted |+| operator, thus extracting
+the error rules |Token $\rightarrow$ +| and |E_\n $\rightarrow$ Insert \n|,
+since the extra token |+| precedes a newline character |\n|. Similarly, if a
+token |t| is added in the fixed program, the error rule
+%
+|E_t $\rightarrow$ $\epsilon$| is added and if a token |t| replaces a token |a|
+in the fix the error rules |E_t $\rightarrow$ Replace| and
+%
+|Replace $\rightarrow$ a| are added.
 
 We then train a Transformer classifier on a new updated error-rule-labeled data
 set. Futhermore, Neural networks have the advantage of associating each class
 with a \emph{confidence score} that can be interpreted as the model's confidence
 of each class being correct for a given input. Therefore, confidence scores can
 be used to rank error rule predictions for new programs and select the top-$N$
-ones that will maintain a decent performance when used with the ECE-Parser. Exploiting
-recent advances in machine learning, we use deep and dense architectures
-\citep{Schmidhuber_2015} for more accurate predictions.
+ones that will maintain a decent performance when used with the ECE-Parser.
+Exploiting recent advances in machine learning, we use deep and dense
+architectures \citep{Schmidhuber_2015} for more accurate predictions.
+
+\subsection{Predicting Error Rules with Sequence Classifiers}
+\label{sec:overview:seq-classifiers}
+

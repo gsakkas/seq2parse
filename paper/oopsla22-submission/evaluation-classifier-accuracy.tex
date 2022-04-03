@@ -12,30 +12,30 @@
 \begin{axis}[
   ybar stacked,
   width=0.9\linewidth,
-  height=9cm,
+  height=6.5cm,
   % title={Accuracy of Repair Template Prediction},
   ylabel={Accuracy},
   bar width=0.9cm,
   ymin=0.0,
-  ymax=115.0,
+  ymax=105.0,
   ytick={0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0},
   yticklabel={\pgfmathparse{\tick}\pgfmathprintnumber{\pgfmathresult}\,\%},
   ytick style={draw=none},
   ymajorgrids = true,
-  symbolic x coords={original, abstracted, abstracted-best},
-  enlarge x limits=0.4,
+  symbolic x coords={original, abstracted, abstracted-best, empty},
+  enlarge x limits=0.2,
   xtick=data,
   xtick style={draw=none},
-  xticklabels={\textsc{Original}\xspace, \textsc{Abstracted}\xspace, \textsc{Threshold}\xspace},
+  xticklabels={\textsc{Original}\xspace, \textsc{Abstracted}\xspace, \textsc{Threshold}\xspace, \xspace},
   %x tick label style={rotate=45, anchor=north east},
   x tick label style={font=\small},
   y tick label style={font=\small},
   reverse legend,
   transpose legend,
-  legend style={legend pos = north east, legend columns=4, font=\small},
+  legend style={legend pos = north east, legend columns=8, font=\small},
 ]
 
-\addplot[draw=black, fill=blue2, bar shift=-.451cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.45851707517178)};
+\addplot[draw=black, fill=blue2, bar shift=-.451cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.45851707517178) (empty, 0.0)};
 
 \resetstackedplots
 

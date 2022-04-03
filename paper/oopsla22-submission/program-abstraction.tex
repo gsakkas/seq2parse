@@ -147,31 +147,6 @@ $\List{e}$ of programs. Finally, $\learnPCFGsym$ will output a PCFG that is
 based on the original grammar $G$ that was used to parse the dataset with the
 additional probabilities.
 
-\begin{figure}[t]
-    \begin{ecode}
-    [P = 100.0%] S -> Stmts_Or_Newlines Endmarker
-    [P = 99.43%] Funcdef -> def Name Parameters : Suite
-    [P = 99.29%] Suite -> Newline Indent Stmts_Or_Newlines Dedent
-    [P = 38.72%] Stmts_Or_Newlines -> Stmt_Or_Newline
-    [P = 61.28%] Stmts_Or_Newlines -> Stmt Stmts_Or_Newlines
-    [P = 86.81%] Stmt -> Expr_Stmt
-    [P =  0.17%] Stmt -> Pass_Stmt
-    [P = 10.25%] Stmt -> Return_Stmt
-    [P =  1.41%] Return_Stmt -> return
-    [P = 98.59%] Return_Stmt -> return Arg_List
-    \end{ecode}
-    \caption{The production rules shown in \autoref{fig:production-rules} with
-    their learned probabilities.}
-    \label{fig:weighted-production-rules}
-\end{figure}
-
-\mypara{Example of PCFG}
-\autoref{fig:weighted-production-rules} has the assigned probabilities for the
-running example grammar. We observe that the \texttt{Return\_Stmt} has 2
-possible production rules and almost 98.6\% of the times a
-\texttt{\textbf{return}} is followed by an argument list.
-
-
 \subsection{From Programs to Abstract Token Sequences}
 
 Given a program $e_{\bot}$ with a parse error and a learned PCFG, $\partialsym$

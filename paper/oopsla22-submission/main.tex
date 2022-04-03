@@ -77,7 +77,7 @@
 \lstset{
   language=Python,
   basicstyle=\ttfamily,
-  keywordstyle=\ttfamily,
+  keywordstyle=\ttfamily\bfseries,
   mathescape=true
 }
 
@@ -88,6 +88,20 @@
   keywordstyle=\ttfamily\bfseries,
   numbers=left,
   xleftmargin=5.5mm,
+  moredelim=[is][\bfseries]{==}{==},
+  moredelim=[is][\underbar]{__}{__},
+  moredelim=[is][\bfseries\underbar]{_=}{=_},
+  escapeinside={(*@}{@*)}
+}}
+{}
+
+\lstnewenvironment{rules}{
+\lstset{
+  language=Python,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\ttfamily\bfseries,
+  xleftmargin=5.5mm,
+  numbers=none,
   moredelim=[is][\bfseries]{==}{==},
   moredelim=[is][\underbar]{__}{__},
   moredelim=[is][\bfseries\underbar]{_=}{=_},
