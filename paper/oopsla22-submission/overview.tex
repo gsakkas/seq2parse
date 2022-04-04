@@ -44,12 +44,13 @@ Function |foo| adds some number to the argument variable |a| and returns it.
 Function |bar| calls |foo| with the argument variable |a|, adds another number
 and returns the result. However, there is an extra |+| operator after the
 |return b| statement. The extra |+| mostly likely needs to be deleted, as the
-programmer intended, as shown in the fix in \autoref{fig:fixed-prog}. This is a
-\emph{syntax (or parse) error} and such parse errors can easily go unnoticed
-\citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when they are
-part of bigger programs. Our goal is to use historical data of how programmers
-have fixed similar errors in their programs to automatically and rapidly guide
-programmers to come up with candidate solutions like the one above.
+programmer intended, as shown in the fixed program in \autoref{fig:fixed-prog}.
+This is a \emph{syntax (or parse) error} and such parse errors can easily go
+unnoticed \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when
+they are part of bigger programs. Our goal is to use historical data of how
+programmers have fixed similar errors in their programs to automatically and
+rapidly guide programmers to come up with candidate solutions like the one
+above.
 
 
 \mypara{Solution: Error Correcting Parsers}
@@ -63,7 +64,7 @@ correcting production rules} \citep{Aho_1972} to generate a valid parse by
 making minimal edits to the original program.
 
 \mypara{Another Problem}
-However, these error-correcting parsers have a time complexity that is cubed on
+However, these error correcting parsers have a time complexity that is cubed on
 the input program size and squared on the grammar size used. Futhermore, there
 is the added cost of the large number of additional production rules these
 parsers have to consider while having an explosion of the internal states by
@@ -71,18 +72,18 @@ maintaining the cost of each possible parse. Therefore, they are not tractable
 or scalable options for real-world programming languages and programs.
 
 
-\mypara{Solution: Train classifier to predict error rules}
+\mypara{Solution: Train Classifier to Predict Error Rules}
 The original Earley parsing is a fairly efficient parsing algorithm
-\citep{Earley_1970} based on dynamic programming. Its error-correcting version
-becomes very inefficient though for larger real-world grammars, since it
-requires the addition of a large number of error production rules as mentioned
-before. However, not every erroneous program needs all of those rules to be
+\citep{Earley_1970} based on dynamic programming. As mentioned above, the
+error-correcting version is very inefficient for larger real-world grammars,
+since it requires the addition of a large number of error production rules.
+However, not every erroneous program needs all of the possible error rules to be
 parsed. In this work, we present a novel strategy to selecting just a small set
 of error production rules that can be used with an updated \emph{Error
 Correcting Earley Parser} (ECE-Parser) to repair a program with parse errors.
 %
-To enable the efficient usage of a scalable ECE-Parser we decompose the problem into 3
-steps:
+To enable the efficient usage of a scalable ECE-Parser we decompose the problem
+into 3 steps:
 %
 First, \emph{learn} the set of error productions rules each program with a parse
 error needs from a corpus of fixed programs.
@@ -97,15 +98,15 @@ of our approach by describing how to:
 
 \begin{enumerate}
 
-  \item Use an \emph{Error Correcting Earley Parser} (ECE-Parser) to repair programs
-  with parse errors (\S~\ref{sec:overview:ec-parsing}),
+  \item Use an \emph{(ECE-Parser} to repair programs with parse errors
+  (\S~\ref{sec:overview:ec-parsing}),
 
   \item Abstract erroneous programs with their \emph{partial parses} and the
   usage of Probabilistic Context-Free Grammars (PCFGs)
   (\S~\ref{sec:overview:abstraction}),
 
   \item Train \emph{sequence classifiers} on the abstracted programs to predict
-  small sets of error production rules (\S~\ref{sec:overview:train}).
+  subsets of error rules (\S~\ref{sec:overview:train}).
 
 \end{enumerate}
 
@@ -135,14 +136,17 @@ algorithm in the history of parsing \citep{Earley_1970}. An Earley parser is a
 parses are stored in a data structure called a \emph{chart}, which can later be
 re-used, and the parse tree is built from the top down. An (Earley) parser
 accepts programs that belong into a language that is defined by a given
-\emph{grammar} $G$. A grammar has a starting symbol |S| and a set of
+\emph{grammar} $G$. The grammar $G$ has a starting symbol |S| and a set of
 \emph{production rules}. \autoref{fig:production-rules} presents some simplified
-production rules for the Python language that will help parse the program in
-\autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are symbols
-that a Python program consists of and are presented here in lowercase letters.
-Symbols that start with a capital letter here represent \emph{non-terminal}
-symbols. For example, the non-terminal |Stmt| defines all the possible Python
-statements, \ie expressions (|ExprStmt|), return statements (|ReturnStmt|), \etc
+production rules for the Python programming language that will help parse the
+program in \autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens})
+are symbols that a Python program consists of and are here presented in all
+lowercase letters. Symbols that start with a capital letter here represent
+\emph{non-terminal} symbols. For example, the non-terminal |Stmt| defines all
+possible Python statements, \ie expressions (|ExprStmt|), return statements
+(|ReturnStmt|), \etc \autoref{fig:partial-parse-tree-1} shows the top levels of
+the parse tree for |bar| function in \autoref{fig:bad-prog} using the
+aforementioned productions rules.
 
 \input{partial-parse-example}
 %
@@ -173,32 +177,34 @@ a program with parse errors. An ECE-Parser extends the original grammar $G$ with
 a set of \emph{error production rules} to create a new \emph{error grammar}
 $G'$. This grammar contains error rules for three major types of errors that the
 ECE-Parser considers, \ie it adds error rules that account for \emph{insertion},
-\emph{deletion}, \emph{replacement} errors.
+\emph{deletion}, and \emph{replacement} errors.
 
-First of all, the ECE-Parser adds a new start symbol |New_S|, the helper symbol
-|Replace| that is used for replacement errors and the symbols |Insert| and
-|Token| that introduce insertion errors. Additionally, for each terminal |t| it
-adds the new non-terminal |E_t| that introduces errors relevant to the |t|
-symbol.
+First of all, the ECE-Parser adds to $G'$ a new start symbol |New_S|, the helper
+symbol |Replace| that is used for replacement errors and the symbols |Insert|
+and |Token| that introduce insertion errors. Additionally, for each terminal |t|
+in $G$ it adds the new non-terminal |E_t| that introduces errors relevant to the
+|t| symbol.
 
 Next, in addition to the existing production rules, the error grammar $G'$ has
-the following error rules. The new start symbols uses the old one with the
-option of an insertion error at the end:
+the following error rules. The new start symbol uses the old one with the option
+of an insertion error at the end:
 \begin{itemize}
   \item \lstinline{New_S  $\rightarrow$ S | S Indent}
 \end{itemize}
-Also, for each non-terminal |T| it adds some non-terminal error rules that
-introduce the terminal errors when the parsing algorithm is executed. For
-example, the |Block| and |RetStmt| rules are updated as:
+Also, for each production rule of a non-terminal |T| in $G$, another
+non-terminal error rule is added that introduces the terminal symbols |E_t|, for
+each original terminal |t| it has. For example, the |Stmts|, |Block| and
+|RetStmt| rules are updated as:
 \begin{itemize}
+  \item \lstinline{Stmts    $\rightarrow$ ... | Stmt E_\n | Stmt E_\n Stmts}
   \item \lstinline{Block    $\rightarrow$ ... | E_\n E_indent Stmts E_dedent}
   \item \lstinline{RetStmt  $\rightarrow$ ... | E_return | E_return Args}
 \end{itemize}
-Next, for each terminal |t|, we add four error rules of the type:
+Next, for each terminal |t| in $G$, we add four error rules of the type:
 \begin{itemize}
   \item \lstinline{E_t $\rightarrow$ t | $\epsilon$ | Replace | Insert t}
 \end{itemize}
-These four new error rules has the following usage for each terminal |t|:
+These four new error rules have the following usage for each terminal |t|:
 \begin{enumerate}
   \item The |E_t $\rightarrow$ t| rule will match the original terminal |t| without any
   errors. This error rule is used in cases that the \emph{non-error} version of
@@ -279,7 +285,7 @@ types of errors.
 For example, \autoref{fig:partial-parse-tree-2} presents a \emph{partial parse}
 of the problematic statements |Stmts|$^1$ of \autoref{fig:partial-parse-tree-1}.
 Considering a deletion error, the |E_number $\rightarrow$ $\epsilon$| error rule
-is used to match the empty symbol and generate a parser that suggests that a
+is used to match the empty symbol and generate a parse that suggests that a
 \emph{number} is missing after the |+| operator. On the other hand, the
 %
 |E_\n $\rightarrow$ Insert \n| error rule can be used to consider a insertion
@@ -292,19 +298,28 @@ programs than don't belong into the given programming language, \ie have parse
 errors. However, this parsing algorithm has limited use in large real-world
 programming languages, \eg Python or Java, and more time- and memory-efficient
 parsing algorithms are used, \eg LR parsing \etc \citep{Knuth_1965,
-Chapman_1987}. Even after certain optimizations such as the usage of |Replace|
-and |Insert| a large amount of error productions rules is added making an
-ECE-Parser not scalable for large programs or programs with a lot of parse
-errors.
+Chapman_1987}. For example, Python has \emph{$90$ terminal symbols} which means
+that for all the cases of the error rules |E_t| (excluding the non-error base
+case |E_t -> t|), |Replace| and |Token|, \emph{$450$ terminal error rules} have
+to be added to the grammar $G'$. The Python grammar that we used has also
+\emph{$283$ production rules}, from which \emph{$182$ rules} have terminals in
+them, meaning another \emph{$182$ error rules} need to be added. Accounting the
+four helper production rules, \eg for the new start symbol, the new grammar $G'$
+has \emph{$636$ new error production rules}. This large amount of error rules
+renders the ECE-Parser not scalable for large programs or programs with a lot of
+parse errors when using real-world programming languages.
 
-A straight-forward approach to keep ECE-Parser tractable is to only add a small
-set of error production rules, \ie keep the size of $G'$ limited and slightly
-larger than the original grammar $G$. This can be achieved by \emph{training
-classifiers} to select a small set of error rules relevant to the parse error.
-However, the program token sequences that we can use have too much irrelevant
-information, \eg the |foo| function in our example in \autoref{fig:example-prog}
-that doesn't contribute to the parse error. The solution to this problem, is to
-further \emph{abstract} our program token sequences.
+As we witnessed in our running example in \autoref{fig:two-partial-parses}, only
+a handful of error rules are relevant to each parse error. Therefore, a
+straight-forward approach to keep ECE-Parser tractable is to only add \emph{a
+small set} of error production rules, \ie keep the size of $G'$ limited and
+slightly larger than the original grammar $G$. This can be achieved by
+\emph{training classifiers} to select a small set of error rules only relevant
+to the parse error. However, the program token sequences that we can use have
+too much irrelevant information, \eg the |foo| function in our example in
+\autoref{fig:example-prog} that doesn't contribute to the parse error. The
+solution to this problem, is to further \emph{abstract} our program token
+sequences.
 
 \subsection{Abstracting program token sequences}
 \label{sec:overview:abstraction}
