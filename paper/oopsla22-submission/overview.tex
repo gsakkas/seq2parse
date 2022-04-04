@@ -303,14 +303,14 @@ programming languages, \eg Python or Java, and more time- and memory-efficient
 parsing algorithms are used, \eg LR parsing \etc \citep{Knuth_1965,
 Chapman_1987}. For example, Python has \emph{$90$ terminal symbols} which means
 that for all the cases of the error rules |E_t| (excluding the non-error base
-case |E_t -> t|), |Replace| and |Token|, \emph{$450$ terminal error rules} have
-to be added to the grammar $G'$. The Python grammar that we used has also
-\emph{$283$ production rules}, from which \emph{$182$ rules} have terminals in
-them, meaning another \emph{$182$ error rules} need to be added. Accounting the
-four helper production rules, \eg for the new start symbol, the new grammar $G'$
-has \emph{$636$ new error production rules}. This large amount of error rules
-renders the ECE-Parser not scalable for large programs or programs with a lot of
-parse errors when using real-world programming languages.
+case |E_t $\rightarrow$ t|), |Replace| and |Token|, \emph{$450$ terminal error
+rules} have to be added to the grammar $G'$. The Python grammar that we used has
+also \emph{$283$ production rules}, from which \emph{$182$ rules} have terminals
+in them, meaning another \emph{$182$ error rules} need to be added. Accounting
+the four helper production rules, \eg for the new start symbol, the new grammar
+$G'$ has \emph{$636$ new error production rules}. This large amount of error
+rules renders the ECE-Parser not scalable for large programs or programs with a
+lot of parse errors when using real-world programming languages.
 
 As we witnessed in our running example in \autoref{fig:two-partial-parses}, only
 a handful of error rules are relevant to each parse error. Therefore, a
@@ -569,23 +569,45 @@ confidence scores can be used to rank error rule predictions for new programs
 and select the top-$N$ ones that will maintain a decent performance when used
 with the ECE-Parser.
 
-For our running example, in \autoref{fig:bad-prog}, we abstract the program as
+For our running example, in \autoref{fig:bad-prog}, we abstract the program
 shown in \autoref{fig:abstract-prog-seq} and then we predict the error
-production rules for it with the trained Transformer classifier. From the full
-set of \emph{terminal} error rules, we rank them based on their predicted error
-score from the classifier and return here the \emph{top 10} predictions.
+production rules for it with the trained Transformer classifier. We rank the
+full set of \emph{terminal} error rules based on their predicted error score
+from the classifier and return the \emph{top 10} predictions for our example.
 Therefore, the predicted set of error rules is the following:
 %
-|E_number -> $\epsilon$|, |E_number -> Insert number|, |E_\n -> Insert \n|,
+|E_number $\rightarrow$ $\epsilon$|, |E_number $\rightarrow$ Insert number|,
 %
-|E_( -> $\epsilon$|,\linebreak |E_return -> $\epsilon$|, |Token -> )|,
+|E_\n $\rightarrow$ Insert \n|, |E_( $\rightarrow$ $\epsilon$|, \linebreak
 %
-|Token -> +|, |Token -> :|, |Token -> name|, |Token -> number|.
+|E_return $\rightarrow$ $\epsilon$|, |Token $\rightarrow$ )|,
+%
+|Token $\rightarrow$ +|, |Token $\rightarrow$ :|, |Token $\rightarrow$ name|,
+%
+|Token $\rightarrow$ number|.
+
+The classifier predicts mostly relevant error rules such as the ones that use
+|E_number|, |E_\n| and |E_return| for example, as we showed previously. There
+are also rules that are not very relevant to this parse error but the classifier
+predicts probably due to them being common parse errors, \eg
+%
+|Token $\rightarrow$ )|, |Token $\rightarrow$ :|. Finally, we added the
+\emph{non-terminal} error rules needed to introduce these errors, which can be
+inferred by them. For example, we can infer
+%
+|Stmts $\rightarrow$ Stmt E_\n|, |Stmts $\rightarrow$ Stmt E_\n Stmts| and
+%
+\lstinline{Block $\rightarrow$ E_\n indent Stmts dedent} from |E_\n| (we don't
+need |E_indent| or |E_dedent| here since no such terminal error rules were
+predicted).
 
 We then parse the program in \autoref{fig:bad-prog} with the ECE-Parser and
-those specific error rules to generate a valid parse. We observe that it takes
+these specific error rules to generate a valid parse. We observe that it takes
 our implementation (as we will show later in depth) around \emph{2 seconds} to
-generate a valid parse and suggest the actual user repair! On the other hand,
-when we use the ECE-Parser with the full set of error rules it takes \emph{2
-minutes and 55 seconds} to generate a valid parse, which is, however, not the
-expected user parse, but the one presented in \autoref{fig:adding-partial}.
+generate a valid parse, which is also the one that leads to the actual user
+repair in \autoref{fig:fixed-prog}! On the other hand, when we use the
+ECE-Parser with the full set of error rules it takes \emph{2 minutes and 55
+seconds} to generate a valid parse, which is, however, not the expected user
+parse, but the one presented in \autoref{fig:adding-partial}. We observe here
+the effectiveness of accurately \emph{predicting error rules using sequence
+classifiers, which are trained on abstracted token sequences}.
