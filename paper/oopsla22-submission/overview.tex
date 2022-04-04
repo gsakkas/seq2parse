@@ -108,6 +108,9 @@ of our approach by describing how to:
   \item Train \emph{sequence classifiers} on the abstracted programs to predict
   subsets of error rules (\S~\ref{sec:overview:train}).
 
+  \item \emph{Predict error rules} for new erroneous programs in order to
+  suggest fixes (\S~\ref{sec:overview:seq-classifiers}).
+
 \end{enumerate}
 
 \subsection{Error Correcting Parsing}
@@ -115,16 +118,16 @@ of our approach by describing how to:
 
 \begin{figure}[t]
 \begin{rules}
-S        (*@$\rightarrow$@*) Stmts end_marker
-Stmts    (*@$\rightarrow$@*) Stmt \n | Stmt \n Stmts
-Stmt     (*@$\rightarrow$@*) FuncDef | ExprStmt | RetStmt | PassStmt | ...
-FuncDef  (*@$\rightarrow$@*) def name Params : Block
-Block    (*@$\rightarrow$@*) \n indent Stmts dedent
-RetStmt  (*@$\rightarrow$@*) return | return Args
-Args     (*@$\rightarrow$@*) ExprStmt | ExprStmt , Args
-ExprStmt (*@$\rightarrow$@*) ArExpr | ...
-ArExpr   (*@$\rightarrow$@*) Literal | ArExpr BinOp Literal
-Literal  (*@$\rightarrow$@*) name | number | ...
+S        $\rightarrow$ Stmts end_marker
+Stmts    $\rightarrow$ Stmt \n | Stmt \n Stmts
+Stmt     $\rightarrow$ FuncDef | ExprStmt | RetStmt | PassStmt | ...
+FuncDef  $\rightarrow$ def name Params : Block
+Block    $\rightarrow$ \n indent Stmts dedent
+RetStmt  $\rightarrow$ return | return Args
+Args     $\rightarrow$ ExprStmt | ExprStmt , Args
+ExprStmt $\rightarrow$ ArExpr | ...
+ArExpr   $\rightarrow$ Literal | ArExpr BinOp Literal
+Literal  $\rightarrow$ name | number | ...
 \end{rules}
 \caption{Simplified production rules of the Python grammar}
 \label{fig:production-rules}
@@ -345,11 +348,14 @@ useful information and abstraction for the program at hand. In our example, the
 partial parse tree shown in \autoref{fig:partial-parse-tree-1} can be generated
 by an Earley parser. Using this partial parse tree we can extract the
 \emph{abstracted token sequence} shown in the bottom of
-\autoref{fig:abstract-prog-seq}. Any \emph{completed} production rules can be
-used to replace the relevant \emph{token sub-sequences} with the high-level
-\emph{non-terminal}. For example, the function |foo| is completely parsed, since
-it had no parse errors and the highest level rule that can be used to abstract
-it is |Stmt $\rightarrow$ FuncDef|. On another example in
+\autoref{fig:abstract-prog-seq}.
+
+Any \emph{completed} production rules can be used to replace the relevant
+\emph{token sub-sequences} with the high-level \emph{non-terminal}. For example,
+the function |foo| is completely parsed, since it had no parse errors and the
+highest level rule that can be used to abstract it is
+%
+|Stmt $\rightarrow$ FuncDef|. On another example in
 \autoref{fig:partial-parse-tree-1}, we observed that
 %
 |Params $\rightarrow$ ( name )| is another completed production rule, therefore
@@ -360,13 +366,15 @@ statement |Stmt| (under |Stmts|$^1$) has a parse error as shown in
 
 The generation of this abstraction, however, poses another difficulty. Earley
 parsing collects a large amount of partial parses until the program is fully
-parses. That means at each program location of the program multiple can be
+parsed. That means at each program location, multiple partial parses can be
 chosen to abstract our programs. This \emph{ambiguity} can be seen even in the
 two suggested repairs in \autoref{fig:two-partial-parses}, where if we delete
 the colored nodes in \autoref{fig:adding-partial} and
-\autoref{fig:deleting-partial} we get two possible partial parses fo our
+\autoref{fig:deleting-partial} we get two possible partial parses for our
 program, the first one matching the one in \autoref{fig:partial-parse-tree-2}
-and the second one not shown here.
+and the second one not shown here. In order to chose between partial parses to
+abstract the program around the parse error, we propose the usage of
+\emph{Probabilistic Context-Free Grammars}.
 
 
 \begin{figure}[t]
@@ -401,13 +409,34 @@ dedent end_marker
 \caption{A simple Python program example}
 \end{figure}
 
-\mypara{Probabilistic Context-Free Grammars} Even if the original grammar $G$ is
-not ambiguous, generating partial parses can be ambiguous as we've shown. Earley
-parsing is an dynamic programming technique and internally keeps all possible
-parses from the begging of the token sequence until a position $i$ in its
-charts. Therefore, when there is a parse error at token $i$, it is possible to
-have more than one partial parses to choose from in order to generate the
-abstracted token sequence.
+\mypara{Probabilistic Context-Free Grammars}
+Even if the original grammar $G$ is not ambiguous, generating partial parses can
+be ambiguous as we've shown. Earley parsing is an dynamic programming technique
+and internally keeps all possible parses for a program token sequence. In that
+aid, Probabilistic Context-Free Grammars (PCFGs) have been used in previous work
+\citep{Collins_2013, Jelinek_1992} to select \emph{complete} parses for
+ambiguous grammars. A PCFG associates each of its production rules with a
+\emph{weight} or \emph{probability}. Each parse tree that is generated during
+parsing is also associated with a probability. The probability of a parse tree
+is simply the \emph{product} of the used rules' probabilities. Finally, the tree
+with the highest probability is selected as a final parse tree.
+
+A PCFG can simply be learned \citep{Collins_2013} by counting the production
+rules used to parse a number of programs belonging to that language. In that
+aid, a large corpus of fixed erroneous programs can be used to learn the
+probabilities by parsing all the fixed programs.
+\autoref{fig:weighted-production-rules} has the learned probabilities for the
+example Python grammar. We observe, for example, that |ReturnStmt| has two
+possible production rules and almost $98.4\%$ of the times a |return| is
+followed by an argument list. Additionally, $62.6\%$ of the times a |Stmt| is an
+|ExprStmt| and only $7.6\%$ of the times it is a |RetStmt|.
+
+% Even if the original grammar $G$ is not ambiguous, generating partial parses
+% can be ambiguous as we've shown. Earley parsing is an dynamic programming
+% technique and internally keeps all possible parses from the begging of the
+% token sequence until a position $i$ in its charts. Therefore, when there is a
+% parse error at token $i$, it is possible to have more than one partial parses
+% to choose from in order to generate the abstracted token sequence.
 
 % For the running example, if we focus on the \texttt{return} statement of the
 % program, there are two possible partial parses in the parser chart, as shown in
@@ -418,51 +447,10 @@ abstracted token sequence.
 % \autoref{fig:deleting-partial} would produce a solution that returns just the
 % number by deleting the arithmetic operator in the red node.
 
-\begin{figure}[t]
-\begin{rules}
-S        (*@$\rightarrow$@*) Stmts end_marker        , $p = 100.0\%$
-Stmts    (*@$\rightarrow$@*) Stmt \n                 , $p = 38.77\%$
-Stmt     (*@$\rightarrow$@*) ExprStmt                , $p = 62.64\%$
-Stmt     (*@$\rightarrow$@*) RetStmt                 , $p =  7.59\%$
-RetStmt  (*@$\rightarrow$@*) return                  , $p =  1.61\%$
-RetStmt  (*@$\rightarrow$@*) return Args             , $p = 98.39\%$
-Args     (*@$\rightarrow$@*) ExprStmt                , $p = 99.20\%$
-ExprStmt (*@$\rightarrow$@*) ArExpr                  , $p = 29.40\%$
-ArExpr   (*@$\rightarrow$@*) Literal                 , $p = 86.89\%$
-ArExpr   (*@$\rightarrow$@*) ArExpr BinOp Literal    , $p = 13.11\%$
-Literal  (*@$\rightarrow$@*) name                    , $p = 64.89\%$
-Literal  (*@$\rightarrow$@*) number                  , $p = 20.17\%$
-\end{rules}
-\caption{The production rules shown in \autoref{fig:production-rules} with
-their learned probabilities.}
-\label{fig:weighted-production-rules}
-\end{figure}
-% Stmts    (*@$\rightarrow$@*) Stmt \n Stmts           , $p = 61.23\%$
-% Stmt     (*@$\rightarrow$@*) FuncDef                 , $p =  7.86\%$
-% Stmt     (*@$\rightarrow$@*) PassStmt                , $p =  0.13\%$
-% FuncDef  (*@$\rightarrow$@*) def name Params : Block , $p = 99.10\%$
-% Block    (*@$\rightarrow$@*) \n indent Stmts dedent  , $p = 99.29\%$
-% Args     (*@$\rightarrow$@*) ExprStmt , Args         , $p =  0.80\%$
-
-In that aid, Probabilistic Context-Free Grammars (PCFGs) have been used in
-previous work \citep{Collins_2013, Jelinek_1992} to select \emph{complete}
-parses for ambiguous grammars. A PCFG associates each of its production rules
-with a \emph{weight} or \emph{probability}. Each parse tree that is generated
-during parsing is also associated with a probability. Finally, the one with the
-highest probability is selected as a final parse tree. A PCFG can simply be
-learned \citep{Collins_2013} by counting the production rules used to parse a
-number of programs belonging to that language for each terminal token.
-\autoref{fig:weighted-production-rules} has the assigned probabilities for the
-running example grammar. We observe, for example, that the |ReturnStmt| has 2
-possible production rules and almost $98.4\%$ of the times a |return| is
-followed by an argument list, and $62.6\%$ of the times a |Stmt| is an
-|ExprStmt|.
-
-We apply this approach to select a partial parse from the Earley parser. The
-probabilities can again be learned from the \emph{fixed} programs of a large
-corpus of erroneous and fixed programs. The selected partial parse can then be
-used to generate an abstracted token sequence. In our example, the probability
-that would be assigned to the partial parse for |Stmts|$^1$ in
+We apply this approach to select a \emph{partial parse} from the Earley parser,
+instead of complete parses. The selected partial parse can then be used to
+generate an abstracted token sequence, as described above. In our example, the
+probability that would be assigned to the partial parse for |Stmts|$^1$ in
 \autoref{fig:adding-partial} (only the sub-tree without the colored error nodes)
 is the product of the probabilities of the production rules |Stmts|
 $\rightarrow$ |Stmt \n|, |Stmt| $\rightarrow$ |RetStmt|, |RetStmt| $\rightarrow$
@@ -470,7 +458,42 @@ $\rightarrow$ |Stmt \n|, |Stmt| $\rightarrow$ |RetStmt|, |RetStmt| $\rightarrow$
 7.59\%\ \cdot\ 98.39\%\ \cdot\ 99.20\%\ \cdot\ \dots =
 4.57\text{\textperthousand}$, while the partial parse for |Stmts|$^1$ in
 \autoref{fig:deleting-partial} would similarly be calculated as
-$47.61\text{\textperthousand}$.
+$47.61\text{\textperthousand}$, making it the proper choice for the abstraction
+of the program.
+
+\begin{figure}[t]
+\begin{rules}
+S        $\rightarrow$ Stmts end_marker ($p = \underline{100.0\%}$)
+Stmts    $\rightarrow$ Stmt \n ($p = \underline{38.77\%}$) | Stmt \n Stmts ($p = \underline{61.23\%}$)
+Stmt     $\rightarrow$ ExprStmt ($p = \underline{62.64\%}$) | RetStmt ($p = \underline{ 7.59\%}$) | ...
+RetStmt  $\rightarrow$ return ($p = \underline{ 1.61\%}$) | return Args ($p = \underline{98.39\%}$)
+Args     $\rightarrow$ ExprStmt ($p = \underline{99.20\%}$) | ...
+ExprStmt $\rightarrow$ ArExpr ($p = \underline{29.40\%}$) | ...
+ArExpr   $\rightarrow$ Literal ($p = \underline{86.89\%}$) | ArExpr BinOp Literal ($p = \underline{13.11\%}$)
+Literal  $\rightarrow$ name ($p = \underline{64.89\%}$) | number ($p = \underline{20.17\%}$) | ...
+\end{rules}
+\caption{The production rules shown in \autoref{fig:production-rules} with
+their learned \underline{probabilities}.}
+\label{fig:weighted-production-rules}
+\end{figure}
+% S        (*@$\rightarrow$@*) Stmts end_marker        , $p = 100.0\%$
+% Stmts    (*@$\rightarrow$@*) Stmt \n                 , $p = 38.77\%$
+% Stmt     (*@$\rightarrow$@*) ExprStmt                , $p = 62.64\%$
+% Stmt     (*@$\rightarrow$@*) RetStmt                 , $p =  7.59\%$
+% RetStmt  (*@$\rightarrow$@*) return                  , $p =  1.61\%$
+% RetStmt  (*@$\rightarrow$@*) return Args             , $p = 98.39\%$
+% Args     (*@$\rightarrow$@*) ExprStmt                , $p = 99.20\%$
+% ExprStmt (*@$\rightarrow$@*) ArExpr                  , $p = 29.40\%$
+% ArExpr   (*@$\rightarrow$@*) Literal                 , $p = 86.89\%$
+% ArExpr   (*@$\rightarrow$@*) ArExpr BinOp Literal    , $p = 13.11\%$
+% Literal  (*@$\rightarrow$@*) name                    , $p = 64.89\%$
+% Literal  (*@$\rightarrow$@*) number                  , $p = 20.17\%$
+% Stmts    (*@$\rightarrow$@*) Stmt \n Stmts           , $p = 61.23\%$
+% Stmt     (*@$\rightarrow$@*) FuncDef                 , $p =  7.86\%$
+% Stmt     (*@$\rightarrow$@*) PassStmt                , $p =  0.13\%$
+% FuncDef  (*@$\rightarrow$@*) def name Params : Block , $p = 99.10\%$
+% Block    (*@$\rightarrow$@*) \n indent Stmts dedent  , $p = 99.29\%$
+% Args     (*@$\rightarrow$@*) ExprStmt , Args         , $p =  0.80\%$
 
 \subsection{Training Sequence Classifiers}
 \label{sec:overview:train}
