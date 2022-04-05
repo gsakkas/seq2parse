@@ -3,20 +3,20 @@
 
 Our next task is to \emph{train} a model that can predict which error production
 rules are needed to parse a given program (with syntax errors) according to a
-given grammar, given its (abstracted) program token sequence.
+given grammar $G$ and given its (abstracted) program token sequence $t^a$.
 %
 We do so by defining a function $\predictDLsym$ which takes as input a
 \emph{pre-trained Deep Neural Network (\dnn)} model $\Model$ and an abstracted
 token sequence $t^a$.
 %
 It returns as output a \emph{fixed set of error production rules}
-$\errorrulessym$ which can be used along with an error correcting parser (ECEP)
-(\autoref{sec:whole-system}) to successfully parse the program.
+$\errorrulessym$ which can be used along with an error correcting parser
+(ECE-Parser) (\autoref{sec:whole-system}) to successfully parse the program.
 %
-We acquire the pre-trained $\Model$ using the $\trainDLsym$ method.
-$\trainDLsym$ gets a dataset of token sequences $t^a$ and the \emph{exact small
-set} of error production rules that the ECEP needs to generate the intended user
-parse, \ie the dataset $\List{t^a \times \errorrulessym}$.
+We train the $\Model$ with the $\trainDLsym$ method. $\trainDLsym$ gets a
+dataset of token sequences $t^a$ and the \emph{exact small set} of error
+production rules that the ECE-Parser needs to generate the intended user parse,
+\ie the dataset $\List{t^a \times \errorrulessym}$.
 
 Next, we provide some necessary background about \emph{\dnn{}s} and
 \emph{Sequence-to-sequence (seq2seq)} models and describe how we incorporate
@@ -118,11 +118,11 @@ This architecture is used as described above in a seq2seq model
 \citep{Vaswani_2017} for the encoder. The decoder would require an extra third
 sub-layer, which performs multi-head attention over the output of the encoder
 stack. However, in our task we need to learn sets of error production rules,
-which can be formed as a classic \emph{classification} problem. We are dealing
+which can be framed as a classic \emph{classification} problem. We are dealing
 with input sequences of varied sizes, where no straightforward feature
 extraction technique exists. Therefore, we utilize the effectiveness of the
 state-of-the-art \emph{Transformer encoder} to summarize the programs into
-fixed-length vectors that can then be fed into classic \dnn{}s.
+fixed-length vectors that can then be fed into classic \dnn{} classifiers.
 
 % TODO: Update the paragraph below
 % Scaled Dot-Product Attention, computes the attention function on a set of
@@ -172,14 +172,14 @@ loss function is used per class to assign the loss per training cycle.
 \mypara{Predicting Error Rules}
 %
 Our ultimate goal is to be able to predict the small set of error production
-rules $\errorrulessym$ that a new unknown program with syntax errors needs to
-get parsed according to the given grammar $G$ and get repaired. Therefore, the
-$\predictDLsym$ function uses the trained $\Model$ to predict all confidence
-scores $\List{\errorrulessym \times \Conf}$ for each error production rule. The
-$\errorrulessym$ are then sorted based on their predicted confidence score
-$\Conf$ and finally the \emph{top-N} rules are returned for error-correcting
-parsing.$N$ is small number in the 10s that will give accurate predictions
-without making the ECEP too slow, as we discuss next in
+rules $\errorrulessym$ that a new unknown program $e_\bot$ with syntax errors
+needs to get parsed according to the given grammar $G$ and get repaired.
+Therefore, the $\predictDLsym$ function uses the trained $\Model$ to predict all
+confidence scores $\List{\errorrulessym \times \Conf}$ for each error production
+rule. The $\errorrulessym$ are then sorted based on their predicted confidence
+score $\Conf$ and finally the \emph{top-N} rules are returned for
+error-correcting parsing. $N$ is small number in the 10s that will give accurate
+predictions without making the ECE-Parser too slow, as we discuss next in
 \autoref{sec:whole-system}.
 
 % \mypara{The Prediction Algorithm}

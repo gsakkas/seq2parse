@@ -26,13 +26,13 @@ all the possible $\errorrulessym$ that are needed to parse and fix $t^a$. The
 straight-forward approach is to use the Error-Correcting Earley parser
 $\ecepsym$ with all possible error production rules $\errorrulessym$ as input
 for each program $e_{\bot}$. Then, when $\ecepsym$ returns with a successful
-parse we can extract from it the rules that where used to repair and parse the
-program $e_{\bot}$. This would produce a dataset with the most accurate error
-rules as labels. However, this approach, first, completely ignores the
-programmer's fix, which might not be the minimum-distance edit that the ECEP
-would produce but contains the intended changes, and, second, can take an
-unreasonable amount of time to generate for a dataset with millions of programs,
-due to the inefficient nature of the ECEP.
+parse we extract the rules that where used to repair and parse the program
+$e_{\bot}$. This would produce a dataset with the smallest set of error rules as
+labels. However, this approach, first, completely ignores the programmer's fix,
+which might not be the minimum-distance edit that the ECE-Parser would produce
+but contains the intended changes, and, second, can take an unreasonable amount
+of time to generate for a dataset with millions of programs, due to the
+inefficient nature of the ECE-Parser.
 
 Therefore, we suggest using an $O(ND)$ difference algorithm to get a small but
 still representative set of error production rules for each program $e$. We
@@ -42,8 +42,8 @@ the \emph{fixed token sequence} $t^o$, which is the lexed program $e$. This
 algorithm returns changes between the token sequences in the form of
 \emph{inserted or deleted tokens}. It is possible that this algorithm returns a
 sequence of deletions followed by a sequence of insertions, which can in turn
-interpreted as \emph{replacement}. Therefore, we map these three types of
-changes to the respective error production rules. Let $t^i$ be a sequence
+interpreted as a single \emph{replacement} of tokens. We map these three types
+of changes to the respective error production rules. Let $t^i$ be a sequence
 $t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
 \dots, t^o_k$. We map:
 \begin{itemize}
@@ -73,20 +73,30 @@ that was added with the above algorithm, or just $b_i$ again if it was not
 added.
 
 Finally, we further refine the new small set of error productions for each
-program $e_{\bot}$ with ECEP, in order to create the final annotated dataset
-$\List{t^a \times \errorrulessym}$. The changes that we extracted from the
-programmers' fixes might include irrelevant changes to the parse error fix.
-Therefore, running ECEP is still essential to annotate each program with the
-appropriate error production rules as described before. However, limiting the
-error rules to only the extracted small set instead of every possible error
-rule, makes the process of generating this dataset a much more tractable and
-efficient process.
+program $e_{\bot}$ with ECE-Parser, in order to create the final annotated
+dataset $\List{t^a \times \errorrulessym}$. The changes that we extracted from
+the programmers' fixes might include irrelevant changes to the parse error fix,
+\eg code clean-up. Therefore, running ECE-Parser is still essential to annotate
+each program with the appropriate error production rules as described before.
+However, limiting the error rules to only the extracted small set instead of
+every possible error rule, makes the process of generating this dataset a much
+more tractable and efficient process.
 
 
 \subsection{Training the Classifier}
 \label{sec:whole-system:training-classifier}
 
-\input{training-classifier-algo.tex}
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{0.47\linewidth}
+    \centering
+    \input{training-classifier-algo.tex}
+  \end{minipage}
+  \begin{minipage}[t]{0.52\linewidth}
+    \centering
+    \input{predict-algo.tex}
+  \end{minipage}
+\end{figure}
 
 \mypara{Training the Transformer Classifier}
 We describe in \autoref{algo:training-classifier-algo} how we use a
@@ -111,11 +121,9 @@ newly extracted dataset $D_{ML}$. The learned classifier $Model$ is returned in
 order to be used later on to fix new erroneous programs. This whole procedure
 happens offline and therefore it won't affect the performance of a final repair.
 
-\input{predict-algo.tex}
-
 \mypara{Predicting Error Rules}
 Having trained a Transformer classifier $Model$, we can now predict error rules
-$Rls$, that will be used by an ECEP, by using the $\predictsym$ procedure
+$Rls$, that will be used by an ECE-Parser, by using the $\predictsym$ procedure
 defined in \autoref{algo:predict-algo}. $\predictsym$ uses the same input
 grammar $G$ to generate an abstracted token sequence $t^a$ for the program $P$
 with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure can
