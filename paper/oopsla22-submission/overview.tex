@@ -301,16 +301,17 @@ programs than don't belong into the given programming language, \ie have parse
 errors. However, this parsing algorithm has limited use in large real-world
 programming languages, \eg Python or Java, and more time- and memory-efficient
 parsing algorithms are used, \eg LR parsing \etc \citep{Knuth_1965,
-Chapman_1987}. For example, Python has \emph{$90$ terminal symbols} which means
-that for all the cases of the error rules |E_t| (excluding the non-error base
-case |E_t $\rightarrow$ t|), |Replace| and |Token|, \emph{$450$ terminal error
-rules} have to be added to the grammar $G'$. The Python grammar that we used has
-also \emph{$283$ production rules}, from which \emph{$182$ rules} have terminals
-in them, meaning another \emph{$182$ error rules} need to be added. Accounting
-the four helper production rules, \eg for the new start symbol, the new grammar
-$G'$ has \emph{$636$ new error production rules}. This large amount of error
-rules renders the ECE-Parser not scalable for large programs or programs with a
-lot of parse errors when using real-world programming languages.
+Chapman_1987}. For example, Python has \emph{$91$ terminal symbols} (including
+the program's |end_marker|) which means that for all the cases of the error
+rules |E_t| (excluding the non-error base case |E_t $\rightarrow$ t|), |Replace|
+and |Token|, \emph{$455$ terminal error rules} have to be added to the grammar
+$G'$. The Python grammar that we used has also \emph{$283$ production rules},
+from which \emph{$182$ rules} have terminals in them, meaning another
+\emph{$182$ error rules} need to be added. Accounting the four helper production
+rules, \eg for the new start symbol, the new grammar $G'$ has \emph{$641$ new
+error production rules}. This large amount of error rules renders the ECE-Parser
+not scalable for large programs or programs with a lot of parse errors when
+using real-world programming languages.
 
 As we witnessed in our running example in \autoref{fig:two-partial-parses}, only
 a handful of error rules are relevant to each parse error. Therefore, a
