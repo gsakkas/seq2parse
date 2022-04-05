@@ -21,21 +21,21 @@
   \end{minipage}
 \end{figure}
 
-Parse errors (or \emph{Syntax Errors}) are usually easier to locate and be
-repaired than other algorithmic or runtime errors most of the times
-\citep{Denny_2012}. For example, the \emph{Python parser} will immediately
-inform the programmer for missing parenthesis in function argument lists or for
-not having the proper indents in a statement block. However, in this section we
-show that programmers (especially novices) mostly deal with these kinds of
-errors on a daily basis and spend a considerable amount of time fixing them.
+Parse errors (or \emph{Syntax Errors}) are usually easier to locate and repair
+than other algorithmic or runtime errors \citep{Denny_2012}. For example, the
+\emph{Python parser} will immediately inform the programmer for missing
+parenthesis in function argument lists or for not having the proper indents in a
+statement block. However, in this section we show that programmers (especially
+novices) mostly deal with these kinds of errors on a daily basis and spend a
+considerable amount of time fixing them.
 
 \mypara{Python Syntax Errors}
-We have collected a dataset of more than 1,000,000 erroneous Python programs
-along with their fixes from a web-based Python compiler called
-PythonTutor.com~\citep{Guo2013}, where novices programmers (mostly novices) can
-submit their code online and execute it. When there is an error, the failed
-attempt is recorded and associated with the next successful run of the same
-fixed code. This process generates a dataset of program pairs.
+We have collected a dataset of more than \emph{1,100,000 erroneous Python
+programs} along with their fixes from a web-based Python compiler called
+PythonTutor.com~\citep{Guo2013}, where programmers (mostly novices) can submit
+their code online and execute it. When there is an error, the failed attempt is
+recorded and associated with the next successful run of the same fixed code.
+This process generates a dataset of program pairs.
 
 By analyzing this data, we observe in \autoref{fig:error-statistics} that $77.4
 \% $ of all faulty programs failed with a syntax error. This accounts for the
