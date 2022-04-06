@@ -2,7 +2,16 @@
 \label{sec:intro}
 
 % Context
-Parsing is important and difficult.
+Writing syntactically correct code is a difficult process that usually requires
+some programming experience from the programmer. On the one hand, \emph{parsing
+algorithms} are essential parts of programming languages. A lot of research has
+been done around these algorithms and many efficient parsers have been used in
+modern programming languages, \eg LR parsing \citep{Aho1974} or Earley parsing
+\citep{Earley_1970}. These highly engineered approaches are usually very
+accurate in locating syntax errors, however, many times they fail to provide
+valuable feedback to the developers, \eg they only point to the first syntax
+error or the error messages are not descriptive enough or have too much
+information \citep{Kummerfeld2003}.
 
 % Gap
 There are highly engineered approaches, \eg parser or pylint, that are accurate
