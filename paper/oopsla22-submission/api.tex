@@ -1,6 +1,6 @@
 \begin{figure}[t]
 \small
-\begin{minipage}[c]{\linewidth}
+\begin{minipage}[t]{0.42\linewidth}
   \lstDeleteShortInline{|}
   \[
   \boxed{
@@ -10,13 +10,23 @@
     \midrule
     G'             & \defeq  & (N',\ \Sigma,\ P',\ S') \\
     P'             & \defeq  & P\ \cup\ \errorrulessym \\
-    N'             & \defeq  & N\ \cup\ \{S',\ H,\ I\}\ \cup\ \{E_a\ |\ a \in \Sigma\} \\
+    N'             & \defeq  & N\ \cup\ \{S',\ H,\ I\}\ \cup\\
+                   &         & \{E_a\ |\ a \in \Sigma\} \\
     \midrule
     e              & \in    & L(G) \\
     e_{\bot}       & \notin & L(G) \\
     \pairsym       & \defeq & e_{\bot} \times e \\
     \datasetsym    & \defeq & \List{\pairsym} \\
-    \midrule
+  \end{array}
+  }
+  \]
+  \lstMakeShortInline[language=Python, mathescape=true]{|}
+\end{minipage}
+\begin{minipage}[t]{0.57\linewidth}
+  \lstDeleteShortInline{|}
+  \[
+  \boxed{
+  \begin{array}{lcl}
     \ecepsym       & : & \errorrulessym \to e_{\bot} \to e \\
     \learnPCFGsym  & : & G \to \List{e} \to \pcfgsym \\
     \partialsym    & : & \pcfgsym \to e_{\bot} \to t^a  \\
@@ -32,11 +42,9 @@
   \end{array}
   }
   \]
-  \lstMakeShortInline[mathescape=true]{|}
-  \captionof{figure}{
-  A high-level API for building a \toolname system that learns parse error
-  repair function $e_{\bot} \to e$ from a $\datasetsym$ of program pairs.
-  }
-  \label{fig:api}
+  \lstMakeShortInline[language=Python, mathescape=true]{|}
 \end{minipage}
+\caption{A high-level API for building a \toolname system that learns parse
+error repair function $e_{\bot} \to e$ from a $\datasetsym$ of program pairs.}
+\label{fig:api}
 \end{figure}
