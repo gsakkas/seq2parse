@@ -9,15 +9,56 @@ errors.
 \mypara{Transformer-based models in Software Engineering}
 %
 \citep{Rahmani2021, Verbruggen2021} has used pre-trained auto-regressive
-transformer models \ie GPT-3 \citep{?} in association with pre-existing program
-synthesis techniques. Similar to our work here, this recent work uses
-established pre-existing algorithms from the NLP and PL research areas. However,
-\citep{Rahmani2021, Verbruggen2021} use pretrained models to acquire semantic
-power over smaller subproblems that can't be solved with the syntactic power of
-classic program synthesis algorithms. In our work, we train our own
-Transformer-based model to augment a classic parsing algorithm in a similar way,
-providing though more focused prior knowledge than using an NLP pretrained
-model.
+transformer models \ie \textsc{GPT-3} \citep{GPT2020} in association with
+pre-existing program synthesis techniques. Similar to our work here, this recent
+work uses established pre-existing algorithms from the NLP and PL research
+areas. However, \citep{Rahmani2021, Verbruggen2021} use pretrained models to
+acquire semantic power over smaller subproblems that can't be solved with the
+syntactic power of classic program synthesis algorithms. In our work, we train
+our own Transformer-based model to augment a classic parsing algorithm in a
+similar way, providing though more focused prior knowledge than using an NLP
+pretrained model.
+
+\mypara{Sequence Models for Parsing}
+\emph{Lenient parsing} \citep{Ahmed_2021} is an approach that is mostly similar
+to ours. Lenient parsing is trained on a corpus of imperfect code and its
+repairs and similarly uses a Transformer model. This approach, however, utilizes
+\emph{two seq2seq models}. One model to repair and create proper nested blocks
+of code, called \textsc{BlockFix} and another model, called \textsc{FragFix} to
+repair and parse fragments of code (\eg program statements) within a repaired
+block from \textsc{BlockFix}. \textsc{BlockFix} tokenizes input program block in
+a similar manner to our abstract token sequences, by abstracting identifiers,
+constants, expressions etc. and is trained on pairs of blocks and manually
+corrupted versions of them. It mostly fixes parentheses and curly brackets. On
+the other hand, \textsc{FragFix} repairs on a program statement level within the
+blocks, by using a serialized version of the ASTs and error hints injected on
+the ASTs that Mostly focus on missing semicolons and commas. Finally, they try
+to combine everything back to parseable code that can generate an AST. While
+this approach is mostly automatic, it relies on the corruption of a dataset to
+generate erroneous programs that may not correlate to the errors actual
+developers make and solely relies on the seq2seq models to learn the underlying
+language model and make repairs. In contrast, \toolname mitigates this problem
+by learning how programmers fixed their programs from a large corpus of programs
+and by adding prior knowledge to even programs that don't parse by abstracting
+them with their partial parses. Additionally, the usage of EC-Parser and the
+language grammar adds significant value in the repair of the programs, instead
+of solely relying on the machine learning models.
+
+\textsc{DeepFix} \citep{Gupta2017} is another seq2seq approach for repairing
+syntactical errors in \textsc{C} programs. It relies though in older models of
+stacked GRUs with Attention and applies single line fixes on the program. The
+model predictions are applied iteratively multiple times if multiple parse
+errors exist or until the parse error is fixed. \textsc{DeepFix} struggles with
+the same problems as lenient parsing, as it solely relies on the sequence
+models, while also not using an special abstraction on program lines.
+\textsc{SynFix} \citep{Bhatia2016} is another seq2seq model that uses the older
+RNNs called LSTMs, but they mostly focus on educational programming tasks.
+\textsc{SynFix} uses a sequence models per task and focus on the error locations
+that the language parser provides to make predictions. \toolname manages to
+generalize, repair and provide feedback to a large number of programs regardless
+the task they are trying to solve, by only encoding the erroneous programs with
+a state-of-the-art Transformer model and utilizing a EC-Parser to parse
+accordingly.
 
 % \mypara{Example-Based Feedback}
 % %
