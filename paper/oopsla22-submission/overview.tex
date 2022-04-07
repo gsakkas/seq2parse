@@ -9,25 +9,24 @@ processes (novice) programmers follow to repair their errors.
 One approach to make erroneous programs such as in \autoref{fig:bad-prog} parse
 is to use \emph{Error Correcting Parsers} (EC-Parsers) \citep{Aho_1972}.
 EC-Parsers are based on \emph{dynamic programming algorithms} and have been used
-in recent literature to automatically infer the intended parse tree for a
-program that doesn't belong to a certain programming language, \ie a program
-that has a syntax error. These dynamic programming parsers have been used along
-side with \emph{error correcting production rules} \citep{Aho_1972} to generate
-a valid parse by making minimal edits to the original program. As mentioned
-before, EC-Parsers are very inefficient for larger real-world grammars, since it
-requires the addition of a large number of error production rules, making them
-impractical for real-world applications. In contrast, the original Earley
-parsing is a fairly efficient parsing algorithm \citep{Earley_1970} based on
-dynamic programming.
+in recent literature to automatically infer the intended parse tree for programs
+that have \emph{syntax errors}. These dynamic programming parsers have been used
+along side with \emph{error correcting production rules} \citep{Aho_1972} to
+generate a valid parse by making minimal edits to the original program. As
+mentioned before, EC-Parsers are very inefficient for larger real-world
+grammars, since they require the addition of a large number of error production
+rules, making them impractical for real-world applications. In contrast, the
+original Earley parsing is a fairly efficient parsing algorithm
+\citep{Earley_1970} based on dynamic programming.
 
 \mypara{Solution: Train Classifier to Predict Error Rules}
-As we show later in this section, we observe that not every erroneous program
-needs all possible error production rules to be parsed, as the original
-algorithm \citep{Aho_1972} suggests. In this work, we present a novel strategy
-to selecting just a small set of error production rules that can be used with an
-updated \emph{Error Correcting Earley Parser} (ECE-Parser) to repair a program
-with parse errors. In the remainder of this section, we give a high-level
-overview of our approach by describing how to:
+As we show later in this section, not every erroneous program needs all possible
+error production rules to be parsed, as the original algorithm \citep{Aho_1972}
+suggests. In this work, we present a novel strategy to selecting just a small
+set of error production rules that can be used with an updated \emph{Error
+Correcting Earley Parser} (ECE-Parser) to repair a program with parse errors. In
+the remainder of this section, we give a high-level overview of our approach by
+describing how to:
 
 \begin{enumerate}
 
@@ -46,9 +45,6 @@ overview of our approach by describing how to:
 
 \end{enumerate}
 
-\subsection{Error Correcting Parsing}
-\label{sec:overview:ec-parsing}
-
 \begin{figure}[t]
 \begin{rules}
 S        $\rightarrow$ Stmts end_marker
@@ -66,18 +62,21 @@ Literal  $\rightarrow$ name | number | ...
 \label{fig:production-rules}
 \end{figure}
 
+\subsection{Error Correcting Parsing}
+\label{sec:overview:ec-parsing}
+
 \mypara{Earley Parsing and Grammars} Earley parsing has been a touch-stone
 algorithm in the history of parsing \citep{Earley_1970}. An Earley parser is a
 \emph{top-down chart parser} that uses dynamic programming, meaning that partial
-parses are stored in a data structure called a \emph{chart}, which can later be
-re-used, and the parse tree is built from the top down. An (Earley) parser
-accepts programs that belong into a language that is defined by a given
-\emph{grammar} $G$. The grammar $G$ has a starting symbol |S| and a set of
-\emph{production rules}. \autoref{fig:production-rules} presents some simplified
-production rules for the Python programming language that will help parse the
-program in \autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens})
-are symbols that a Python program consists of and are here presented in all
-lowercase letters. Symbols that start with a capital letter here represent
+parses are stored in a data structure called a \emph{chart} and the parse trees
+are built top down. An (Earley) parser accepts programs that belong into a
+language that is defined by a given \emph{grammar} $G$. The grammar $G$ has a
+starting symbol |S| and a set of \emph{production rules}.
+\autoref{fig:production-rules} presents some simplified production rules for the
+Python programming language that will help parse the program in
+\autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are symbols
+that a Python program consists of and are here presented in all lowercase
+letters. Symbols that start with a capital letter here represent
 \emph{non-terminal} symbols. For example, the non-terminal |Stmt| defines all
 possible Python statements, \ie expressions (|ExprStmt|), return statements
 (|ReturnStmt|), \etc \autoref{fig:partial-parse-tree-1} shows the top levels of
@@ -468,10 +467,9 @@ labels, called \emph{classes}. Therefore, we encode the task of learning a
 function that will map token sequences of erroneous programs to a small set of
 error production rules as a \emph{multi-class} classification (MCC) problem. We
 use an \emph{encoder transformer} to encode the input sequences into abstract
-vectors that we can then feed into a \emph{Deep Neural Network (DNN)} classifier
-to train it and make predictions. Exploiting recent advances in machine
-learning, we use deep and dense architectures \citep{Schmidhuber_2015} for more
-accurate predictions.
+vectors that we can then be fed into a \emph{\dnn} classifier to train and make
+predictions. Exploiting recent advances in machine learning, we use deep and
+dense architectures \citep{Schmidhuber_2015} for more accurate predictions.
 
 \mypara{Acquiring a Dataset}
 Given a dataset of fixed parse errors, such as \autoref{fig:example-prog}, we

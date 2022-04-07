@@ -1,6 +1,21 @@
 \section{Python Parse Error Analysis}
 \label{sec:error-analysis}
 
+We perform here an \emph{error data analysis} on a \python dataset of more than
+\emph{1,100,000 erroneous Python programs} and their respective fixes. This
+dataset was gathered from PythonTutor.com~\citep{Guo2013} between the years 2017
+and 2018, previously used in related work \citep{Endres2019, Cosman2020}. Each
+program which throws an uncaught \python exception is paired with the next
+program by the same user that does not crash, under the assumption that the
+latter is the fixed version of the former. We discard pairs where the difference
+between crashing and fixed versions is too high (more than a standard deviation
+above average), since these are usually unrelated submissions or complete
+refactorings. We also discard submissions that violate PythonTutor's policies
+(e.g., those using forbidden libraries). Ultimately, the dataset used in this
+evaluation contains more than a million usable program pairs, representing
+students from dozens of universities (PythonTutor has been used in many
+introductory courses~\citep{Guo2013}) as well as non-traditional novices.
+
 \subsection{Parse Errors in Real life}
 \label{sec:error-analysis:syntax}
 
@@ -27,22 +42,8 @@ than other algorithmic or runtime errors \citep{Denny_2012}. For example, the
 parenthesis in function argument lists or for not having the proper indents in a
 statement block. However, in this section we show that programmers (especially
 novices) mostly deal with these kinds of errors on a daily basis and spend a
-considerable amount of time fixing them.
-
-We perform here an \emph{error data analysis} on a \python dataset of more
-than \emph{1,100,000 erroneous Python programs} and their respective fixes. This
-dataset was gathered from PythonTutor.com~\citep{Guo2013} between 2017 and 2018,
-previously used in related work \citep{Endres2019, Cosman2020}. Each program
-which throws an uncaught \python exception is paired with the next program by
-the same user that does not crash, under the assumption that the latter is the
-fixed version of the former. We discard pairs where the difference between
-crashing and fixed versions is too high (more than a standard deviation above
-average), since these are usually unrelated submissions or complete
-refactorings. We also discard submissions that violate PythonTutor's policies
-(e.g., those using forbidden libraries). Ultimately, the dataset used in this
-evaluation contains more than a million usable program pairs, representing
-students from dozens of universities (PythonTutor has been used in many
-introductory courses~\citep{Guo2013}) as well as non-traditional novices.
+considerable amount of time fixing them, as has also be found in previous work
+\citep{Ahadi_2018, Kummerfeld2003}.
 
 \mypara{Python Syntax Errors}
 First of all, we count the different \emph{types} of errors users dealt with in

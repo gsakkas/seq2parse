@@ -8,12 +8,12 @@ shown in \autoref{fig:bad-prog}. The program defines two functions |foo| and
 |bar|. Function |foo| adds some number to the argument variable |a| and returns
 it. Function |bar| calls |foo| with the argument variable |a|, adds another
 number and returns the result. However, there is an extra |+| operator after the
-|return b| statement. The extra |+| mostly likely needs to be deleted, as the
-programmer intended, as shown in the fixed program in \autoref{fig:fixed-prog}.
-This presents a \emph{syntax (or parse) error}. Such parse errors can easily go
-unnoticed \citep{Denny_2012, Ahadi_2018, VanDerSpek_2005} by programmers when
-they are part of bigger programs and may still require significant effort to fix
-them \citep{Kummerfeld2003}.
+|return b| statement. The extra |+| possibly needs to be deleted, as the
+programmer intended in the fixed program in \autoref{fig:fixed-prog}. This
+example presents a \emph{syntax (or parse) error}. Such parse errors can easily
+go unnoticed \citep{Denny_2012, Ahadi_2018} by programmers when they are part of
+bigger programs and may still require significant effort to fix them
+\citep{Kummerfeld2003}.
 
 % Our goal is to use historical data of how programmers have fixed similar errors
 % in their programs to automatically and rapidly guide programmers to come up with
@@ -59,8 +59,9 @@ efficient parsers have been used in modern programming languages, \eg LR parsing
 approaches are usually very accurate in locating syntax errors, however, many
 times they fail to provide valuable feedback to the developers, \eg they only
 point to the first syntax error or the error messages are not descriptive enough
-or have too much information \citep{Kummerfeld2003, Ahadi_2018}. Additionally,
-these parsers require a lot of manual effort from the software engineers.
+or have too much information \citep{Kummerfeld2003, Ahadi_2018,
+VanDerSpek_2005}. Additionally, these parsers require a lot of manual effort
+from the software engineers.
 
 Recent advances in the Natural Language Processing (NLP) research domain
 \citep{Sutskever_2014, Hardalov_2018} have suggested many automatic approaches
@@ -69,21 +70,21 @@ significant progress by utilizing \emph{sequence models} to learn underlying
 patterns in their data. These algorithms have also been shown to be remarkably
 effective at parsing \citep{Vinyals2015}. The vast availability of data has
 rendered these deep neural network (\dnn) architectures rather successful. They
-are able to learn to effectively parse sentences to their associated
-(serialized) parse trees. Such approaches have been applied on automatically
-parsing and repairing programs \citep{Ahmed_2021}, but they, however, are still
-not very accurate to parse real-world programs.
+are able to learn to effectively parse sentences into their associated
+(serialized) parse trees. Such approaches have also been applied on
+automatically parsing and repairing programs \citep{Ahmed_2021}, but they,
+however, are still not very accurate to parse real-world programs.
 
 Relevant work in programming languages research has suggested \emph{error
-correcting parsers} (EC-Parsers) \citep{Aho_1972}, that uses error production
+correcting parsers} (EC-Parsers) \citep{Aho_1972}, that use error production
 rules for parsing programs with syntax errors. These parsers can return
 minimal-edit repairs that make the programs parse and can simultaneously fix
 multiple locations with minimal effort from the programmers. Their drawback,
-however, have a time complexity that is cubed on the input program size and
+however, is that they have a time complexity cubed on the input program size and
 squared on the grammar size used. Futhermore, there is the added cost of the
 large number of additional production rules these parsers have to consider while
 having an explosion of the internal states by maintaining the cost of each
-possible parse. Additionally, barely any improvements have ever been introduced
+possible parse. Finally, barely any improvements have ever been introduced
 \citep{McLean1996, Rajasekaran2014} which renders EC-Parsers impractical for use
 in real-world programming languages.
 
@@ -99,17 +100,17 @@ Specifically, to enable the efficient usage of a scalable EC-Parser we decompose
 the problem into three steps:
 %
 First, \emph{learn} the set of error productions rules that fix the dataset of
-programs needs from a corpus of fix edits that the users made.
+programs from a corpus of fix edits that the users made.
 %
-Second, \emph{predict} the small set of error rules for a new error program, by
-training sequence multi-class classifiers on the abstracted program token
+Second, \emph{predict} the small set of error rules for a new erroneous program,
+by training sequence multi-class classifiers on abstracted program token
 sequences.
 %
 Third, \emph{parse} the given erroneous program with the predicted error rules,
 thus generating a repair.
 %
 Critically, we show how to perform the crucial abstraction from a particular
-program to an abstract token sequence by using the an Earley parser's
+program to an abstract token sequence by using an Earley parser's
 \citep{Earley_1970} partial parses and a learnt Probabilistic Context-Free
 Grammar. This abstraction lets us train accurate predictors over low-level
 program sequences allowing the efficient error-correcting parsing of programs
