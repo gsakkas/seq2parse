@@ -1,17 +1,19 @@
+
 \section{Introduction}
 \label{sec:intro}
 
 % Context
-Writing syntactically-correct code can be difficult for novice 
-programmers. Consider the simple program,
-shown in \autoref{fig:bad-prog}, which defines two functions |foo| and
-|bar|. 
+Although type and runtime errors have received more research
+attention and tool support recently, syntax errors remain important, especially for
+programmers with less experience in a language. 
+Consider the program shown in \autoref{fig:bad-prog}. 
+% which defines two functions |foo| and |bar|. 
 % Function |foo| adds the argument variable |a| and returns
 % it. Function |bar| calls |foo| with the argument variable |a|, adds another
 % number and returns the result. 
 The programmer has introduced an extra |+| operator after the
-|return b| statement on line 6. This extra |+| likely needs to be deleted, as the
-programmer intended in the fixed program in \autoref{fig:fixed-prog}. This
+|return b| on line 6. This extra |+| should be deleted, as shown in the
+developer-fixed program in \autoref{fig:fixed-prog}. This
 example presents a \emph{syntax} (or \emph{parse}) \emph{error}. Such parse errors can easily
 go unnoticed~\citep{Denny_2012, Ahadi_2018} by programmers when they are part of
 bigger programs and may require significant effort to fix~\citep{Kummerfeld2003}.
@@ -44,50 +46,59 @@ def bar(a):
   b = foo(a) + 17
   return b
 \end{ecode}
-\subcaption{A possible fixed version for the previous example that has no parse
+\subcaption{A fixed version for the previous example that has no parse
  errors.}
 \label{fig:fixed-prog}
 \end{minipage}
-\caption{A simple Python program example}
+\caption{A Python program example with syntax error (left) and fix (right).}
 \label{fig:example-prog}
 \end{figure}
 
+We desire an approach for automatically repairing parse errors in
+off-the-shelf programs. An effective solution must apply to programs in
+real languages efficiently and must produce repairs that are of high
+quality. Unfortunately, the current state of the art is insufficient.  
+First, standard parsing algorithms are efficient but do not produce repairs. 
+Second, natural language processing sequence models are efficient but lack
+accuracy. 
+Third, error correcting parsers have high quality but are not efficient.
+\emph{We propose \toolname, an approach for repairing syntax errors that
+combines the efficiency of sequence models with the quality of error
+correcting parsing.}
+
 % Gap
-\emph{Parsing algorithms}, which check compliance with syntax rules, are
-essential parts of programming systems. Research around these algorithms
-has led to 
-efficient or expressive parsers used in modern programming languages, \eg 
-LR parsing~\citep{Aho1974} or Earley parsing~\citep{Earley_1970}. These highly-engineered
-approaches are usually very accurate in locating syntax errors, however, many
-times they fail to provide effective feedback to the developers. For example, they may only
-point to the first syntax error or may produce messages that are not descriptive enough
-or are too verbose~\citep{Kummerfeld2003, Ahadi_2018,
-VanDerSpek_2005}. 
+Standard \emph{parsing algorithms}, which check compliance with syntax rules, are
+essential in programming systems. 
+Efficient and expressive parsers are used in modern programming languages (\eg,
+LR~\citep{Aho1974} or Earley~\citep{Earley_1970} parsing). These 
+approaches can accurately locate syntax errors. However,
+they often fail to provide effective feedback to humans. For 
+example, they may only indicate the first syntax error or may produce
+messages that are not descriptive enough or are too
+verbose~\citep{Kummerfeld2003, Ahadi_2018, VanDerSpek_2005}. 
 % WRW doesn't understand this claim and does not think it is true without
 % more explanation. GCC is push-button, requiring no SE effort. 
 % 
 % Additionally, these parsers require a lot of manual effort from the software engineers.
 
-Recent advances in the Natural Language Processing (NLP) research domain
-\citep{Sutskever_2014, Hardalov_2018} have suggested many automatic approaches
+Recent advances in the natural language processing (NLP) research domain
+\citep{Sutskever_2014, Hardalov_2018} have produced many automatic approaches
 for natural language applications, such as language translation. In
-particular, \emph{sequence models} can learn underlying
-patterns in their data and have been shown to be remarkably
-effective at parsing \citep{Vinyals2015}. The vast availability of data has
-rendered such deep neural network (\dnn) architectures rather successful. They
-are able to learn to effectively parse sentences into their associated
-(serialized) parse trees. Such approaches have been considered for
-automatically parsing and repairing programs~\citep{Ahmed_2021}, but 
-initial efforts lacked accuracy in real-world contexts. 
+particular, deep neural network (\dnn) \emph{sequence models} can learn
+underlying patterns in from data and have been shown to be remarkably
+effective at parsing \citep{Vinyals2015}. They are able to learn to
+effectively parse sentences into their associated (serialized) parse trees.
+Such approaches have been considered for automatically parsing and
+repairing programs~\citep{Ahmed_2021}, but initial efforts lacked accuracy
+in real-world contexts. 
 
 In programming languages research, \emph{error
 correcting parsers} (EC-Parsers) \citep{Aho_1972} use special error production
 rules to support parsing programs with syntax errors. These parsers can return
 minimal-edit repairs that make the programs parse and can simultaneously fix
-multiple locations with minimal effort from the programmers. Their drawback,
-however, is that they have a cubic time complexity with respect to the
-input program size and a quadratic complexity with respect to the grammar
-used. 
+multiple locations. Their drawback,
+however, is a cubic time complexity with respect to the
+input program size and a quadratic complexity with respect to the grammar.
 % WRW doesn't see why this next bit is a problem the reader cares about. It
 % seems like an internal issue that has the same symptom (bad complexity)
 % and is more like "our problem". 
@@ -102,50 +113,49 @@ impractical for most uses in real-world programming languages.
 
 % Innovation
 \mypara{Sequence Classifiers for Error-Correcting Parsing}
-In this work, we propose training sequence classifiers for predicting error
-production rules for EC-Parsers in order to automatically, accurately and
-efficiently parse programs with syntax errors. Our approach exploits data-driven
-approaches from sequence learning and realizes them by using a large training
-dataset of pairs of syntactically incorrect programs and their fixed versions.
+In this work, we propose training sequence classifiers for predicting
+error
+production rules for EC-Parsers to automatically, accurately and
+efficiently parse programs with syntax errors. Our approach exploits the data-driven
+nature of sequence learning, drawing on a large training dataset of pairs
+of syntactically incorrect programs and their fixes.
 %
 Specifically, to enable the efficient usage of a scalable EC-Parser we decompose
-the problem into three steps:
+the problem into three steps.
 %
 First, \emph{learn} the set of error productions rules that fix the dataset of
-programs from a corpus of fix edits that the users made.
+programs from a corpus of fix edits from historical users.
 %
 Second, \emph{predict} the small set of error rules for a new erroneous program,
 by training sequence multi-class classifiers on abstracted program token
 sequences.
 %
-Third, \emph{parse} the given erroneous program with the predicted error rules,
+Third, \emph{parse} a given erroneous program using the predicted error rules,
 thus generating a repair.
 %
-Critically, we show how to perform the crucial abstraction from a particular
+Critically, we show how to perform the abstraction from a particular
 program to an abstract token sequence by using an Earley parser's
-\citep{Earley_1970} partial parses and a learnt Probabilistic Context-Free
+\citep{Earley_1970} partial parses and a learned Probabilistic Context-Free
 Grammar. This abstraction lets us train accurate predictors over low-level
-program sequences allowing the efficient error-correcting parsing of programs
-with syntax errors.
+program sequences and thus allows the efficient and high-quality
+error-correcting parsing of programs with syntax errors.
 
 % Results
-\mypara{\toolname}
-We implemented our approach in \toolname and trained it and tested it on a
-dataset of more than 1,100,000 programs. Given a new erroneous program,
-\toolname generates a list of potential error production rules ranked by
-likelihood. We train \toolname on programs from a online editor from over two
-years and evaluate in several ways.
+We implemented our approach, \toolname, and trained it and tested it on a
+dataset of more than 1,100,000 programs taken from over two years of
+user interactions with an online editor. Given a new erroneous program,
+\toolname first generates a list of potential error production rules ranked by
+likelihood. We evaluate our approach in three ways. 
 %
 First, we measure its \emph{accuracy}: we show that \toolname correctly predicts
 the right set of error rules $81\%$ of the time when considering the top $20$
 rules and can parse $92\%$ of our tests within $4.1$ seconds with these
 predictions.
 %
-Second, we measure its \emph{efficiency}: we show that \toolname is able to
-parse and repair erroneous programs within $25$ seconds $81\%$ of the time,
+Second, we measure its \emph{efficiency}: we show that \toolname 
+parses and repairs erroneous programs within $25$ seconds $81\%$ of the time,
 while also generating \emph{the user fix in almost 1 out 3 of the cases}.
 %
-Finally, we measure the \emph{quality} of the generated repairs via a user study
-with XX participants and show that humans perceive both \toolname's edit
-locations and final repair quality to be better than YY in a
-statistically-significant manner.
+Finally, we measure the \emph{quality} of the generated repairs via a human study
+with FIXME participants and show that humans perceive both \toolname's edit
+locations and final repair quality to be FIXME in a statistically-significant manner.
