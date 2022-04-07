@@ -6,20 +6,54 @@ we focus on the most closely related work on providing feedback for parse
 errors.
 
 
-\mypara{Transformer-based models in Software Engineering}
+\mypara{Sequence models in Software Engineering}
 %
-\citep{Rahmani2021, Verbruggen2021} has used pre-trained auto-regressive
-transformer models \ie \textsc{GPT-3} \citep{GPT2020} in association with
-pre-existing program synthesis techniques. Similar to our work here, this recent
-work uses established pre-existing algorithms from the NLP and PL research
-areas. However, \citep{Rahmani2021, Verbruggen2021} use pretrained models to
-acquire semantic power over smaller subproblems that can't be solved with the
-syntactic power of classic program synthesis algorithms. In our work, we train
-our own Transformer-based model to augment a classic parsing algorithm in a
-similar way, providing though more focused prior knowledge than using an NLP
-pretrained model.
+\citep{Rahmani2021, Verbruggen2021} have suggested using pre-trained
+auto-regressive transformer models \ie \textsc{GPT-3} \citep{GPT2020} in
+association with pre-existing program synthesis techniques. Similar to our work
+here, this recent work uses established pre-existing algorithms from the NLP and
+PL research areas. However, \citep{Rahmani2021, Verbruggen2021} use pretrained
+models to acquire semantic power over smaller subproblems that can't be solved
+with the syntactic power of classic program synthesis algorithms. In our work,
+we train our own Transformer-based model to augment a classic parsing algorithm
+in a similar way, providing though more focused prior knowledge than using an
+NLP pretrained model.
 
 \mypara{Sequence Models for Parsing}
+%
+\textsc{SynFix} \citep{Bhatia2016} and \emph{sk\_p} \citep{Pu2016} are two
+systems that use seq2seq models, however with the older and simpler Long
+Short-Term Memory networks (LSTMs). They mostly focus on educational programming
+tasks in order to learn task-specific patterns for fixing erroneous solutions to
+them. \textsc{SynFix} uses a sequence model per task and uses the prefixes of
+the error locations that the language parser provides to make sequence
+predictions after the parser error. \emph{sk\_p}, while it doesn't solely focus
+on syntax errors, makes sequence predictions per program line, replacing it with
+a hole and considering only the abstracted context line (previous and next
+lines) to fill the holes. The predictions with the highest probabilities
+associated to them after applying the model to every program line. \toolname
+manages to generalize, repair and provide feedback to a large number of programs
+regardless the task they are trying to solve by only encoding the full erroneous
+programs with a state-of-the-art Transformer model and utilizing an EC-Parser to
+parse them accordingly achieving a much higher accuracy. Additionally, uses a
+real-world dataset of millions of \python programs to learn to effectively parse
+programs, while \textsc{SynFix} and \emph{sk\_p} are trained on smaller datasets
+of correct programs that have errors introduced on training, possibly skewing
+the predictions away from real-world fixes.
+
+\textsc{DeepFix} \citep{Gupta2017} is another seq2seq approach for repairing
+syntactical errors in \textsc{C} programs. It relies though in an older sequence
+models based on stacked gated recurrent units (GRUs) with attention. It applies
+only some simple abstraction over the terminal tokens and breaks the program
+into subsequences per each program line. The model has input all the program
+subsequences and their associated line number but only predicts single line
+fixes on the program to reduce its complexity. The model predictions are applied
+iteratively multiple times if multiple parse errors exist or until the parse
+error is fixed based on an oracle. \textsc{DeepFix} struggles with the same
+problems as previous work, as it solely relies on the sequence models to learn
+the full grammar and repair approaches with minimal abstraction and prior
+knowledge over the programs.
+
 \emph{Lenient parsing} \citep{Ahmed_2021} is an approach that is mostly similar
 to ours. Lenient parsing is trained on a corpus of imperfect code and its
 repairs and similarly uses a Transformer model. This approach, however, utilizes
@@ -43,117 +77,3 @@ and by adding prior knowledge to even programs that don't parse by abstracting
 them with their partial parses. Additionally, the usage of EC-Parser and the
 language grammar adds significant value in the repair of the programs, instead
 of solely relying on the machine learning models.
-
-\textsc{DeepFix} \citep{Gupta2017} is another seq2seq approach for repairing
-syntactical errors in \textsc{C} programs. It relies though in older models of
-stacked GRUs with Attention and applies single line fixes on the program. The
-model predictions are applied iteratively multiple times if multiple parse
-errors exist or until the parse error is fixed. \textsc{DeepFix} struggles with
-the same problems as lenient parsing, as it solely relies on the sequence
-models, while also not using an special abstraction on program lines.
-\textsc{SynFix} \citep{Bhatia2016} is another seq2seq model that uses the older
-RNNs called LSTMs, but they mostly focus on educational programming tasks.
-\textsc{SynFix} uses a sequence models per task and focus on the error locations
-that the language parser provides to make predictions. \toolname manages to
-generalize, repair and provide feedback to a large number of programs regardless
-the task they are trying to solve, by only encoding the erroneous programs with
-a state-of-the-art Transformer model and utilizing a EC-Parser to parse
-accordingly.
-
-% \mypara{Example-Based Feedback}
-% %
-% Recent work has looked at providing \emph{counterexamples} that show how a
-% program went wrong, for type errors \cite{Seidel2016-ul} or for general
-% correctness properties where the generated inputs show divergence from a
-% reference implementation or other correctness oracle~\cite{Song_2019}. In
-% contrast, we provide feedback on how to fix the error.
-
-% \mypara{Fault Localization} Several authors have studied the problem of
-% \emph{fault localization}, \ie winnowing down the set of locations that are
-% relevant for the error, often using slicing
-% \citep{Wand1986-nw,Haack2003-vc,Tip2001-qp,Rahli2015-tt}, counterfactual typing
-% \citep{Chen2014-gd} or bayesian methods \citep{Zhang2014-lv}.
-% %
-% \textsc{Nate}~\citep{Seidel:2017} introduced the BOAT representation,
-% and showed it could be used for accurate localization.
-% %
-% We aim to go beyond localization, into suggesting concrete \emph{changes} that
-% novices can make to understand and fix the problem.
-
-% \mypara{Repair-model based feedback}
-% %
-% \textsc{Seminal} \citep{Lerner2007-dt} \emph{enumerates} minimal fixes using an
-% expert-guided heuristic search.
-% %
-% The above approach is generalized to general correctness properties by
-% \cite{singh2013} which additionally performs a \emph{symbolic} search using a
-% set of expert provided \emph{sketches} that represent possible repairs.
-% %
-% In contrast, \toolname learns a template of repairs from a corpus yielding
-% higher quality feedback (\S~\ref{sec:eval}).
-
-% \mypara{Corpus-based feedback}
-% %
-% \textsc{Clara} \citep{Gulwani_2018} uses code and execution traces to match a
-% given incorrect program with a ``nearby'' correct solution obtained by
-% clustering all the correct answers for a particular task. The matched
-% representative is used to extract repair expressions.
-% %
-% Similarly, \textsc{Sarfgen} \citep{Wang_2018} focuses on structural and
-% control-flow similarity of programs to produce repairs, by using AST vector
-% embeddings to calculate distance metrics (to ``nearby'' correct
-% programs) more robustly.
-% %
-% \textsc{Clara} and \textsc{Sarfgen} are data-driven, but both assume
-% there is a ``close'' correct sample in the corpus.
-% %
-% In contrast, \toolname has a more general philosophy that \emph{similar errors
-% have similar repairs}: we extract generic fix templates that can be applied to
-% arbitrary programs whose errors (BOAT vectors) are similar.
-% %
-% The \textsc{Tracer} system \cite{TRACER2018} is closest in philosophy to ours,
-% except that it focuses on single-line compilation errors for C programs, where
-% it shows that NLP-based methods like sequence-to-sequence predicting DNNs can
-% effectively suggest repairs, %\eg \verb+scanf("%d", a)+ should be converted to
-% %\verb+scanf("%d", %a)+
-% but this does not scale up to fixing general type errors.
-% %
-% We have found that \ocaml's relatively simple
-% \emph{syntactic} structure but rich \emph{type}
-% structure make token-level seq-to-seq methods quite imprecise
-% (\eg \emph{deleting} offending statements suffices to ``repair'' C but
-% yields ill-typed \ocaml) necessitating \toolname's higher-level semantic
-% features and (learned) repair templates.
-
-
-%
-% \textsc{Hercules} \citep{Saha_2019} uses version history to
-% repair multiple program locations by using fault localization
-% to rank error locations and then generating repairs for each
-% location.
-% %
-% However, it utilizes version history of a big codebase to find
-% such repairs, and uses that history to produce repairs that
-% modifies multiple program locations.
-% %
-% \toolname attempts a different approach of multiple location
-% repairing, by considering each candidate error location as independent from one
-% another.
-%
-%% While \textsc{Sarfgen} is still a data-driven approach it tries to
-%% search for matching programs on the fly, using \toolname's approach can be similarly
-%% seen as a per AST node embedding, which however we use in advance for training
-%% predictive models, thus mitigating any extra cost on runtime.
-%%
-%% that can be used to produce repairs. Despite the apparent
-%% similarities, \toolname partitions similar fix patterns found in our dataset,
-%% while \textsc{Clara} clusters whole student solutions.
-%%
-%% Additionally, \textsc{Clara} assumes that there is always
-%% a matching student solution in the dataset, while \toolname
-%% extracts generic fix templates can be applied to arbitrary
-%% programs.
-%%
-%% \textsc{Clara} also scales poorly in matching programs due
-%% to the use of Integer Linear Programming, while \toolname's precomputation of
-%% fix template models makes final repairs more robust.

@@ -155,9 +155,9 @@ however keeps always the minimum-edit repair and discards all other states that
 may lead to a higher cost. This allows for a higher maximum cost of 10 edits.
 Finally, while \textsc{All-Parses} can generate a large number of repairs, we
 keep only the top 3 repairs after filtering with a static code checker
-(\textsc{Pylint} \citep{pylint2022}) as most developers will consider at most five
-suggestions before falling back to manual debugging \citep{Kochhar2016-oc,
-Parnin2011-ce}.
+(\textsc{Pylint}, \url{https://www.pylint.org/}) as most developers will
+consider at most five suggestions before falling back to manual debugging
+\citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the parse accuracy) and
