@@ -151,14 +151,14 @@ standard neural networks to generate our model $\Model$.
 %
 A \dnn $\Model$ can be used as a binary classifier, \ie predict if the given
 input belongs into a class or not. While this model is enough for many tasks,
-\eg error localization \citep{Sakkas_2020}, in the case of error rule prediction
-we have to select from more \emph{classes}. We therefore use a \dnn for our
-error rule prediction $\Model$, but we adjust the output layer to have $N$ nodes
-for the $N$ chosen error-rule-classes. For multi-class classification problems
-solved with neural networks, usually the \emph{softmax} function is used at
-output layer \citep{Goodfellow-et-al-2016, Bishop-book-2006}. Softmax assigns
-probabilities to each class that must add up to 1. This additional constraint
-speeds up training.
+\eg error localization \citep{Sakkas_2020, Seidel:2017}, in the case of error
+rule prediction we have to select from more \emph{classes}. We therefore use a
+\dnn for our error rule prediction $\Model$, but we adjust the output layer to
+have $N$ nodes for the $N$ chosen error-rule-classes. For multi-class
+classification problems solved with neural networks, usually the \emph{softmax}
+function is used at output layer \citep{Goodfellow-et-al-2016,
+Bishop-book-2006}. Softmax assigns probabilities to each class that must add up
+to 1. This additional constraint speeds up training.
 
 \mypara{Training Multi-class Transformer Classifiers}
 %

@@ -16,9 +16,6 @@ evaluation contains more than a million usable program pairs, representing
 students from dozens of universities (PythonTutor has been used in many
 introductory courses~\citep{Guo2013}) as well as non-traditional novices.
 
-\subsection{Parse Errors in Real life}
-\label{sec:error-analysis:syntax}
-
 \begin{figure}[t]
   \centering
   \begin{minipage}[c]{0.49\linewidth}
@@ -45,7 +42,7 @@ novices) mostly deal with these kinds of errors on a daily basis and spend a
 considerable amount of time fixing them, as has also be found in previous work
 \citep{Ahadi_2018, Kummerfeld2003}.
 
-\mypara{Python Syntax Errors}
+\mypara{Parse errors are very common}
 First of all, we count the different \emph{types} of errors users dealt with in
 this dataset. \autoref{fig:error-statistics} presents the statistics of these
 error types. We observe that $77.4 \% $ of all faulty programs in the dataset
@@ -55,7 +52,7 @@ merely $13.6\%$ of the dataset and represents Python type errors. This is a
 strong indication that these parse errors are very common and require an
 automated approach of repairing.
 
-\mypara{Python Repair Rate}
+\mypara{Parse errors take time to fix}
 The web-based compiler that we used to generate our dataset, also provides us
 with a \emph{server timestamp}. The timestamp is associated with each program
 attempt submission, erroneous or not. The \emph{repair time} of an erroneous
@@ -98,7 +95,7 @@ beneficial for a lot of programmers, novices or not.
   \end{minipage}
 \end{figure}
 
-\mypara{Token-level changes}
+\mypara{Parse errors can require multiple edits to fix}
 The average \emph{token-level changes} needed to fix a program with syntax
 errors, \ie the number of changes in the lexed program token sequence, is
 \emph{10.7 token changes}, while the \emph{median is 4}. A variable rename or a
@@ -110,6 +107,7 @@ changes to be fixed. This shows that the majority of the syntax errors can be
 fixed with only a few changes in their token sequences. But it is also important
 to see how long it takes the users on average to make those changes.
 
+\mypara{Parse errors with more edits take longer to fix}
 \autoref{fig:token-changes} shows the average time that it takes a user to fix
 their programs with syntax errors per the number of token-level changes in their
 programs. As expected, with an increasing number of changes needed to fix all

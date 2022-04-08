@@ -6,14 +6,14 @@ parse errors by fine-tuning error correcting parsers with prior knowledge of the
 processes (novice) programmers follow to repair their errors.
 
 \mypara{Error Correcting Parsers}
-One approach to fixing erroneous programs (as in \autoref{fig:bad-prog}) 
+One approach to fixing erroneous programs (as in \autoref{fig:bad-prog})
 is to use \emph{Error Correcting Parsers} (EC-Parsers) \citep{Aho_1972}.
 EC-Parsers are based on dynamic programming algorithms and have been used
 to automatically infer the intended parse trees for programs
 that have syntax errors. These dynamic programming parsers have been used
 with \emph{error correcting production rules} \citep{Aho_1972} to
-generate a valid parse by making minimal edits to the original program. 
-However, EC-Parsers are very inefficient for larger 
+generate a valid parse by making minimal edits to the original program.
+However, EC-Parsers are very inefficient for larger
 grammars, since they require the addition of a large number of error production
 rules, making them impractical for real-world applications. In contrast, the
 original Earley parsing algorithm is also based on dynamic programming
@@ -21,8 +21,8 @@ but does not directly support error correction~\citep{Earley_1970}.
 
 \mypara{Solution: Train Classifier to Predict Error Rules}
 We observe that a given erroneous program rarely uses all possible error
-production rules. 
-% as the original algorithm \citep{Aho_1972} suggests. 
+production rules.
+% as the original algorithm \citep{Aho_1972} suggests.
 In this work, we present a novel strategy to selecting just a small
 set of error production rules that can be used with an updated \emph{Error
 Correcting Earley Parser} (ECE-Parser) to repair a program with parse errors. In
@@ -75,10 +75,10 @@ language that is defined by a given \emph{grammar} $G$. The grammar $G$ has a
 starting symbol |S| and a set of \emph{production rules}.
 \autoref{fig:production-rules} presents some simplified production rules for the
 Python programming language that will help parse the program in
-\autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are 
+\autoref{fig:bad-prog}. \emph{Terminal} symbols (or \emph{tokens}) are
 syntactical symbols and are here presented in lowercase
 letters. Uppercase letters denote \emph{non-terminal} symbols, which are
-rewritten using production rules during a parse. 
+rewritten using production rules during a parse.
 For example, the non-terminal |Stmt| defines all
 possible Python statements, including expressions (|ExprStmt|), return statements
 (|RetStmt|), \etc \autoref{fig:partial-parse-tree-1} shows the top levels of
@@ -107,20 +107,20 @@ productions rules.
 % \label{fig:error-rules}
 % \end{figure}
 
-\mypara{Error Correcting Parsing} Recent work has presented an \emph{Error
-Correcting Earley Parser} (ECE-Parser) \citep{Aho_1972}, 
-% FIXME ^^ WRW does not think this 1972 is "recent".  
-which extends the
-original algorithm's operations, with the goal to find a minimum-edit parse for
-a program with parse errors. An ECE-Parser extends the original grammar $G$ with
-a set of \emph{error production rules} to create a new \emph{error grammar}
-$G'$. This grammar contains error rules for three major types of errors that the
-ECE-Parser considers: \emph{insertion}, \emph{deletion}, and \emph{replacement} errors.
+\mypara{Error Correcting Parsing} Related work has presented an \emph{Error
+Correcting Earley Parser} (ECE-Parser) \citep{Aho_1972},
+% FIXME ^^ WRW does not think this 1972 is "recent".
+which extends the original algorithm's operations, with the goal to find a
+minimum-edit parse for a program with parse errors. An ECE-Parser extends the
+original grammar $G$ with a set of \emph{error production rules} to create a new
+\emph{error grammar} $G'$. This grammar contains error rules for three major
+types of errors that the ECE-Parser considers: \emph{insertion},
+\emph{deletion}, and \emph{replacement} errors.
 
-\subsubsection{ECE Parsing Rules for Python} 
+\subsubsection{ECE Parsing Rules for Python}
 
-In this section, we present the details of adapting the Python 
-production rules for an ECE-Parser. 
+In this section, we present the details of adapting the Python
+production rules for an ECE-Parser.
 
 First, the ECE-Parser adds to $G'$ a new start symbol |New_S|, the helper
 symbol |Replace| that is used for replacement errors and the symbols |Insert|
@@ -225,14 +225,15 @@ types of errors.
 % is at least 3 times larger than $G$, making ECE-Parser not scalable for large
 % programs or programs with a lot of parse errors.
 
-\subsubsection{ECE Parsing Considerations for Python} 
-In this section we describe considerations that arise when using ECE-Parser for Python 
-directly. 
-\autoref{fig:partial-parse-tree-2} presents a \emph{partial parse}
-of the problematic statements |Stmts|$^1$ of \autoref{fig:partial-parse-tree-1}.
-Considering a deletion error, the |E_number $\rightarrow$ $\epsilon$| error rule
-is used to match the empty symbol and generate a parse that suggests that a
-\emph{number} is missing after the |+| operator. On the other hand, the
+\subsubsection{ECE Parsing Considerations for Python}
+In this section we describe considerations that arise when using ECE-Parser for
+Python directly. \autoref{fig:partial-parse-tree-2} presents a \emph{partial
+parse} of the problematic statements |Stmts|$^1$ of
+\autoref{fig:partial-parse-tree-1}. Considering a deletion error, the
+%
+|E_number $\rightarrow$ $\epsilon$| error rule is used to match the empty symbol
+and generate a parse that suggests that a \emph{number} is missing after the |+|
+operator. On the other hand, the
 %
 |E_\n $\rightarrow$ Insert \n| error rule can be used to consider a insertion
 error before the new line character, basically \emph{deleting} the |+| operator.
@@ -256,12 +257,12 @@ error production rules}. This large amount of error rules renders the ECE-Parser
 not scalable for large programs or programs with a lot of parse errors when
 using real-world programming languages.
 
-One of our insights, 
+One of our insights,
 as seen in our running example in \autoref{fig:two-partial-parses}, is that only
 a handful of error rules are relevant to each parse error. Therefore, we
 propose to improve ECE-Parsing's scalability by only adding \emph{a
 small set} of error production rules, \ie keeping the size of $G'$ limited and
-only slightly larger than the original grammar $G$. We propose to do so by 
+only slightly larger than the original grammar $G$. We propose to do so by
 \emph{training classifiers} to select a small set of error rules only relevant
 to the parse error. However, the program token sequences that we can use
 may have irrelevant information, \eg the |foo| function in our example in
@@ -272,18 +273,17 @@ sequences.
 \subsection{Abstracting program token sequences}
 \label{sec:overview:abstraction}
 
-We need to work on programs that have parse errors, which means that we can not generate a
-parse tree for them to perform the usual of analyses associated with 
-automated program repair \citep{Sakkas_2020,
-Martinez_2013,Gulwani_2018, Wang_2018} or program analysis in general.
+We need to work on programs that have parse errors, which means that we can not
+generate a parse tree for them to perform the usual of analyses associated with
+automated program repair \citep{Sakkas_2020, Martinez_2013, Gulwani_2018,
+Wang_2018} or program analysis in general.
 %
 The highest form of abstraction that we can use is the output of the
 \emph{lexer}. The lexer tokenizes the program and returns a program \emph{token
 sequence} with minimal abstractions, \eg no variable names, defining the
 underlying statement blocks \etc, as shown in \autoref{fig:prog-seq}. This token
-sequence is appropriate for training our sequence classifier models, but it 
-can be large or contain irrelevant context for repairing
-the parse error at hand. 
+sequence is appropriate for training our sequence classifier models, but it can
+be large or contain irrelevant context for repairing the parse error at hand.
 
 \mypara{Solution: Abstract with Partial Parses}
 A parser will hold some internal state of the partial parses it has
@@ -310,17 +310,16 @@ statement |Stmt| (under |Stmts|$^1$) has a parse error as shown in
 \autoref{fig:partial-parse-tree-2}.
 
 The generation of this abstraction, however, poses another difficulty. Earley
-parsing collects a large amount of partial parses (via dynamic programming) 
-until the program is fully
-parsed. That means at each program location, multiple partial parses can be
-chosen to abstract our programs. This \emph{ambiguity} can be seen even in the
-two suggested repairs in \autoref{fig:two-partial-parses}: if we delete
-the colored nodes in \autoref{fig:adding-partial} and
+parsing collects a large amount of partial parses (via dynamic programming)
+until the program is fully parsed. That means at each program location, multiple
+partial parses can be chosen to abstract our programs. This \emph{ambiguity} can
+be seen even in the two suggested repairs in \autoref{fig:two-partial-parses}:
+if we delete the colored nodes in \autoref{fig:adding-partial} and
 \autoref{fig:deleting-partial} we obtain two possible partial parses for our
-program, the first one matching \autoref{fig:partial-parse-tree-2}
-and the second one not shown here. To chose between partial parses to
-abstract the program around the parse error, we propose the use of
-\emph{Probabilistic Context-Free Grammars}.
+program, the first one matching \autoref{fig:partial-parse-tree-2} and the
+second one not shown here. To chose between partial parses to abstract the
+program around the parse error, we propose the use of \emph{Probabilistic
+Context-Free Grammars}.
 
 
 \begin{figure}[t]
@@ -359,9 +358,9 @@ dedent end_marker
 
 \mypara{Probabilistic Context-Free Grammars}
 Even if the original grammar $G$ is not ambiguous, generating partial parses can
-be ambiguous. Earley parsing is a dynamic programming technique
-and internally keeps all possible parses for a program token sequence. 
-Probabilistic Context-Free Grammars (PCFGs) have been used in previous work
+be ambiguous. Earley parsing is a dynamic programming technique and internally
+keeps all possible parses for a program token sequence. Probabilistic
+Context-Free Grammars (PCFGs) have been used in previous work
 \citep{Collins_2013, Jelinek_1992} to select \emph{complete} parses for
 ambiguous grammars. A PCFG associates each of its production rules with a
 \emph{weight} or \emph{probability}. Each parse tree that is generated during
@@ -370,7 +369,7 @@ is simply the \emph{product} of the used rules' probabilities. Finally, the tree
 with the highest probability is selected as a final parse tree.
 
 A PCFG can be learned \citep{Collins_2013} by counting the production
-rules used to parse a number of programs belonging to that language. 
+rules used to parse a number of programs belonging to that language.
 \autoref{fig:weighted-production-rules} has the learned probabilities for the
 example Python grammar. We observe, for example, that |ReturnStmt| has two
 possible production rules and almost $98.4\%$ of the times a |return| is
@@ -451,7 +450,7 @@ natural language processing (NLP) \citep{Sutskever_2014, Hardalov_2018}
 work has used \emph{sequence models} to learn underlying patterns in their data.
 These models stand out in domains where the input is a sequence and where feature
 extraction methods are not readily available~\citep{Sutskever_2014}.
-% to utilize in order to use the older classic neural network models 
+% to utilize in order to use the older classic neural network models
 
 \mypara{Sequence Models}
 Sequence-to-sequence (seq2seq) architectures transform an input sequence
@@ -550,10 +549,18 @@ We then parse the program in \autoref{fig:bad-prog} with the ECE-Parser and
 these specific error rules to generate a valid parse. We observe that it takes
 our implementation (as we will show later in depth) around \emph{2 seconds} to
 generate a valid parse, which is also the one that leads to the actual user
-repair in \autoref{fig:fixed-prog}! On the other hand, when we use a
-baseline ECE-Parser with the full set of error rules it takes \emph{2 minutes and 55
-seconds} to generate a valid parse, which is, additionally, not the expected user
-parse, but the one presented in \autoref{fig:adding-partial}. These
-examples demonstrate
-the effectiveness of accurately \emph{predicting error rules using sequence
-classifiers, which are trained on abstracted token sequences}.
+repair in \autoref{fig:fixed-prog}! On the other hand, when we use a baseline
+ECE-Parser with the full set of error rules it takes \emph{2 minutes and 55
+seconds} to generate a valid parse, which is, additionally, not the expected
+user parse, but the one presented in \autoref{fig:adding-partial}. These
+examples demonstrate the effectiveness of accurately \emph{predicting error
+rules using sequence classifiers, which are trained on abstracted token
+sequences}.
+
+In the next three sections, we describe in depth the specifics of our approach
+by defining all the methods in \autoref{fig:api}. We start by presenting the
+program abstraction (\autoref{sec:prog-abstract}) using partial parses and a
+learnt PCFG, we then explain how we train sequence models for making error rule
+predictions (\autoref{sec:seq-classifiers}) and, finally, we demonstrate our
+algorithms for building \toolname, an approach for efficiency parsing erroneous
+programs.

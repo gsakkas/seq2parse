@@ -32,12 +32,11 @@ replaced, deleted or inserted in order to generate the $t^o$. It can be the
 whole program, part of it or multiple parts of it. $t^o$ will finally be a token
 sequence that can be parsed by the original language's $L(G)$ parser.
 
-However, programs can be large, \ie $n$ can take large values, which makes it
-unsuitable for training effectively sequence models. These large programs can
-also contain a lot of irrelevant information for fixing a specific parse error.
-Therefore, our goal is to first generate an \emph{abstracted token sequence}
-$t^a$ that removes all irrelevant information from $t^i$ and gives hints for the
-parse error fix by using the internal states of an \emph{Earley} parser.
+However, programs can be large and, thus, $n$ can take large values, which makes
+them unsuitable for training effectively sequence models. Therefore, our goal is
+to first generate an \emph{abstracted token sequence} $t^a$ that removes all
+irrelevant information from $t^i$ and gives hints for the parse error fix by
+using the internal states of an \emph{Earley} parser.
 
 
 \subsection{Earley Partial Parses}
