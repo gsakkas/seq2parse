@@ -8,27 +8,28 @@ errors.
 \mypara{Error-Correcting Parsers}
 %
 As we have already demonstrated, error-correcting parses have been proposed for
-repairing parse syntax errors and we have extensively described ECE-Parsers
-\citep{Aho_1972}. The technique presented by \citep{Burke1987} is applicable
-with LR and LL parsing. It uses three phases. First attempts to repair the parse
-error by symbol insertions, deletions, or substitutions. If that fails, this
-approach tries to close one or more open code blocks and if that fails, some it
-removes code surrounding the erroneous symbol. Finally, it uses \emph{deferred
-parsing} that may be viewed as double parsing, where one main parser moves
-forward as much as possible, whereas a second parser is $k$ steps behind, so
-that it can backtrack to a state $k$ steps before efficiently.
-\citep{VanDerSpek_2005} has shown that the previous approach is not applicable
-in real-world languages for specific cases (\eg multiple function definitions)
-and has suggested an improvement that works along with \textsc{JavaCC} parser
-generator and a form of follow-set error recovery. \citep{Corchuelo2002} have
-suggested an error-correcting version of the popular LR parser. Rather than
-focusing on error production rules, this method adds \emph{error-repair
-transitions} along with the regular shift/reduce operations. It employs a simple
-cost model and heuristics to limit the explosion of the repair search space.
-However, all of these approaches are impractical and inefficient for real-world
-applications, as they only successfully parsed either small examples or used
-tiny grammars. In contrast, \toolname relies on pre-trained sequence models to
-alleviate much of the repair search for minimal overheads in real parsers.
+repairing syntax errors and we have extensively described ECE-Parsers
+\citep{Aho_1972}. The technique presented by \citep{Burke1987} describes another
+EC-Parser. IT is applicable with LR and LL parsing and uses three phases. It
+first attempts to repair the parse error by symbol insertions, deletions, or
+substitutions. If that fails, this approach tries to close one or more open code
+blocks and if that fails, some it removes code surrounding the erroneous symbol.
+Finally, it uses \emph{deferred parsing} that may be viewed as double parsing,
+where one main parser moves forward as much as possible, whereas a second parser
+is $k$ steps behind, so that it can backtrack to a state $k$ steps before
+efficiently. \citep{VanDerSpek_2005} has shown that the previous approach is not
+applicable in real-world languages for specific cases (\eg multiple function
+definitions) and has suggested an improvement that works along with the
+\textsc{JavaCC} parser generator and a form of follow-set error recovery.
+\citep{Corchuelo2002} has suggested an error-correcting version of the popular
+LR parser. Rather than focusing on error production rules, this method adds
+\emph{error-repair transitions} along with the regular shift/reduce operations.
+It employs a simple cost model and heuristics to limit the explosion of the
+repair search space. However, all of these approaches are impractical and
+inefficient for real-world applications, as they only successfully parsed either
+small examples or used tiny grammars. In contrast, \toolname relies on
+pre-trained sequence models to efficiently explore the repair search space for
+minimal overheads in real-time parsing.
 
 \mypara{Sequence models in Software Engineering}
 %
@@ -46,61 +47,61 @@ NLP pretrained model.
 \mypara{Sequence Models for Parsing}
 %
 \textsc{SynFix} \citep{Bhatia2016} and \emph{sk\_p} \citep{Pu2016} are two
-systems that use seq2seq models, however with the older and simpler Long
-Short-Term Memory networks (LSTMs). They mostly focus on educational programming
-tasks in order to learn task-specific patterns for fixing erroneous solutions to
-them. \textsc{SynFix} uses a sequence model per task and uses the prefixes of
-the error locations that the language parser provides to make sequence
-predictions after the parser error. \emph{sk\_p}, while it doesn't solely focus
-on syntax errors, makes sequence predictions per program line, replacing it with
-a hole and considering only the abstracted context line (previous and next
-lines) to fill the holes. The predictions with the highest probabilities
-associated to them after applying the model to every program line. \toolname
+systems that use seq2seq models using the older and simpler Long Short-Term
+Memory networks (LSTMs). They mostly focus on educational programming tasks in
+order to learn task-specific patterns for fixing erroneous solutions to them.
+\textsc{SynFix} uses a sequence model per task and uses the prefixes of the
+error locations that the language parser provides to make sequence predictions
+after the parser error. \emph{sk\_p}, while it doesn't solely focus on syntax
+errors, makes sequence predictions per program line, replacing it with a hole
+and considering only the abstracted context lines (previous and next lines) to
+fill the holes. The predictions with the highest probabilities associated to
+them are selected, after applying the model to every program line. \toolname
 manages to generalize, repair and provide feedback to a large number of programs
 regardless the task they are trying to solve by only encoding the full erroneous
 programs with a state-of-the-art Transformer model and utilizing an EC-Parser to
-parse them accordingly achieving a much higher accuracy. Additionally, uses a
+parse them accordingly achieving a much higher accuracy. Additionally, it uses a
 real-world dataset of millions of \python programs to learn to effectively parse
 programs, while \textsc{SynFix} and \emph{sk\_p} are trained on smaller datasets
 of correct programs that have errors introduced on training, possibly skewing
 the predictions away from real-world fixes.
 
 \textsc{DeepFix} \citep{Gupta2017} is another seq2seq approach for repairing
-syntactical errors in \textsc{C} programs. It relies though in an older sequence
-models based on stacked gated recurrent units (GRUs) with attention. It applies
-only some simple abstraction over the terminal tokens and breaks the program
-into subsequences per each program line. The model has input all the program
-subsequences and their associated line number but only predicts single line
-fixes on the program to reduce its complexity. The model predictions are applied
-iteratively multiple times if multiple parse errors exist or until the parse
-error is fixed based on an oracle. \textsc{DeepFix} struggles with the same
-problems as previous work, as it solely relies on the sequence models to learn
-the full grammar and repair approaches with minimal abstraction and prior
-knowledge over the programs.
+syntactical errors in \textsc{C} programs. It relies on older sequence models
+based on stacked gated recurrent units (GRUs) with attention. It applies only
+some simple abstraction over the terminal tokens and breaks the program into
+subsequences per each program line. The model gets as input all the program line
+subsequences and their associated line number, but only predicts single line
+fixes for the program to reduce its complexity. The model predictions are
+applied iteratively multiple times if multiple parse errors exist or until the
+parse error is fixed based on an oracle. \textsc{DeepFix} struggles with the
+same problems as previous work, as it solely relies on the sequence models'
+capability to learn the full grammar and repair approaches with minimal
+abstraction and prior knowledge over the programs.
 
-\emph{Lenient parsing} \citep{Ahmed_2021} is an approach that is mostly similar
-to ours. Lenient parsing is trained on a corpus of imperfect code and its
-repairs and similarly uses a Transformer model. This approach, however, utilizes
-\emph{two seq2seq models}. One model to repair and create proper nested blocks
-of code, called \textsc{BlockFix} and another model, called \textsc{FragFix} to
-repair and parse fragments of code (\eg program statements) within a repaired
-block from \textsc{BlockFix}. \textsc{BlockFix} tokenizes input program block in
-a similar manner to our abstract token sequences, by abstracting identifiers,
-constants, expressions etc. and is trained on pairs of blocks and manually
-corrupted versions of them. It mostly fixes parentheses and curly brackets. On
-the other hand, \textsc{FragFix} repairs on a program statement level within the
-blocks, by using a serialized version of the ASTs and error hints injected on
-the ASTs that Mostly focus on missing semicolons and commas. Finally, they try
-to combine everything back to parsable code that can generate an AST. While this
-approach is mostly automatic, it relies on the corruption of a dataset to
-generate erroneous programs that may not correlate to the errors actual
-developers make and solely relies on the seq2seq models to learn the underlying
-language model and make repairs. In contrast, \toolname mitigates this problem
-by learning how programmers fixed their programs from a large corpus of programs
-and by adding prior knowledge to even programs that don't parse by abstracting
-them with their partial parses. Additionally, the usage of EC-Parser and the
-language grammar adds significant value in the repair of the programs, instead
-of solely relying on the machine learning models.
+\emph{Lenient parsing} \citep{Ahmed_2021} is another sequence model approach.
+Lenient parsing is trained on a corpus of imperfect code and its repairs. and
+uses a Transformer model. This approach, however, utilizes \emph{two seq2seq
+models}. One model to repair and create proper nested blocks of code, called
+\textsc{BlockFix} and another model, called \textsc{FragFix} to repair and parse
+fragments of code (\eg program statements) within a repaired block from
+\textsc{BlockFix}. \textsc{BlockFix} tokenizes input program block in a similar
+manner to our abstract token sequences, by abstracting identifiers, constants,
+expressions etc. and is trained on pairs of blocks and manually corrupted
+versions of them. It mostly fixes parentheses and curly brackets. On the other
+hand, \textsc{FragFix} repairs on a program statement level within the blocks,
+by using a serialized version of the ASTs and error hints injected on the ASTs
+that mostly focus on missing semicolons and commas. Finally, they try to combine
+everything back to parsable code that can generate an AST. While this approach
+is mostly automatic, it relies on the corruption of a dataset to generate
+erroneous programs that may not correlate to the errors actual developers make
+and solely relies on the seq2seq models to learn the underlying language model
+and make repairs. In contrast, \toolname mitigates this problem by learning how
+programmers fixed their programs from a large corpus of programs and by adding
+prior knowledge to even programs that don't parse by abstracting them with their
+partial parses. Additionally, the usage of EC-Parser and the language grammar
+adds significant value in the repair of the programs, instead of solely relying
+on the machine learning models.
 
 \mypara{Graph models for parsing}
 %
@@ -113,9 +114,9 @@ models then predict an error location in the program sequence and a token
 suggestion for the repair. This single-token repair approach is applied
 iteratively multiple time until the program correctly parses. While this
 approach is much more accurate than any previous work in repairing syntax
-errors, \toolname is still lacks the advantages of using a real parser with the
-actual grammar as final step of the process and relies again in the model to
-learn the semantics of the language.
+errors, it is still lacks the advantages of using a real parser with the actual
+grammar as final step of the process that \toolname takes benefit from and
+relies again in the model to learn the semantics of the language.
 
 \mypara{Neural Machine Translation (NMT) for Program Repair}
 %
@@ -124,11 +125,11 @@ a new \emph{context-aware NMT model} that has two separate \emph{Convolutional
 Neural Network (CNN)} encoders, one for the buggy lines and one for the context.
 It also uses \emph{ensemble learning} to train NMT models of different
 hyper-parameters in order to capture different relations between erroneous and
-correct code. However, this approach using a minimal level of abstraction over
-the input programs, with only a subword-level tokenization to minimize the
-vocabulary size and make training of such enormous models more attainable.
-\textsc{CURE} \citep{Jiang_2021} suggested a similar \emph{code-aware NMT model}
-that is pre-trained using unsupervised learning on correct programs, It also
-uses a programming language (PL) \textsc{GPT} \citep{GPT2020} model that learns
-to predict the next token in program sequences and uses bean search to maintain
-a small set of accurate repairs.
+correct code. This approach uses a minimal level of abstraction over the input
+programs, with only a subword-level tokenization to minimize the vocabulary size
+and make training of such enormous models more attainable. \textsc{CURE}
+\citep{Jiang_2021} suggested a similar \emph{code-aware NMT model} that is
+pre-trained using unsupervised learning on correct programs, It also uses a
+programming language (PL) \textsc{GPT} \citep{GPT2020} model that learns to
+predict the next token in program sequences and uses bean search to maintain a
+small set of accurate repairs.
