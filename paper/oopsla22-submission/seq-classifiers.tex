@@ -25,32 +25,28 @@ frame as a instance of \emph{multi-class classification}. We leave the high
 level details of acquiring the dataset of labeled token sequences and using the
 predictor for new erroneous programs for \autoref{sec:whole-system}.
 
-\mypara{Background: Neural Networks}
+\subsection{Neural Networks and Sequence Models Background}
+\label{sec:seq-classifiers:background}
+
+\mypara{Neural Networks}
 A neural network (or feed-forward network) can be represented as a directed
 acyclic graph whose nodes are arranged in layers that are fully connected by
 weighted edges. The first layer corresponds to the input features, and the final
 to the output. The output of an internal node is the sum of the weighted outputs
 of the previous layer passed to a non-linear function, called the
 \emph{activation function}. For example, the outputs of an internal layer of
-nodes $l$ is given as:
-\begin{equation*}
-    y_l = g(W_{l-1} y_{l-1})
-\end{equation*}
-where $W_{l-1}$ is the weight matrix for the edges between layers $l$ and $l-1$
-and $y_{l-1}$ is the output of the previous layer. The input $y_0 = x$ is the
-input features of the neural network and, finally, g is the activation function,
-which in recent work is commonly chosen to be the rectified linear unit (ReLU),
-defined as $g(x) = max(0, x)$ \citep{Nair2010-xg}.  The number of layers, the
-number of nodes per layer, and the connections between layers constitute the
-\emph{architecture} of a neural network. In this work, we use relatively
-\emph{deep neural networks} (\dnn). A thorough introduction to neural networks
-is beyond the scope of this work~\citep{Hastie2009-bn, Nielsen2015-pu}.
+nodes $l$ is given as $y_l = g(W_{l-1} y_{l-1})$, where $W_{l-1}$ is the weight
+matrix for the edges between layers $l$ and $l-1$ and $y_{l-1}$ is the output of
+the previous layer. The input $y_0 = x$ is the input features of the neural
+network and, finally, g is the activation function, which in recent work is
+commonly chosen to be the rectified linear unit (ReLU), defined as $g(x) =
+max(0, x)$ \citep{Nair2010-xg}.  The number of layers, the number of nodes per
+layer, and the connections between layers constitute the \emph{architecture} of
+a neural network. In this work, we use relatively \emph{deep neural networks}
+(\dnn). A thorough introduction to neural networks is beyond the scope of this
+work~\citep{Hastie2009-bn, Nielsen2015-pu}.
 
-
-\subsection{Sequence Models}
-\label{sec:seq-classifiers:seq-models}
-
-\mypara{Background: Sequence-To-Sequence Models}
+\mypara{Sequence-To-Sequence Models}
 Sequence-to-sequence (seq2seq) models aim to transform input sequences of one
 domain into sequences of another domain \citep{Sutskever_2014}. In the general
 case, these models consist of two major layers, an \emph{encoder} and a
@@ -69,7 +65,7 @@ to the decoder, which in turn transforms it into an output sequence $y_1, y_2,
 
 The simplest approach historically uses a Recurrent Neural Network (RNN)
 \citep{Rumelhart1986, Werbos1990, Hochreiter_1997}, which is a natural next step
-from the classic neural networks. Each RNN unit however operates on each input
+from the classic neural networks. Each RNN unit, however, operates on each input
 token $x_t$ separately. It keeps an internal \emph{hidden state} $h_t$ that is
 calculated as in \autoref{eq:1}, as a function of the input token $x_t$ and the
 previous hidden state $h_{t-1}$. The weight matrices $W_{hx}$ and $W_{hh}$
@@ -160,49 +156,21 @@ function is used at output layer \citep{Goodfellow-et-al-2016,
 Bishop-book-2006}. Softmax assigns probabilities to each class that must add up
 to 1. This additional constraint speeds up training.
 
-\mypara{Training Multi-class Transformer Classifiers}
+\mypara{Multi-class Transformer Classifiers}
 %
 We use a Transformer encoder to represent an abstracted token sequence $t^a =
 (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V \in \R^k$. The abstract
 vector $V$ is then immediately fed into the \dnn as input and the error
-production labels are used as the ground truth for training this whole
-architecture, \ie the \emph{Transformer classifier}. The binary cross-entropy
-loss function is used per class to assign the loss per training cycle.
+production labels are used as the ground truth for training $\trainDLsym$ this
+whole architecture, \ie the \emph{Transformer classifier} $\Model$. The binary
+cross-entropy loss function is used per class to assign the loss per training
+cycle.
 
-\mypara{Predicting Error Rules}
-%
-Our ultimate goal is to be able to predict the small set of error production
-rules $\errorrulessym$ that a new unknown program $e_\bot$ with syntax errors
-needs to get parsed according to the given grammar $G$ and get repaired.
-Therefore, the $\predictDLsym$ function uses the trained $\Model$ to predict all
-confidence scores $\List{\errorrulessym \times \Conf}$ for each error production
-rule. The $\errorrulessym$ are then sorted based on their predicted confidence
+Finally, the $\predictDLsym$ function uses the trained $\Model$ to predict all
+confidence scores $\List{\errorrulessym \times \Conf}$ for every error
+production rule $\errorrulessym$ for a new unknown program $e_\bot$ with syntax
+errors. The $\errorrulessym$ are then sorted based on their predicted confidence
 score $\Conf$ and finally the \emph{top-N} rules are returned for
 error-correcting parsing. $N$ is small number in the 10s that will give accurate
 predictions without making the ECE-Parser too slow, as we discuss next in
 \autoref{sec:whole-system}.
-
-% \mypara{The Prediction Algorithm}
-% Our algorithm first extracts the machine-learning-amenable dataset $D_{ML}$
-% from the program pairs dataset $D$. For each program pair in $D$,
-% \textsc{Extract} returns a mapping from the erroneous program's subexpressions
-% to features and labels. Then, \textsc{InSlice} keeps only the expressions in
-% the the type-error slice and evaluates to a list of the respective feature and
-% label vectors, which is added to the $D_{ML}$ dataset. This dataset
-% is used by the \textsc{Train} function to generate our predictive $Models$, \ie
-% $\Model$ and $\Model$.
-
-% At this point we want to generate a $\predictorsym$ for a new unknown program
-% $p$. We perform feature extraction for $p$ with \textsc{Extract}, and use
-% \textsc{InSlice} to restrict to expressions in $p$'s type-error slice.
-% The result is given by $Data(p)$.
-
-% \textsc{Rank} is then applied to all subexpressions produced by $Data(p)$ with
-% $\textsc{Map}$, which will create a mapping of the type
-% $\Emap{(\labelsym{\Conf})}$ associating expressions with confidence scores. We
-% apply \textsc{Rank} to each feature vector that corresponds to an expression in
-% the type-error slice of $p$. These vectors are the first elements of $\tilde{p}
-% \in Data(p)$, which are of type $\datasym \times \labelsym{\ConfBin}$. Finally,
-% $\predictorsym\ Pr$ is returned, which is used by our synthesis algorithm in
-% \autoref{sec:synthesis} to correlate subexpressions in $p$ with their confidence
-% scores.
