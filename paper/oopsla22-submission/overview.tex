@@ -5,6 +5,13 @@ We begin with an overview of our approach to suggesting fixes for programs with
 parse errors by fine-tuning error correcting parsers with prior knowledge of the
 processes (novice) programmers follow to repair their errors.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[trim={0 3.5cm 0 3.5cm}, clip, width=\linewidth]{overall-approach.pdf}
+  \caption{\toolname's overall approach.}
+  \label{fig:overall-approach}
+\end{figure}
+
 \mypara{Error Correcting Parsers}
 One approach to fixing erroneous programs (as in \autoref{fig:bad-prog})
 is to use \emph{Error Correcting Parsers} (EC-Parsers) \citep{Aho_1972}.
@@ -21,10 +28,8 @@ but does not directly support error correction~\citep{Earley_1970}.
 
 \mypara{Solution: Train Classifier to Predict Error Rules}
 We observe that a given erroneous program rarely uses all possible error
-production rules.
-% as the original algorithm \citep{Aho_1972} suggests.
-In this work, we present a novel strategy to selecting just a small
-set of error production rules that can be used with an updated \emph{Error
+production rules. In this work, we present a novel strategy to selecting just a
+small set of error production rules that can be used with an updated \emph{Error
 Correcting Earley Parser} (ECE-Parser) to repair a program with parse errors. In
 the remainder of this section, we give a high-level overview of our approach by
 describing how to:
