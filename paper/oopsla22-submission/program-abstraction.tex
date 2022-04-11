@@ -81,16 +81,17 @@ the parse error and have no more states available to use, \ie where $S(k + 1) =
 \emptyset$. In the same manner, we use the longest possible partial parses that
 we can extract from the chart to abstract $t^i_{j+1}, \dots, t^i_k$.
 
-\mypara{Problem: Multiple Partial Parses} Each of the states $S(j)$, where $0
-\leq j \leq k$, holds a large number of uncompleted rules, \ie partial parses.
-Our heuristic is to choose the longest possible partial parse to abstract our
-erroneous programs and thus limit the size of the program token sequence $t^i$
-as much as possible. However, it is possible that the longest partial parse
-cannot generate abstractions until the position $k$, where $S(k + 1) =
-\emptyset$. Additionally, there may be two or more partial parses in $S(k)$,
-with different lengths, \eg $\{(X \rightarrow \alpha \cdot \beta,\ j),\ (X'
-\rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\ j \neq h$. In this case, we
-want to select the most \emph{probable parse}.
+% \mypara{Problem: Multiple Partial Parses}
+%
+However, each of the states $S(j)$, where $0 \leq j \leq k$, holds a large
+number of uncompleted rules, \ie partial parses. Our heuristic is to choose the
+longest possible partial parse to abstract our erroneous programs and thus limit
+the size of the program token sequence $t^i$ as much as possible. However, it is
+possible that the longest partial parse cannot generate abstractions until the
+position $k$, where $S(k + 1) = \emptyset$. Additionally, there may be two or
+more partial parses in $S(k)$, with different lengths, \eg $\{(X \rightarrow
+\alpha \cdot \beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\
+j \neq h$. In this case, we want to select the most \emph{probable parse}.
 
 % \mypara{Example} For the running example in \autoref{fig:orig-prog},
 % $\{(Arith\_Expr\ \rightarrow\ Literal\ Arith\_Op\ \cdot\ Arith\_Expr,\ 15)$,
@@ -108,7 +109,8 @@ $\learnPCFGsym$. We use the learned PCFG within an augmented Earley parser in
 $\partialsym$ to abstract a program $e_{\bot}$ into a abstract token sequence
 $t^a$.
 
-\mypara{Learning a PCFG}
+% \mypara{Learning a PCFG}
+%
 A PCFG can be defined similarly to a \emph{context-free grammar} $G \defeq (N,\
 \Sigma,\ P,\ S)$ as a quintuple $(N,\ \Sigma,\ P,\ S,\ W)$, where:
 \begin{itemize}
@@ -154,7 +156,8 @@ augmented Earley parser to disambiguate partial parses and choose one, in order
 to produce an abstracted token sequence as described in
 \S~\ref{sec:prog-abstract:partial}.
 
-\mypara{Probabilistic Earley Parsing}
+% \mypara{Probabilistic Earley Parsing}
+%
 We augment Earley states $(X \rightarrow \alpha \cdot \beta,\ j)$ to $(X
 \rightarrow \alpha \cdot \beta,\ j,\ p)$, where $p$ is the probability that $X
 \rightarrow \alpha \cdot \beta$ is a correct partial parse. Therefore, the

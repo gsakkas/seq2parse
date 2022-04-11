@@ -7,7 +7,7 @@ processes (novice) programmers follow to repair their errors.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[trim={0 3.5cm 0 3.5cm}, clip, width=\linewidth]{overall-approach.pdf}
+  \includegraphics[trim={0 3.5cm 0 3.5cm}, clip, width=0.9\linewidth]{overall-approach.pdf}
   \caption{\toolname's overall approach.}
   \label{fig:overall-approach}
 \end{figure}
@@ -52,20 +52,29 @@ the remainder of this section, we give a high-level overview of our approach
 \end{enumerate}
 
 \begin{figure}[t]
+\begin{minipage}[c]{0.47\linewidth}
 \begin{rules}
 S        $\rightarrow$ Stmts end_marker
 Stmts    $\rightarrow$ Stmt \n | Stmt \n Stmts
-Stmt     $\rightarrow$ FuncDef | ExprStmt | RetStmt | PassStmt | ...
+Stmt     $\rightarrow$ FuncDef | ExprStmt
+          | RetStmt | PassStmt | ...
 FuncDef  $\rightarrow$ def name Params : Block
 Block    $\rightarrow$ \n indent Stmts dedent
 RetStmt  $\rightarrow$ return | return Args
 Args     $\rightarrow$ ExprStmt | ExprStmt , Args
 ExprStmt $\rightarrow$ ArExpr | ...
-ArExpr   $\rightarrow$ Literal | ArExpr BinOp Literal
+ArExpr   $\rightarrow$ Literal
+          | ArExpr BinOp Literal
 Literal  $\rightarrow$ name | number | ...
 \end{rules}
 \caption{Simplified production rules of the Python grammar.}
 \label{fig:production-rules}
+\end{minipage}
+\hspace{0.02\linewidth}%
+\begin{minipage}[c]{0.50\linewidth}
+\hspace*{-0.06\linewidth}%
+\input{partial-parse-example}
+\end{minipage}
 \end{figure}
 
 \subsection{Error Correcting Parsing}
@@ -90,7 +99,6 @@ possible Python statements, including expressions (|ExprStmt|), return statement
 the parse tree for the |bar| function in \autoref{fig:bad-prog} using these
 productions rules.
 
-\input{partial-parse-example}
 %
 % \begin{figure}[t]
 % \begin{ecode}

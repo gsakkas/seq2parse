@@ -24,9 +24,9 @@ analysis in \autoref{sec:error-analysis} gathered from
 PythonTutor.com~\citep{Guo2013} between the years 2017 and 2018. The dataset has
 more than 1,100,000 usable erroneous Python programs and their respective fixes.
 The programs have an average length of \emph{87 tokens}, while the abstracted
-token sequences have a much shorter average of \emph{43 tokens}. We use 15,000
-random programs from the dataset for all our tests, and the rest we use as our
-training set.
+token sequences have a much shorter average of \emph{43 tokens}. We choose
+15,000 random programs from the dataset for all our tests, and the rest we use
+as our training set.
 
 We first learn a PCFG on the training set of fixed programs in order to learn
 the probabilities for each production rule in the \emph{full set of the \python
@@ -64,17 +64,17 @@ version of our approach
 
 \input{evaluation-classifier-accuracy}
 
-\mypara{Results: Accuracy of Error Rule Prediction}
+% \mypara{Results: Accuracy of Error Rule Prediction}
 %
 \autoref{fig:accuracy-results} shows the accuracy results of our error
-production rule prediction experiments. The y-axis describes the fraction of
-programs for which the \emph{whole} set of the needed error rules needed to
-repair the \emph{erroneous} program was a complete subset of the top-K predicted
-rules.
+production rule prediction experiments. The y-axis describes the
+\emph{prediction accuracy}, \ie the fraction of test programs for which the
+correct \emph{full set} of error rules to repair the program was predicted in
+the top-K sorted rules.
 %
 The \textsc{Original} version of our transformer classifier didn't consider the
-partial parses produced with the PCFG's aid and used the full \textsc{Original}
-token sequences, whose results are presented in the first two bars of
+abstracted token sequences and used the full \textsc{Original} token sequences,
+whose results are presented in the first two bars of
 \autoref{fig:accuracy-results}. The next two bars show our final results using
 the \textsc{Abstracted} token sequences to train the classifier. Finally, the
 last two dotted bars show the results for when a \textsc{Threshold} is set in
@@ -82,145 +82,173 @@ order to select the predicted error rules, instead of picking the static top-K
 ones. The predicted error rule set can have a size anywhere between 1 and a
 maximum of 25 (pre-defined by us based on the top-K results).
 
-The blue bars show the accuracy on the full test set of \textsc{All} 15,000
-programs, while the green bars show the results on the subset of \textsc{Rare}
-programs, \ie the programs that didn't include any of the 50 most popular error
-rules, that amount only for 4.8\% of our test set.
+The blue bars show the accuracy on the full test set of \textsc{All} 15,000 test
+programs, while the green bars show the results on the subset of the
+\textsc{Rare} programs, \ie the programs that didn't include any of the 50 most
+popular error rules, that amount only for 4.8\% of our test set.
 
 The \textsc{Original} predictor, even with the Top-50 predicted error rules is
 less accurate than the Top-20 predictions of the \textsc{Abstracted}, with an
-accuracy of 73.96\%, which drops to 51.16\% and 32.34\% respectively for the
+accuracy of 87.13\%, which drops to 68.48\% and 56.71\% respectively for the
 Top-20 and Top-10 predictions. The \textsc{Abstracted} predictor significantly
-outperforms the \textsc{Original} predictor with a 72.08\% Top-10 accuracy,
-81.08\% Top-20 accuracy and 92.13\% Top-10 accuracy.
+outperforms the \textsc{Original} predictor with a 72.11\% Top-10 accuracy,
+81.45\% Top-20 accuracy and 92.70\% Top-50 accuracy.
 
 The \textsc{Threshold} predictions are almost as accurate as the
-\textsc{Abstracted} Top-20 predictions with an accuracy of 79.46\% and a median
-number of selected error rules of 12 (average 13.9). This could potentially mean
+\textsc{Abstracted} Top-20 predictions with an accuracy of 79.14\% and a median
+number of selected error rules of 11 (average 13.2). This could potentially mean
 that this predictor is a valid alternative for the static Top-20 predictions.
 
 Finally, we observe that our \textsc{Abstracted} classifiers generalize
 efficiently for our dataset of erroneous \python programs and is almost as
-accurate as the rest of the dataset with a 74.11\% Top-20 accuracy (85.69\%
-Top-50 accuracy). The same holds for the \textsc{Threshold} predictions with a
-72.46\% accuracy.
+accurate for the \textsc{Rare} programs as the rest of the dataset with a
+73.32\% Top-20 accuracy (88.81\% Top-50 accuracy). The same holds for the
+\textsc{Threshold} predictions with a 66.42\% accuracy.
 
 \begin{framed}
   \noindent \toolname's transformer classifier learns to encode programs with
   syntax errors and select candidate error production rules for them
   effectively, yielding \emph{high accuracies}. By abstracting the tokens
   sequences, \toolname is able to \emph{generalize} better and make more
-  accurate predictions with a \emph{81.08\% Top-20 accuracy}.
+  accurate predictions with a \emph{81.45\% Top-20 accuracy}.
 \end{framed}
 
 
 \subsection{RQ2: Repaired Program Preciseness}
 \label{sec:eval:precise}
 
-\begin{table}[t]
-  \centering
-  \begin{tabular}{l||cccc}
-    Error Rule Approach            & Parse Accuracy & User Parse Rate & Parse time & Speedup \\
-    \hline
-    20 Most Popular                & 79.81\% & 16.31\% & 4.8 sec  & 45.8 sec \\
-    50 Most Popular                & 90.03\% & 18.55\% & 10.6 sec & 37.1 sec \\
-    Top-20 (\textsc{All-Parses})   & 59.31\% & 30.57\% & 15.6 sec & 57.4 sec \\
-    Top-20 (\textsc{Minimum-Cost}) & 92.45\% & 19.95\% & 4.1 sec  & 68.0 sec \\
-  \end{tabular}
-  \caption{Experimental results of \toolname's repair approaches.}
-  \label{tab:seq2parse_full_results}
-\end{table}
-
 Next we evaluate \toolname's end-to-end accuracy and preciseness in generating
-valid parses for programs with syntax errors. For all of our tests we limit the
-\toolname's parsing to \emph{5 mins} and run our experiments on \emph{15,000
-erroneous programs} from our dataset. The rest of the dataset was used to train
-our transformer classifiers, and specifically here the \textsc{Abstracted}
-classifier.
+valid parses for programs with syntax errors. For all of our tests we limit
+\toolname's parsing time to \emph{5 mins} and run our experiments on the 15,000
+program  test set. Additionally, we use here the highest-performing transformer
+classifier, the \textsc{Abstracted} classifier.
 
-We compare our \emph{two versions} of our implementation of \toolname
-(\textsc{All-Parses} and \textsc{Minimum-Cost}) against two versions of the
+We compare \emph{two versions} of our implementation of \toolname
+(\textsc{AllParses} and \textsc{MinimumCost}) against two versions of the
 error-correcting parser with a static selection of the 20 and 50 most popular
 error production rules in our training set. We make this comparison because we
 observe in our training set that the 50 most of popular error rules are used for
 parsing as much as \emph{86\%} of the dataset.
 
-Our \textsc{All-Parses} ECEP and \textsc{Minimum-Cost} ECEP both use the
-\emph{Top-20 predictions} from our \textsc{Abstracted} classifier to generate
-parses and thus generate full program repairs. The \textsc{All-Parses} ECEP
-keeps internally all possible states that arise from using the predicted error
-rules and having a maximum repair cost of 2 edits (\ie a maximum of 2
-insertions, deletions or replacements). The \textsc{Minimum-Cost} version
+Our \textsc{AllParses} ECE-Parser and \textsc{MinimumCost} ECE-Parser both use
+the \emph{Top-20 predictions} from our \textsc{Abstracted} classifier to parse
+and repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
+\emph{all possible states} that arise from using the predicted error rules
+similarly to the original ECE-Parser described in \citep{Aho_1972}. We use a
+maximum repair cost of 2 edits (\ie a maximum of 2 insertions, deletions or
+replacements) to limit the search space. The \textsc{MinimumCost} version
 however keeps always the minimum-edit repair and discards all other states that
 may lead to a higher cost. This allows for a higher maximum cost of 10 edits.
-Finally, while \textsc{All-Parses} can generate a large number of repairs, we
+Finally, while \textsc{AllParses} can generate a large number of repairs, we
 keep only the top 3 repairs after filtering with a static code checker
 (\textsc{Pylint}, \url{https://www.pylint.org/}) as most developers will
 consider at most five suggestions before falling back to manual debugging
 \citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
-each of these four versions can parse successfully (\ie the parse accuracy) and
-the amount of parses that match the one that user compiled. We observe that the
-Top-20 predictions with the \textsc{Minimum-Cost} ECEP \emph{outperforms} every
-other option in parse accuracy and parse time, with 92.45\% and 4.1 seconds
-respectively. It also achieves to generate the intended parse for 19.95\% of the
-set, \ie in almost 1 out 5 of the cases. The 20 most popular ECEP with 79.81\%
-parse accuracy and 4.8 seconds parse time is less accurate while a bit slower in
-general, and achieves 3.64\% less times to generate the user parse, while the 50
-most popular is slightly less accurate with 90.03\%, but a lot slower in general
-with 10.6 seconds parse time. The 50 most popular ECEP also almost achieves the
-\textsc{Minimum-Cost} ECEPs with a 18.55\% user parse rate. The
-\textsc{All-Parses} ECEP has a smaller parse accuracy of 59.31\%, however it
-manages to generate the user fix 30.57\% of the times, \ie almost one out of
-three programs with syntax errors, with the cost that is also the slowest
-version with a parse time of 15.6 seconds.
+each of these four versions can parse successfully (\ie the parse accuracy), the
+rare programs parse accuracy and the amount of parses that match the one that
+user compiled. We observe that the Top-20 predictions with the
+\textsc{MinimumCost} ECE-Parser \emph{outperforms} every other option with
+94.25\% parse accuracy and 94.01\% rare parse accuracy. It also achieves to
+generate the intended user parse for 20.55\% of the set, \ie over 1 out 5 of the
+cases. The 20 most popular ECE-Parser with 79.81\% parse accuracy and 65.01\%
+rare parse accuracy is much less accurate, and achieves 4.24\% less times to
+generate the user parse, while the 50 most popular is slightly less accurate
+with 90.03\% and 79.82\% accuracy. The 50 most popular ECE-Parser has also a
+high user fix accuracy of 18.55\%. The \textsc{AllParses} ECE-Parser has a lower
+parse accuracy of 59.31\% in general, however it manages to generate the user
+fix 30.57\% of the times and achieve a 71.47\% rare accuracy. It thus achieves
+to parse almost one out of three programs with syntax errors, while being able
+to parse even the rare programs.
 
 \begin{framed}
-  \noindent \toolname can \emph{generate parses} for \emph{92\%} of our tests
-  within 4.1 secs for the majority of them, while also generating \emph{the user
-  fix in almost 1 out 5 of the cases}.
+  \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
+  syntax errors, while also generating \emph{the user fix over 1 out 5 of
+  cases}.
 \end{framed}
+
+% \begin{table}[t]
+%   \centering
+%   \begin{tabular}{l||cccc}
+%     Error Rule Approach            & Parse Accuracy & User Parse Rate & Parse time & Speedup \\
+%     \hline
+%     20 Most Popular                & 79.81\% & 16.31\% & 4.8 sec  & 45.8 sec \\
+%     50 Most Popular                & 90.03\% & 18.55\% & 10.6 sec & 37.1 sec \\
+%     Top-20 (\textsc{AllParses})   & 59.31\% & 30.57\% & 15.6 sec & 57.4 sec \\
+%     Top-20 (\textsc{MinimumCost}) & 92.45\% & 19.95\% & 5.3 sec  & 68.0 sec \\
+%   \end{tabular}
+%   \caption{Experimental results of \toolname's repair approaches.}
+%   \label{tab:seq2parse_full_results}
+% \end{table}
+
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[c]{0.46\linewidth}
+    \centering
+    \resizebox{\linewidth}{!}{
+      \begin{tabular}{l||ccc}
+        Error Rule            & Parse            & Rare Parse       & User Fix \\
+        Approach              & Accuracy         & Accuracy         & Accuracy \\
+        \hline
+        20 Most Popular       & 79.81\%          & 65.01\%          & 16.31\% \\
+        50 Most Popular       & 90.03\%          & 79.82\%          & 18.55\% \\
+        \textsc{AllParses}    & 59.31\%          & 71.47\%          & \textbf{30.57\%} \\
+        \textsc{MinimumCost}  & \textbf{94.25\%} & \textbf{94.01\%} & 20.55\% \\
+      \end{tabular}
+    }
+    \caption{Experimental results of \toolname's repair approaches.}
+    \label{tab:seq2parse_full_results}
+  \end{minipage}
+  \begin{minipage}[c]{0.53\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{tool-repair-rate.pdf}
+    \caption{The repair rate for all the approaches in
+    \autoref{tab:seq2parse_full_results}}
+    \label{fig:tool-repair-rate}
+  \end{minipage}
+\end{figure}
 
 \subsection{RQ3: Efficiency}
 \label{sec:eval:efficiency}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.8\linewidth]{tool-repair-rate.pdf}
-  \caption{The repair rate for all the approaches in
-  \autoref{tab:seq2parse_full_results}}
-  \label{fig:tool-repair-rate}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=0.8\linewidth]{tool-repair-rate.pdf}
+%   \caption{The repair rate for all the approaches in
+%   \autoref{tab:seq2parse_full_results}}
+%   \label{fig:tool-repair-rate}
+% \end{figure}
 
 Next we evaluate \toolname's efficiency by measuring how many programs it is
-able to parse. We limit each ECEP to 180 seconds. (In general the procedure is
-undecidable, and we conjecture that a longer timeout will diminish the practical
-usability for novices.) We compare the efficiency of \toolname for all the
-versions of \autoref{tab:seq2parse_full_results}.
+able to parse. We limit each ECE-Parser to 5 minutes. (In general the procedure
+is undecidable, and we conjecture that a longer timeout will diminish the
+practical usability for novices.) We compare the efficiency of \toolname for all
+the versions of \autoref{tab:seq2parse_full_results}.
 
 \autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
 \toolname approaches' repair rates over their parse time. We observe that using
 the top 20 error production rule predictions is the most efficient while
 maintaining the highest parse accuracy at all times, with a repair rate of
-80.8\% within 25 seconds.
+82.1\% within 30 seconds and a median parse time of 5.3 seconds.
 
 We observe that, using a fixed set of the 20 and 50 most popular rules for
-\toolname to parse programs with syntax errors, a 67.9\% and 64.5\% respectively
-within 25 seconds. The 50 most popular ECEP is parses less programs until the 45
-seconds but the extra number of error rules aids the ECEP to parse more after
-that point and outperform the 20 most popular ECEP.
+\toolname to parse programs with syntax errors, a 70.0\% and 67.56\%
+respectively within 30 seconds, and median parse times of 4.8 and 10.6 seconds
+respectively. The 50 most popular ECE-Parser is parses less programs until the
+45 seconds but the extra number of error rules aids the ECE-Parser to parse more
+after that point and outperform the 20 most popular ECE-Parser.
 
-We also observe that \toolname successfully parses around 33.0\% of the programs
-with its \textsc{All-Parses} approach in 25 seconds. While this approach is much
-less efficient that the others. due to the vast amount of states is keeps
-internally in its data structure, it is also able to generate the exact human
-repair in 1 out of 3 times which makes still a very valuable approach
-(\S~\ref{sec:eval:precise}).
+We also observe that \toolname successfully parses around 34.1\% of the programs
+with its \textsc{AllParses} approach in 30 seconds and has a median parse time
+of 15.6 seconds. While this approach is much less efficient that the others. due
+to the vast amount of states is keeps internally in its data structure, it is
+also able to generate the exact human repair in 1 out of 3 times which makes
+still a very valuable approach (\S~\ref{sec:eval:precise}).
 
 \begin{framed}
   \noindent \toolname can parse programs with syntax errors for the vast
-  majority of the test set in under 25 seconds.
+  majority of the test set in under 30 seconds.
 \end{framed}
 
 \subsection{RQ4: Usefulness}

@@ -7,66 +7,77 @@
 \definecolor{green3}{HTML}{31A354}
 
 \begin{figure}[t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  ybar stacked,
-  width=0.9\linewidth,
-  height=6.5cm,
-  % title={Accuracy of Repair Template Prediction},
-  ylabel={Accuracy},
-  bar width=0.9cm,
-  ymin=0.0,
-  ymax=105.0,
-  ytick={0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0},
-  yticklabel={\pgfmathparse{\tick}\pgfmathprintnumber{\pgfmathresult}\,\%},
-  ytick style={draw=none},
-  ymajorgrids = true,
-  symbolic x coords={original, abstracted, abstracted-best, empty},
-  enlarge x limits=0.2,
-  xtick=data,
-  xtick style={draw=none},
-  xticklabels={\textsc{Original}\xspace, \textsc{Abstracted}\xspace, \textsc{Threshold}\xspace, \xspace},
-  %x tick label style={rotate=45, anchor=north east},
-  x tick label style={font=\small},
-  y tick label style={font=\small},
-  reverse legend,
-  transpose legend,
-  legend style={legend pos = north east, legend columns=8, font=\small},
-]
+  \begin{minipage}[c]{0.49\linewidth}
+    \centering
+    \resizebox{\linewidth}{!}{
+      \Large
+      \begin{tikzpicture}
+      \begin{axis}[
+        ybar stacked,
+        width=2.0\linewidth,
+        height=11cm,
+        % title={Accuracy of Repair Template Prediction},
+        ylabel={Prediction Accuracy (\%)},
+        bar width=1cm,
+        ymin=0.0,
+        ymax=107.0,
+        ytick={0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0},
+        yticklabel={\pgfmathparse{\tick}\pgfmathprintnumber{\pgfmathresult}},
+        ytick style={draw=none},
+        ymajorgrids = true,
+        symbolic x coords={original, abstracted, abstracted-best},
+        enlarge x limits=0.3,
+        xtick=data,
+        xtick style={draw=none},
+        xticklabels={\textsc{Original}\xspace, \textsc{Abstracted}\xspace, \textsc{Threshold}\xspace},
+        %x tick label style={rotate=45, anchor=north east},
+        % x tick label style={font=\small},
+        % y tick label style={font=\small},
+        reverse legend,
+        % transpose legend,
+        legend style={legend pos = north east, legend columns=4, font=\small},
+      ]
 
-\addplot[draw=black, fill=blue2, bar shift=-.451cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.45851707517178) (empty, 0.0)};
+      \addplot[draw=black, fill=blue2, bar shift=-.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.13970059488788)};
 
-\resetstackedplots
+      \resetstackedplots
 
-\addplot[draw=black, fill=green2, bar shift=.451cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 72.46065808297568)};
+      \addplot[draw=black, fill=green2, bar shift=.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 66.42335766423358)};
 
-\resetstackedplots
+      \resetstackedplots
 
-\addplot[draw=black, fill=green1, bar shift=.451cm] coordinates {(original, 12.875536480686696) (abstracted, 61.23032904148784) (abstracted-best, 0.0)};
-\addlegendentry{Top-10}
-\addplot[draw=black, fill=green2, bar shift=.451cm] coordinates {(original, 20.100143061516448) (abstracted, 12.875536480686698) (abstracted-best, 0.0)};
-\addlegendentry{Top-20}
-\addplot[draw=black, fill=green3, bar shift=.451cm] coordinates {(original, 31.974248927038623) (abstracted, 11.587982832618025) (abstracted-best, 0.0)};
-\addlegendentry{Top-50}
-\addlegendimage{empty legend}
-\addlegendentry{Rare}
+      \addplot[draw=black, fill=green1, bar shift=.501cm] coordinates {(original, 12.875536480686696) (abstracted, 58.394160583941606) (abstracted-best, 0.0)};
+      \addlegendentry{Top-10}
+      \addplot[draw=black, fill=green2, bar shift=.501cm] coordinates {(original, 20.100143061516448) (abstracted, 14.922952149229523) (abstracted-best, 0.0)};
+      \addlegendentry{Top-20}
+      \addplot[draw=black, fill=green3, bar shift=.501cm] coordinates {(original, 31.974248927038623) (abstracted, 15.49067315490673) (abstracted-best, 0.0)};
+      \addlegendentry{Top-50}
+      \addlegendimage{empty legend}
+      \addlegendentry{Rare:}
 
-\resetstackedplots
+      \resetstackedplots
 
-\addplot[draw=black, fill=blue1, bar shift=-.451cm] coordinates {(original, 56.712132089016514) (abstracted, 72.08149591494889) (abstracted-best, 0.0)};
-\addlegendentry{Top-10}
-\addplot[draw=black, fill=blue2, bar shift=-.451cm] coordinates {(original, 11.769733018835673) (abstracted, 9.0007862441459) (abstracted-best, 0.0)};
-\addlegendentry{Top-20}
-\addplot[draw=black, fill=blue3, bar shift=-.451cm] coordinates {(original, 18.65107852186101) (abstracted, 11.045021023484779) (abstracted-best, 0.0)};
-\addlegendentry{Top-50}
-\addlegendimage{empty legend}
-\addlegendentry{All}
+      \addplot[draw=black, fill=blue1, bar shift=-.501cm] coordinates {(original, 56.712132089016514) (abstracted, 72.11217885859972) (abstracted-best, 0.0)};
+      \addlegendentry{Top-10}
+      \addplot[draw=black, fill=blue2, bar shift=-.501cm] coordinates {(original, 11.769733018835673) (abstracted, 9.335163757599531) (abstracted-best, 0.0)};
+      \addlegendentry{Top-20}
+      \addplot[draw=black, fill=blue3, bar shift=-.501cm] coordinates {(original, 18.65107852186101) (abstracted, 11.253840622344256) (abstracted-best, 0.0)};
+      \addlegendentry{Top-50}
+      \addlegendimage{empty legend}
+      \addlegendentry{All:}
 
-\end{axis}
-\end{tikzpicture}
-\caption{
-  Results of our error production rule prediction classifiers for the simple original token sequences and their abstracted versions using the PCFG.
-}
-\label{fig:accuracy-results}
+      \end{axis}
+      \end{tikzpicture}
+    }
+    \caption{
+      Results of our error production rule prediction classifiers for the simple original token sequences and their abstracted versions using the PCFG.
+    }
+    \label{fig:accuracy-results}
+  \end{minipage}
+  \begin{minipage}[c]{0.49\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{accuracy-per-change.pdf}
+    \caption{The repair accuracy for the number of edits needed by the user to repair.}
+    \label{fig:accuracies-per-changes}
+  \end{minipage}
 \end{figure}

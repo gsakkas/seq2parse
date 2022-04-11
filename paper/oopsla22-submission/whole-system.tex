@@ -18,7 +18,8 @@ program $e_{\bot}$ to produce the fixed program $e$. We can map the extracted
 changes to the relevant error production rules that are needed to repair
 $e_{\bot}$.
 
-\mypara{Extracting error rules efficiently from a dataset}
+% \mypara{Extracting error rules efficiently from a dataset}
+%
 The $\trainDLsym$ method requires a dataset of token sequences $t^a$ that is
 annotated with an \emph{exact and small set} of error production rules, \ie
 $\List{t^a \times \errorrulessym}$. These error productions are just a subset of
@@ -83,7 +84,7 @@ every possible error rule, makes the process of generating this dataset a much
 more tractable and efficient process.
 
 
-\subsection{Training the Classifier}
+\subsection{Training and Using a Transformer Classifier}
 \label{sec:whole-system:training-classifier}
 
 \begin{figure}[t]
@@ -98,7 +99,8 @@ more tractable and efficient process.
   \end{minipage}
 \end{figure}
 
-\mypara{Training the Transformer Classifier}
+% \mypara{Training the Transformer Classifier}
+%
 We describe in \autoref{algo:training-classifier-algo} how we use a
 (probabilistic) grammar $G$ and a dataset $Ds$ to train a Transformer classifier
 $Model$ that can be used to predict error production rules for erroneous
@@ -121,7 +123,8 @@ newly extracted dataset $D_{ML}$. The learned classifier $Model$ is returned in
 order to be used later on to fix new erroneous programs. This whole procedure
 happens offline and therefore it won't affect the performance of a final repair.
 
-\mypara{Predicting Error Rules}
+% \mypara{Predicting Error Rules}
+%
 Having trained a Transformer classifier $Model$, we can now predict error rules
 $Rls$, that will be used by an ECE-Parser, by using the $\predictsym$ procedure
 defined in \autoref{algo:predict-algo}. $\predictsym$ uses the same input
