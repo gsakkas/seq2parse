@@ -77,6 +77,7 @@
 \usepackage[skip=4pt]{caption}
 \usepackage{wrapfig}
 \usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
 
 \lstset{
   language=Python,
@@ -116,6 +117,10 @@
 \MakeRobust{\Call}
 
 \newcommand{\algorithmautorefname}{Algorithm}
+\makeatletter
+\renewcommand{\ALG@beginalgorithmic}{\small}
+\renewcommand{\ALG@endalgorithmic}{\small}
+\makeatother
 
 \lstMakeShortInline[language=Python, mathescape=true]{|}
 
