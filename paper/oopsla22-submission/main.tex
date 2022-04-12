@@ -213,7 +213,25 @@
 \email{jhala@cs.ucsd.edu}
 
 \begin{abstract}
-Abstract FIXME --- George.
+We propose an automated approach for repairing syntax errors that combines the
+efficiency of machine learning sequence models with the quality of error
+correcting parsing. Our approach exploits the data-driven nature of sequence
+learning, drawing on a large training dataset of pairs of syntactically
+incorrect programs and their fixes. Specifically, to enable the efficient usage
+of a scalable error-correcting parser we decompose the problem into three steps:
+(1) \emph{learn} the set of error productions rules that fix the dataset of
+programs from the corpus of user fix edits; (2) \emph{predict} the small set of
+error rules for a new erroneous program, by training sequence multi-class
+classifiers on abstracted program token sequences; (3) \emph{parse} a given
+erroneous program using the predicted error rules, thus generating a repair. We
+have implemented our approach in \toolname, which we trained and tested on a
+dataset of more than 1,100,000 Python programs. We present our evaluation of the
+\emph{accuracy} and \emph{efficiency} of \toolname, showing it can parse $94\%$
+of our tests within $5.3$ seconds, while generating \emph{the user fix in 1 out
+3 of the cases}. Finally, we measure the \emph{quality} of the generated repairs
+via a human study and show that humans perceive both \toolname's edit locations
+and final repair quality to be almost as good as the user's in a
+statistically-significant manner.
 \end{abstract}
 
 % \begin{abstract}
