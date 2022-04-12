@@ -1,13 +1,13 @@
 \section{Overview}
 \label{sec:overview}
 
-We begin with an overview of our approach to suggesting fixes for programs with
+We begin with an overview of our approach to parsing and repairing programs with
 parse errors by fine-tuning error correcting parsers with prior knowledge of the
 processes (novice) programmers follow to repair their errors.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[trim={0 3.5cm 0 3.5cm}, clip, width=0.9\linewidth]{overall-approach.pdf}
+  \includegraphics[trim={0 3.8cm 0 3.8cm}, clip, width=0.9\linewidth]{overall-approach.pdf}
   \caption{\toolname's overall approach.}
   \label{fig:overall-approach}
 \end{figure}
@@ -465,6 +465,7 @@ These models stand out in domains where the input is a sequence and where featur
 extraction methods are not readily available~\citep{Sutskever_2014}.
 % to utilize in order to use the older classic neural network models
 
+% FIXME: Maybe delete this sequnce models
 \mypara{Sequence Models}
 Sequence-to-sequence (seq2seq) architectures transform an input sequence
 of tokens into a new sequence \citep{Sutskever_2014}. These architectures
