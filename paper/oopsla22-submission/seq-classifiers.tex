@@ -3,25 +3,25 @@
 
 Our next task is to \emph{train} a model that can predict which error production
 rules are needed to parse a given program (with syntax errors) according to a
-given grammar $G$ and given its (abstracted) program token sequence $t^a$.
+given grammar $G$ by using its (abstracted) program token sequence $t^a$.
 %
-We do so by defining a function $\predictDLsym$ which takes as input a
-\emph{pre-trained Deep Neural Network (\dnn)} model $\Model$ and an abstracted
-token sequence $t^a$.
+We first define a function $\predictDLsym$ which takes as input a
+\emph{pre-trained Transformer classifier} $\Model$ and an abstracted token
+sequence $t^a$.
 %
 It returns as output a \emph{fixed set of error production rules}
-$\errorrulessym$ which can be used along with an error correcting parser
-(ECE-Parser) (\autoref{sec:whole-system}) to successfully parse the program.
+$\errorrulessym$ which can be used with an ECE-Parser
+(\autoref{sec:whole-system}) to successfully parse the program.
 %
-We train the $\Model$ with the $\trainDLsym$ method. $\trainDLsym$ gets a
-dataset of token sequences $t^a$ and the \emph{exact small set} of error
-production rules that the ECE-Parser needs to generate the intended user parse,
-\ie the dataset $\List{t^a \times \errorrulessym}$.
+We train the $\Model$ offline with the $\trainDLsym$ method. $\trainDLsym$ gets
+a dataset $\List{t^a \times \errorrulessym}$ of token sequences $t^a$ and the
+\emph{exact small set} of error production rules that the ECE-Parser used to
+generate the intended \emph{user parse}.
 
 Next, we provide some necessary background about \emph{\dnn{}s} and
 \emph{Sequence-to-sequence (seq2seq)} models and describe how we incorporate
 them in the problem of selecting a small set of error production rules, which we
-frame as a instance of \emph{multi-class classification}. We leave the high
+frame as an instance of \emph{multi-class classification}. We leave the high
 level details of acquiring the dataset of labeled token sequences and using the
 predictor for new erroneous programs for \autoref{sec:whole-system}.
 
@@ -58,37 +58,40 @@ into a higher dimensional space. The abstract vector is then given as an input
 to the decoder, which in turn transforms it into an output sequence $y_1, y_2,
 \dots, y_n$.
 
-\begin{align}
-    h_t &= f(W_{hx} x_t + W_{hh} h_{t-1}) \label{eq:1} \\
-    y_t &= g(W_{yh} h_t) \label{eq:2}
-\end{align}
+% \begin{align}
+%     h_t &= f(W_{hx} x_t + W_{hh} h_{t-1}) \label{eq:1} \\
+%     y_t &= g(W_{yh} h_t) \label{eq:2}
+% \end{align}
 
 The simplest approach historically uses a Recurrent Neural Network (RNN)
 \citep{Rumelhart1986, Werbos1990, Hochreiter_1997}, which is a natural next step
-from the classic neural networks. Each RNN unit, however, operates on each input
-token $x_t$ separately. It keeps an internal \emph{hidden state} $h_t$ that is
-calculated as in \autoref{eq:1}, as a function of the input token $x_t$ and the
-previous hidden state $h_{t-1}$. The weight matrices $W_{hx}$ and $W_{hh}$
-parametrize the input-to-hidden and the hidden-to-hidden connections
-respectively. The function $f$ is also a non-linear activation function such as
-\emph{tanh, sigmoid} and \emph{ReLU}. The output $y_t$ at position $t$ is
-calculated as the product of the current hidden state $h_t$ and the weight
-matrix $W_{yh}$ (\autoref{eq:2}). The activation function $g$ is usually chosen
-as the standard \emph{softmax} function, which, for an output vector $y = (y_1,
-\dots, y_N) \in \R^{N}$, is defined as:
-\[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N.
-\] Finally, the loss function at all steps of the RNN is typically calculated
-as the sum of the cross-entropy loss of each step.
+from the classic neural networks. Each RNN unit operates on each input token
+$x_t$ separately. It keeps an internal \emph{hidden state} $h_t$ that is
+calculated as in $h_t = f(W_{hx} x_t + W_{hh} h_{t-1})$, a function of the input
+token $x_t$ and the previous hidden state $h_{t-1}$. The weight matrices
+$W_{hx}$ and $W_{hh}$ parametrize the input-to-hidden and the hidden-to-hidden
+connections respectively. The function $f$ is another non-linear activation
+function such as \emph{tanh, sigmoid} and \emph{ReLU}.
 
-The recurrent models such as the RNN, have to generate the sequence of hidden
-states $h_t$, as a function of the previous hidden state $h_{t-1}$ and the input
-for position $t$. This sequential generation of hidden states limits
-parallelization within training examples and causes training problems when
-dealing with longer sequences, as memory constraints limit batching across
-examples. However, the latest state-of-the-art approach for the seq2seq
-architecture is the newer \emph{Transformer} model \citep{Vaswani_2017} that
-replaces the classic RNN unit in the encoder and decoder architectures and
-solves these problems due to its \emph{attention mechanisms}.
+The output $y_t$ is calculated as $y_t = g(W_{yh} h_t)$, \ie the product of the
+current hidden state $h_t$ and the weight matrix $W_{yh}$. The activation
+function $g$ is usually chosen as the standard \emph{softmax} function
+\citep{Nielsen2015-pu, Goodfellow-et-al-2016, Bishop-book-2006}. Softmax assigns
+probabilities to each output that must add up to 1.
+% which, for an output vector $y = (y_1, \dots, y_N) \in \R^{N}$, is defined as:
+% \[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N.
+% \]
+Finally, the loss function at all steps of the RNN is typically calculated as
+the sum of the cross-entropy loss of each step.
+
+These recurrent models have to generate the sequence of hidden states $h_t$, as
+a function of the previous hidden state $h_{t-1}$ and the input $x_t$. This
+sequential generation of hidden states limits parallelization within training
+examples and causes training problems when dealing with longer sequences, as
+memory constraints limit batching across examples. However, the latest
+state-of-the-art approach for seq2seq architectures is the newer
+\emph{Transformer} model \citep{Vaswani_2017} that replaces the classic RNN unit
+and solves these problems due to its \emph{attention mechanisms}.
 
 \mypara{Transformers}
 Attention mechanisms have been of interest lately \citep{Bahdanau2015, Kim2017,
@@ -113,8 +116,8 @@ outputs of the same dimension $d_{model}$.
 This architecture is used as described above in a seq2seq model
 \citep{Vaswani_2017} for the encoder. The decoder would require an extra third
 sub-layer, which performs multi-head attention over the output of the encoder
-stack. However, in our task we need to learn sets of error production rules,
-which can be framed as a classic \emph{classification} problem. We are dealing
+stack. However, in our task we learn sets of error production rules, which we
+frame as a classic \emph{multi-class classification} problem. We are dealing
 with input sequences of varied sizes, where no straightforward feature
 extraction technique exists. Therefore, we utilize the effectiveness of the
 state-of-the-art \emph{Transformer encoder} to summarize the programs into
@@ -141,30 +144,25 @@ $t^a$. Critically, we require that the classifier outputs a \emph{confidence
 score} $\Conf$ for each possible error rule that measures how sure the
 classifier is that the rule can be used to parse the associated input program
 $e_{\bot}$. We consider a Transformer encoder for the varied-sized programs and
-standard neural networks to generate our model $\Model$.
+standard \dnn{}s to train $\Model$.
 
-\mypara{Multi-class \dnn{}s}
+% \mypara{Multi-class \dnn{}s}
 %
-A \dnn $\Model$ can be used as a binary classifier, \ie predict if the given
-input belongs into a class or not. While this model is enough for many tasks,
-\eg error localization \citep{Sakkas_2020, Seidel:2017}, in the case of error
-rule prediction we have to select from more \emph{classes}. We therefore use a
+A \dnn can be used as a binary classifier, \ie predict if the given input
+belongs into a class or not. While this model is enough for many tasks, \eg
+error localization \citep{Sakkas_2020, Seidel:2017}, in the case of error rule
+prediction we have to select from multiple \emph{classes}. We therefore use a
 \dnn for our error rule prediction $\Model$, but we adjust the output layer to
-have $N$ nodes for the $N$ chosen error-rule-classes. For multi-class
-classification problems solved with neural networks, usually the \emph{softmax}
-function is used at output layer \citep{Goodfellow-et-al-2016,
-Bishop-book-2006}. Softmax assigns probabilities to each class that must add up
-to 1. This additional constraint speeds up training.
+have $N$ nodes for the selected $N$ error-rule-classes.
 
-\mypara{Multi-class Transformer Classifiers}
+% \mypara{Multi-class Transformer Classifiers}
 %
 We use a Transformer encoder to represent an abstracted token sequence $t^a =
 (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V \in \R^k$. The abstract
-vector $V$ is then immediately fed into the \dnn as input and the error
-production labels are used as the ground truth for training $\trainDLsym$ this
-whole architecture, \ie the \emph{Transformer classifier} $\Model$. The binary
-cross-entropy loss function is used per class to assign the loss per training
-cycle.
+vector $V$ is fed into a multi-class \dnn as input and the error production
+labels are used as the ground truth during the training procedure $\trainDLsym$.
+The binary cross-entropy loss function is used per class to assign the loss per
+training cycle.
 
 Finally, the $\predictDLsym$ function uses the trained $\Model$ to predict all
 confidence scores $\List{\errorrulessym \times \Conf}$ for every error
@@ -172,5 +170,5 @@ production rule $\errorrulessym$ for a new unknown program $e_\bot$ with syntax
 errors. The $\errorrulessym$ are then sorted based on their predicted confidence
 score $\Conf$ and finally the \emph{top-N} rules are returned for
 error-correcting parsing. $N$ is small number in the 10s that will give accurate
-predictions without making the ECE-Parser too slow, as we discuss next in
+predictions without making the ECE-Parser too slow, as we discuss in
 \autoref{sec:whole-system}.
