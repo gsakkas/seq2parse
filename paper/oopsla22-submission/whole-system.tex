@@ -61,7 +61,7 @@ $t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
 In the case of an insertion error, we also include the helper rules $Ins\
 \rightarrow\ Tok\ \vert\ Ins\ Tok$, that can derive any nonempty sequence of
 insertions. To introduce (possible) insertion errors at the end of a program, we
-include the production rules $S' \rightarrow S\ \vert\ S\ Ins$.
+include the production rules $S' \rightarrow S$ and $S' \rightarrow S\ Ins$.
 
 The above algorithm, so far, adds only the \emph{terminal error productions}. We
 have to include the \emph{non-terminal error productions} that will invoke the
@@ -130,7 +130,7 @@ with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure
 predicts a small set of error production rules $Rls$ for the sequence $t^a$
 given the pre-trained $Model$.
 
-\subsection{Generating an error-correcting parser}
+\subsection{Generating an efficient error-correcting parser}
 \label{sec:whole-system:building-ecp}
 
 \input{ecep-algo.tex}
