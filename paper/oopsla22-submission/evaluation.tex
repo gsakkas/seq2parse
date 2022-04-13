@@ -58,10 +58,6 @@ epochs.
 \subsection{RQ1: Accuracy}
 \label{sec:eval:accuracy}
 
-We consider \toolname's transformer classifiers' accuracy up to the \emph{top
-50} error production rules predictions against our original and the final
-version of our approach
-
 \input{evaluation-classifier-accuracy}
 
 % \mypara{Results: Accuracy of Error Rule Prediction}
@@ -72,9 +68,9 @@ production rule prediction experiments. The y-axis describes the
 correct \emph{full set} of error rules to repair the program was predicted in
 the top-K sorted rules.
 %
-The \textsc{Original} version of our transformer classifier didn't consider the
-abstracted token sequences and used the full \textsc{Original} token sequences,
-whose results are presented in the first two bars of
+The \textsc{Original} version of our transformer classifier does not consider
+the abstracted token sequences and used the full \textsc{Original} token
+sequences, whose results are presented in the first two bars of
 \autoref{fig:accuracy-results}. The next two bars show our final results using
 the \textsc{Abstracted} token sequences to train the classifier. Finally, the
 last two dotted bars show the results for when a \textsc{Threshold} is set in
@@ -84,7 +80,7 @@ maximum of 25 (pre-defined by us based on the top-K results).
 
 The blue bars show the accuracy on the full test set of \textsc{All} 15,000 test
 programs, while the green bars show the results on the subset of the
-\textsc{Rare} programs, \ie the programs that didn't include any of the 50 most
+\textsc{Rare} programs, \ie the programs that did not include any of the 50 most
 popular error rules, that amount only for 4.8\% of our test set.
 
 The \textsc{Original} predictor, even with the Top-50 predicted error rules is
@@ -152,14 +148,15 @@ user compiled. We observe that the Top-20 predictions with the
 \textsc{MinimumCost} ECE-Parser \emph{outperforms} every other option with
 94.25\% parse accuracy and 94.01\% rare parse accuracy. It also achieves to
 generate the intended user parse for 20.55\% of the set, \ie over 1 out 5 of the
-cases. The 20 most popular ECE-Parser with 79.81\% parse accuracy and 65.01\%
+cases. The 20 most popular ECE-Parser with 79.87\% parse accuracy and 65.01\%
 rare parse accuracy is much less accurate, and achieves 4.24\% less times to
 generate the user parse, while the 50 most popular is slightly less accurate
-with 90.03\% and 79.82\% accuracy. The 50 most popular ECE-Parser has also a
-high user fix accuracy of 18.55\%. The \textsc{AllParses} ECE-Parser has a lower
-parse accuracy of 59.31\% in general, however it manages to generate the user
-fix 30.57\% of the times and achieve a 71.47\% rare accuracy. It thus achieves
-to parse almost one out of three programs with syntax errors, while being able
+with 91.91\% and 82.70\% accuracy, as expected from the usage of a large number
+of popular error rules. The 50 most popular ECE-Parser has also a high user fix
+accuracy of 18.61\%. The \textsc{AllParses} ECE-Parser has a lower parse
+accuracy of 61.82\% in general, however it manages to generate the user fix
+33.92\% of the times and achieve a 72.22\% rare accuracy. It thus achieves to
+parse one out of three programs with syntax errors, while also being effective
 to parse even the rare programs.
 
 \begin{framed}
@@ -191,9 +188,9 @@ to parse even the rare programs.
         Error Rule            & Parse            & Rare Parse       & User Fix \\
         Approach              & Accuracy         & Accuracy         & Accuracy \\
         \hline
-        20 Most Popular       & 79.81\%          & 65.01\%          & 16.31\% \\
-        50 Most Popular       & 90.03\%          & 79.82\%          & 18.55\% \\
-        \textsc{AllParses}    & 59.31\%          & 71.47\%          & \textbf{30.57\%} \\
+        20 Most Popular       & 79.87\%          & 65.01\%          & 16.31\% \\
+        50 Most Popular       & 91.91\%          & 82.70\%          & 18.61\% \\
+        \textsc{AllParses}    & 61.82\%          & 72.22\%          & \textbf{33.92\%} \\
         \textsc{MinimumCost}  & \textbf{94.25\%} & \textbf{94.01\%} & 20.55\% \\
       \end{tabular}
     }
@@ -230,95 +227,95 @@ the versions of \autoref{tab:seq2parse_full_results}.
 \toolname approaches' repair rates over their parse time. We observe that using
 the top 20 error production rule predictions is the most efficient while
 maintaining the highest parse accuracy at all times, with a repair rate of
-82.1\% within 30 seconds and a median parse time of 5.3 seconds.
+78.10\% within 20 seconds and a median parse time of 5.3 seconds.
 
 We observe that, using a fixed set of the 20 and 50 most popular rules for
-\toolname to parse programs with syntax errors, a 70.0\% and 67.56\%
-respectively within 30 seconds, and median parse times of 4.8 and 10.6 seconds
+\toolname to parse programs with syntax errors, a 61.41\% and 65.20\%
+respectively within 20 seconds, and median parse times of 7.0 and 10.1 seconds
 respectively. The 50 most popular ECE-Parser is parses less programs until the
 45 seconds but the extra number of error rules aids the ECE-Parser to parse more
 after that point and outperform the 20 most popular ECE-Parser.
 
-We also observe that \toolname successfully parses around 34.1\% of the programs
-with its \textsc{AllParses} approach in 30 seconds and has a median parse time
-of 15.6 seconds. While this approach is much less efficient that the others. due
-to the vast amount of states is keeps internally in its data structure, it is
-also able to generate the exact human repair in 1 out of 3 times which makes
-still a very valuable approach (\S~\ref{sec:eval:precise}).
+We also observe that \toolname successfully parses around 38.50\% of the
+programs with its \textsc{AllParses} approach in 20 seconds and has a median
+parse time of 23.2 seconds. While this approach is much less efficient that the
+others. due to the vast amount of states is keeps internally in its data
+structure, it is also able to generate the exact human repair in 1 out of 3
+times which makes still a very valuable approach (\S~\ref{sec:eval:precise}).
 
 \begin{framed}
   \noindent \toolname can parse programs with syntax errors for the vast
-  majority of the test set in under 30 seconds.
+  majority of the test set in under 20 seconds.
 \end{framed}
 
 \subsection{RQ4: Usefulness}
 \label{sec:eval:useful}
 
-We are also interested in the subjective human understanding of the quality 
-and helpfulness of \toolname's repairs. 
-This is so because \toolname's primary use case is as an aid for programmers 
-faced with parse errors. 31\% of repairs produced by \toolname 
+We are also interested in the subjective human understanding of the quality
+and helpfulness of \toolname's repairs.
+This is so because \toolname's primary use case is as an aid for programmers
+faced with parse errors. 31\% of repairs produced by \toolname
 using its \textsc{AllParses} approach are identical to the historical human repair
 and thus likely helpful for programmers. However, it may be that \toolname's fixes
-are still helpful for debugging even when they differ from the historical human 
+are still helpful for debugging even when they differ from the historical human
 repair. To investigate this hypothesis, we conduct a human study of the quality and
 debugging helpfulness of \toolname fixes.
 
-\mypara{Human Study Setup.} We recruited participants from two large public 
-research institutions (names omitted for blind-review) and through Twitter. 
-The study was online, took around 30 minutes, and participants could enter a 
-drawing for one of two \$50 awards. In the study, participants 
-were each asked to rate 15 debugging hints randomly selected from a corpus of 50 
-stimuli\footnote{All human study stimuli are included in our replication 
-package at FIXME}. 
+\mypara{Human Study Setup.} We recruited participants from two large public
+research institutions (names omitted for blind-review) and through Twitter.
+The study was online, took around 30 minutes, and participants could enter a
+drawing for one of two \$50 awards. In the study, participants
+were each asked to rate 15 debugging hints randomly selected from a corpus of 50
+stimuli\footnote{All human study stimuli are included in our replication
+package at FIXME}.
 
-We created the stimuli by selecting 50 buggy programs from the Python Tutor dataset 
-for which \toolname and the historical human produced different fixes. Other than 
+We created the stimuli by selecting 50 buggy programs from the Python Tutor dataset
+for which \toolname and the historical human produced different fixes. Other than
 ensuring a wide array of difficulty (as assessed by how long the
-human took to fix the error), programs were selected randomly. Each 
-stimulus consisted of a buggy program, its associated syntax 
-error, and a potential program fix presented as a \emph{debugging hint} 
-(see Figure FIXME for an example stimulus). 
-For each stimulus, we produced two versions: one where the debugging hint was 
-generated by \toolname and one where the debugging hint was the historical 
-human-created fix. 
+human took to fix the error), programs were selected randomly. Each
+stimulus consisted of a buggy program, its associated syntax
+error, and a potential program fix presented as a \emph{debugging hint}
+(see Figure FIXME for an example stimulus).
+For each stimulus, we produced two versions: one where the debugging hint was
+generated by \toolname and one where the debugging hint was the historical
+human-created fix.
 
-Participants rated the quality and helpfulness of each debugging 
-hint using a 1-5 Likert scale. 
-They also indicated if the debugging hint provided helpful information beyond 
-that in the Python error message %\footnote{In this study, we used error messages from Python 3.10. Compared to earlier Python versions, 3.10 includes improved error messages for Syntax Errors.}. 
-Participants were unaware of if any given 
-hint was generated by a human or \toolname, and participants were never shown both the 
-tool-generated and human-generated repairs to the same buggy program. To be included 
-in analysis, participants had to assess the quality and debugging helpfulness of at 
-least four stimuli. Overall, we analyze 527 unique stimuli ratings from 39 valid 
+Participants rated the quality and helpfulness of each debugging
+hint using a 1-5 Likert scale.
+They also indicated if the debugging hint provided helpful information beyond
+that in the Python error message %\footnote{In this study, we used error messages from Python 3.10. Compared to earlier Python versions, 3.10 includes improved error messages for Syntax Errors.}.
+Participants were unaware of if any given
+hint was generated by a human or \toolname, and participants were never shown both the
+tool-generated and human-generated repairs to the same buggy program. To be included
+in analysis, participants had to assess the quality and debugging helpfulness of at
+least four stimuli. Overall, we analyze 527 unique stimuli ratings from 39 valid
 participants (246 for human-generated foxes and 281 for \toolname fixes).
 
 \mypara{Overall Results.} Humans in our study find that repairs produced by
-\toolname are lower in both quality and debugging helpfulness than those produced 
-by humans (2.9/5 helpfulness for tool-produced repairs vs 3.7/5 for human-produced 
-repairs, p < 0.001). However, we find that humans still often find \toolname's fixes 
-helpful for debugging: participants found that \toolname repairs contained helpful 
-debugging information beyond that contained in the Python Error message 48\% of 
+\toolname are lower in both quality and debugging helpfulness than those produced
+by humans (2.9/5 helpfulness for tool-produced repairs vs 3.7/5 for human-produced
+repairs, p < 0.001). However, we find that humans still often find \toolname's fixes
+helpful for debugging: participants found that \toolname repairs contained helpful
+debugging information beyond that contained in the Python Error message 48\% of
 the time (134/281). This additional helpful debugging information was often in both
-the content (73\% of the time) and location (55\% of the time) of the generated 
-repair. Additionally, \toolname fixes are helpful for easy and hard Syntax Errors 
+the content (73\% of the time) and location (55\% of the time) of the generated
+repair. Additionally, \toolname fixes are helpful for easy and hard Syntax Errors
 alike: we found no statistically significant difference between the helpfulness or
-quality of \toolname's repairs for easy parse errors (those repaired by the human in under 
+quality of \toolname's repairs for easy parse errors (those repaired by the human in under
 40 seconds) or hard parse errors (those repaired by the human in over 40 seconds). %p = 0.07 and 0.13 respectively if we have room to include
-Overall, these results indicate that even when \toolname repairs differ from 
-that of the historical human repair, they may still often be helpful for debugging. 
+Overall, these results indicate that even when \toolname repairs differ from
+that of the historical human repair, they may still often be helpful for debugging.
 
 \mypara{Individual Stimuli.}
 
-Beyond an analysis of FIXME:TOOL’s overall quality and helpfulness, we also 
+Beyond an analysis of FIXME:TOOL’s overall quality and helpfulness, we also
 
 
 \begin{framed}
-  \noindent 
-While humans find that \toolname repairs that differ from the historical human repair are 
-of lower quality than the historical human repair, they still contain helpful 
-debugging information beyond that in the Python error message 48\% of the time. 
+  \noindent
+While humans find that \toolname repairs that differ from the historical human repair are
+of lower quality than the historical human repair, they still contain helpful
+debugging information beyond that in the Python error message 48\% of the time.
 Additionally, over half of \toolname fixes (56\%) were either indistinguishable from
 or more helpful than those produced by humans.
 \end{framed}
