@@ -251,6 +251,8 @@ times which makes still a very valuable approach (\S~\ref{sec:eval:precise}).
 \subsection{RQ4: Usefulness}
 \label{sec:eval:useful}
 
+% FIXME - define word for non-equivelent repairs
+
 As \toolname's is intended as an aid for programmers
 faced with parse errors, we are also interested in the subjective 
 human understanding of the quality
@@ -258,8 +260,8 @@ and helpfulness of our repairs. 31\% of repairs produced by \toolname
 using its \textsc{AllParses} approach are identical to the historical human repair
 and thus likely helpful for programmers. However, it may be that \toolname's fixes
 are still helpful for debugging even when they differ from the human
-repair. To investigate this hypothesis, we conduct a human study of the quality and
-debugging helpfulness of \toolname fixes.
+repair (\ie \textit{non-equivelent} repairs). To investigate this hypothesis, 
+we conduct a human study of the quality and debugging helpfulness of \toolname non-equivalent fixes.
 
 \mypara{Human Study Setup.} We recruited participants from two large public
 research institutions (names omitted for blind-review) and through Twitter.
@@ -267,7 +269,7 @@ The study was online, took around 30 minutes, and participants could enter a
 drawing for one of two \$50 awards. In the study, participants
 were each asked to rate 15 debugging hints randomly selected from a corpus of 50
 stimuli\footnote{All human study stimuli are included in our replication
-package at FIXME}.
+package at {link removed for blind review}}.
 
 We created the stimuli by selecting 50 buggy programs from the Python Tutor dataset
 for which \toolname and the historical human produced different fixes. Other than
@@ -289,10 +291,10 @@ in analysis, participants had to assess at
 least four stimuli. Overall, we analyze 527 unique stimuli ratings from 39 valid
 participants (246 for human-generated foxes and 281 for \toolname fixes).
 
-\mypara{Overall Results.} Humans in our study find that repairs produced by
+\mypara{Overall Results.} While humans in our study find that non-equivelent repairs produced by
 \toolname are lower in both quality and debugging helpfulness than those produced 
 by humans (2.9/5 helpfulness for tool-produced repairs vs 3.7/5 for human-produced 
-repairs, $p < 0.001$). However, we find that humans still often find \toolname's fixes 
+repairs, $p < 0.001$), humans still often find \toolname's fixes 
 helpful for debugging: participants found that \toolname repairs contained helpful 
 debugging information beyond that contained in the Python Error message 48\% of 
 the time (134/281). This additional helpful debugging information was often in both
@@ -417,9 +419,8 @@ FIXME: add last line here saying why that is.
 
 \begin{framed}
   \noindent 
-While humans find that \toolname repairs are 
-of lower quality than the historical human repair, they still contain helpful 
-debugging information beyond that in the Python error message 48\% of the time. 
+Even when non-equivalent to the user's fix, \toolname's repairs are still useful and helpful:
+they contain debugging information beyond that in the Python error message 48\% of the time. 
 Additionally, two-thirds of \toolname's fixes were either indistinguishable from
 or better than those produced by humans for helping debugging.
 \end{framed}
