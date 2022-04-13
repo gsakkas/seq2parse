@@ -135,16 +135,14 @@ given the pre-trained $Model$.
 
 \input{ecep-algo.tex}
 
-We now describe our approach for $\systemsym$ in \Cref{algo:ecep-algo}. This
-is the high-level algorithm that combines everything that we described so far in
-the last three sections.
-
-$\systemsym$ first extracts the fixed programs $ps$ from the dataset $Ds$ to
-learn a probabilistic context-free grammar $PCFG$ for the input grammar $G$.
-Then it $\trainsym$s the $Model$ to predict error production rules. Then we
-define an error rule predictor function \textsc{ERulePredictor} using
-$\predictsym$ with the pre-trained $Model$ and grammar $PCFG$. Finally, the
-algorithm returns the error correcting parser $Prs$, which we define as a
-function that takes as input an erroneous program $\pbad$ that uses
-\textsc{ERulePredictor} to get the set of error rules needed by $\ecepsym$ to
-parse and repair it.
+We now describe our approach for $\systemsym$ in \Cref{algo:ecep-algo}. This is
+the high-level algorithm that combines everything that we described so far in
+the last three sections. $\systemsym$ first extracts the fixed programs $ps$
+from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$ for
+the input grammar $G$. Then it $\trainsym$s the $Model$ to predict error
+production rules. Then we define an error rule predictor function
+\textsc{ERulePredictor} using $\predictsym$ with the pre-trained $Model$ and
+grammar $PCFG$. Finally, the algorithm returns the error correcting parser
+$Prs$, which we define as a function that takes as input an erroneous program
+$\pbad$ that uses \textsc{ERulePredictor} to get the set of error rules needed
+by $\ecepsym$ to parse and repair it.

@@ -465,32 +465,23 @@ extraction methods are not readily available~\citep{Sutskever_2014}.
 % to utilize in order to use the older classic neural network models
 
 % FIXME: Maybe delete this sequnce models
-\mypara{Sequence Models}
-Sequence-to-sequence (seq2seq) architectures transform an input sequence
-of tokens into a new sequence \citep{Sutskever_2014}. These architectures
-consist of an \emph{encoder} and a \emph{decoder}. The encoder transforms the
-input token sequence into a \emph{$n$-dimensional abstract vector} that captures
-all the essence and context of the input sequence. This vector does not
-necessarily have a physical meaning and is instead an internal representation of
-the input sequence into a higher dimensional space. The abstract vector is given
-as an input to the decoder, which in turn transforms it into a output sequence.
-Both the encoder and the decoder can be an (older) Long-Short-Term-Memory
-(LSTM)-based model \citep{Hochreiter_1997} or a more modern and state-of-the-art
-\emph{Transformer} \citep{Vaswani_2017}.
+% \mypara{Sequence Models}
+Sequence-to-sequence (seq2seq) architectures transform an input sequence of
+tokens into a new sequence \citep{Sutskever_2014} and consist of an
+\emph{encoder} and a \emph{decoder}. The encoder transforms the input token
+sequence into a \emph{abstract vector} that captures all the essence and context
+of the input sequence. This vector does not necessarily have a physical meaning
+and is instead an internal representation of the input sequence into a higher
+dimensional space. The abstract vector is given as an input to the decoder,
+which in turn transforms it into an output sequence.
+% Both the encoder and the decoder can be an (older) Long-Short-Term-Memory
+% (LSTM)-based model \citep{Hochreiter_1997} or a more modern and state-of-the-art
+% \emph{Transformer} \citep{Vaswani_2017}.
 
-\mypara{Transformer Classifier}
-We desire to train a model that can correctly predict a small set of error
-production rules for a given abstracted token sequence. We approach this
-problem using \emph{supervised multi-class classification}. A \emph{supervised}
-learning problem is one where, given a labeled training set, the task is to
-learn a function that accurately maps the inputs to output labels and
-generalizes to future inputs. In a \emph{classification} problem, the function
-we are trying to learn maps inputs to a discrete set of two or more output
-labels, called \emph{classes}. We thus encode the task of learning a
-function that will map token sequences of erroneous programs to a small set of
-error production rules as a \emph{multi-class} classification (MCC) problem. We
-use an \emph{encoder transformer} to encode the input sequences into abstract
-vectors that we can then be fed into a \emph{\dnn} classifier to train and make
+We propose using a \emph{Transformer classifier} that can correctly predict a
+small set of error production rules for a given abstracted token sequence. We
+use an \emph{transformer encoder} to encode the input sequences into abstract
+vectors that we then feed into a \emph{\dnn} classifier to train and make
 predictions. Exploiting recent advances in machine learning, we use deep and
 dense architectures \citep{Schmidhuber_2015} for more accurate predictions.
 
@@ -517,7 +508,7 @@ in the fix the error rules |E_t $\rightarrow$ Replace| and
 
 \subsection{Predicting Error Rules with Sequence Classifiers}
 \label{sec:overview:seq-classifiers}
-The learned Transformer classifier model, which has be trained on the updated
+The learned sequence classifier model, which has be trained on the updated
 error-rule-labeled data set can now be used to make predictions for new
 erroneous programs. Additionally, neural networks have the advantage of
 associating each class with a \emph{confidence score} that can be interpreted as
@@ -528,14 +519,16 @@ with the ECE-Parser.
 
 For our running example, in \autoref{fig:bad-prog}, we abstract the program
 shown in \autoref{fig:abstract-prog-seq} and then we predict the error
-production rules for it with the trained Transformer classifier. We rank the
-full set of \emph{terminal} error rules based on their predicted error score
-from the classifier and return the \emph{top 10} predictions for our example.
-Therefore, the predicted set of error rules is the following:
+production rules for it with the trained classifier. We rank the full set of
+\emph{terminal} error rules based on their predicted error score from the
+classifier and return the \emph{top 10} predictions for our example. Therefore,
+the predicted set of error rules is the following:
 %
-|E_number $\rightarrow$ $\epsilon$|, |E_number $\rightarrow$ Insert number|,
+|E_number $\rightarrow$ $\epsilon$|, \linebreak
 %
-|E_\n $\rightarrow$ Insert \n|, |E_( $\rightarrow$ $\epsilon$|, \linebreak
+|E_number $\rightarrow$ Insert number|, |E_\n $\rightarrow$ Insert \n|,
+%
+|E_($\rightarrow$ $\epsilon$|,
 %
 |E_return $\rightarrow$ $\epsilon$|, |Token $\rightarrow$ )|,
 %
@@ -544,9 +537,11 @@ Therefore, the predicted set of error rules is the following:
 |Token $\rightarrow$ number|.
 
 The classifier predicts mostly relevant error rules such as the ones that use
-|E_number|, |E_\n| and |E_return| for example, as we showed previously. There
-are also rules that are not very relevant to this parse error but the classifier
-predicts probably due to them being common parse errors, \eg
+|E_number|, \linebreak
+%
+|E_\n| and |E_return| for example, as we showed previously. There are also rules
+that are not very relevant to this parse error but the classifier predicts
+probably due to them being common parse errors, \eg
 %
 |Token $\rightarrow$ )|, |Token $\rightarrow$ :|. Finally, we added the
 \emph{non-terminal} error rules needed to introduce these errors, which can be
@@ -555,7 +550,7 @@ inferred by them. For example, we can infer
 |Stmts $\rightarrow$ Stmt E_\n|, |Stmts $\rightarrow$ Stmt E_\n Stmts| and
 %
 \lstinline{Block $\rightarrow$ E_\n indent Stmts dedent} from |E_\n| (we don't
-need |E_indent| or |E_dedent| here since no such terminal error rules were
+need \linebreak |E_indent| or |E_dedent| here since no such terminal error rules were
 predicted).
 
 We then parse the program in \autoref{fig:bad-prog} with the ECE-Parser and

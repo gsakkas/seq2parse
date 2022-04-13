@@ -135,7 +135,7 @@ production rule $X \rightarrow \alpha$ is then defined as:
 $\learnPCFGsym$ invokes an instrumented Earley parser to calculate all the
 values $count(X \rightarrow \alpha), \forall X \rightarrow \alpha: P$ and
 $count(X), \forall X: N$. The instrumented parser keeps a \emph{global record}
-for these counters, while parsing the dataset $\List{e}$ of programs. Finally,
+of these values, while parsing the dataset $\List{e}$ of programs. Finally,
 $\learnPCFGsym$ outputs a PCFG that is based on the original grammar $G$ that
 was used to parse the dataset with the learned probabilities $W$.
 
