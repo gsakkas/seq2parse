@@ -28,15 +28,14 @@ token sequences have a much shorter average of \emph{43 tokens}. We choose
 15,000 random programs from the dataset for all our tests, and the rest we use
 as our training set.
 
-We first learn a PCFG on the training set of fixed programs in order to learn
-the probabilities for each production rule in the \emph{full set of the \python
+We first learn a PCFG on the training set of fixed programs to learn
+the probabilities for each production rule in the \emph{full \python
 grammar}. \toolname then extracts the abstracted token sequences for all
-programs in the training set. Next, while for the full set of \python there are
-\emph{455 possible terminal error production rules} that \toolname's can predict
-from, in reality only \emph{340 error rules} are ever used in the full dataset.
+programs in the training set. Next, while the full \python grammar has
+\emph{455 possible terminal error production rules}, in reality only \emph{340 error rules} are ever used in our dataset.
 We arrive at this set of error rules by parsing all the erroneous programs in
 the training set with the ECE-Parser and the "diff" error rules, as described in
-\autoref{sec:overview:train}. Each program is also assigned as labels these
+\autoref{sec:overview:train}. Each program is assigned as labels these
 error rules that make the ECE-Parser parse the erroneous program successfully.
 
 \mypara{Transformer Classifier}
@@ -48,7 +47,7 @@ and 128 neurons respectively. The neurons use rectified linear units (ReLU) as
 their activation function \citep{Nair2010-xg}, while the output layer uses the
 sigmoid function for each class \citep{Nielsen2015-pu}. Additionally, the are
 \emph{two input embedding layers} of a length of 128, one for input tokens and
-one for their positions in the sequence. We also limit the size of the input
+one for their positions in the sequence. We also limit the input
 abstracted token sequences to a length of 128, which covers $95.7\%$ of the
 training set, without the need of pruning them. Finally, the Transformer
 classifier was trained using an \textsc{Adam} optimizer \citep{Kingma2014-ng}, a
@@ -119,11 +118,11 @@ valid parses for programs with syntax errors. For all of our tests we limit
 program  test set. Additionally, we use here the highest-performing transformer
 classifier, the \textsc{Abstracted} classifier.
 
-We compare \emph{two versions} of our implementation of \toolname
+We compare \emph{two versions} of our \toolname implementation
 (\textsc{AllParses} and \textsc{MinimumCost}) against two versions of the
 error-correcting parser with a static selection of the 20 and 50 most popular
-error production rules in our training set. We make this comparison because we
-observe in our training set that the 50 most of popular error rules are used for
+error production rules in our training set. We do this because we
+observe in our training set that the 50 most popular error rules are used for
 parsing as much as \emph{86\%} of the dataset.
 
 Our \textsc{AllParses} ECE-Parser and \textsc{MinimumCost} ECE-Parser both use
@@ -143,21 +142,22 @@ consider at most five suggestions before falling back to manual debugging
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the parse accuracy), the
-rare programs parse accuracy and the amount of parses that match the one that
+rare programs parse accuracy, and the amount of parses that match the one that
 user compiled. We observe that the Top-20 predictions with the
 \textsc{MinimumCost} ECE-Parser \emph{outperforms} every other option with
-94.25\% parse accuracy and 94.01\% rare parse accuracy. It also achieves to
-generate the intended user parse for 20.55\% of the set, \ie over 1 out 5 of the
+94.25\% parse accuracy and 94.01\% rare parse accuracy. It also
+generates the intended user parse for 20.55\% of the set, \ie over 1 out 5 of the
 cases. The 20 most popular ECE-Parser with 79.87\% parse accuracy and 65.01\%
-rare parse accuracy is much less accurate, and achieves 4.24\% less times to
+rare parse accuracy is much less accurate, and is 4.24\% less likely to
 generate the user parse, while the 50 most popular is slightly less accurate
 with 91.91\% and 82.70\% accuracy, as expected from the usage of a large number
 of popular error rules. The 50 most popular ECE-Parser has also a high user fix
 accuracy of 18.61\%. The \textsc{AllParses} ECE-Parser has a lower parse
-accuracy of 61.82\% in general, however it manages to generate the user fix
-33.92\% of the times and achieve a 72.22\% rare accuracy. It thus achieves to
-parse one out of three programs with syntax errors, while also being effective
-to parse even the rare programs.
+accuracy of 61.82\%, however it manages to generate the user fix
+33.92\% of the time and achieve a high 72.22\% rare accuracy. 
+%It thus achieves to
+%parse one out of three programs with syntax errors, while also being effective
+%to parse even the rare programs. recommends removing due to space
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
@@ -307,7 +307,7 @@ that of the historical human repair, they may still often be helpful for debuggi
 \mypara{Individual Stimuli.} Beyond an analysis of \toolname's overall quality, we also 
 analyze the helpfulness of each stimulus. % FIXME: If room, can add more statistical details if needed
 Of the 48 programs for which we collected sufficient data to permit statistical 
-comparison, the human repair was statistically more helpful for debugging than \toolname's
+comparison, the user repair was statistically more helpful for debugging than \toolname's
 repair for 33\% of stimuli (16/48, $p<0.05$). However, we found that \toolname's
 repair was actually \emph{more helpful} for debugging than the human's repair for 15\% of
 stimuli (7/48, $p<0.05$). For the remaining 52\% of stimuli, we found no evidence of a 
@@ -391,22 +391,22 @@ print(a ** (* 3))
 
 To better contextualize these results, we provide examples of stimuli with
 statistically significant differences in debugging helpfulness. 
-Figure~\ref{fig:progb} shows an example
-of when \toolname's repair was significantly more helpful than the human repair: 
+In figure~\ref{fig:progb}, \toolname's repair was 
+significantly more helpful than the user repair: 
  \toolname correctly adds parentheses to \texttt{print} 
-while the human programmer simply deletes the 
+while the human simply deletes the 
 buggy line, perhaps out of confusion or frustration.
-Similarly, figure~\ref{fig:proga}'s \toolname's repair was also
-better than the human repair. In this case, the original programmer appears to try to
+Similarly, figure~\ref{fig:proga}'s \toolname repair was also
+better than the user repair. In this case, the user appears to try to
 implement a function to calculate the greatest common divisor of two integers,
-but currently has empty \texttt{if} \texttt{elif} statements. 
-To ``fix'' this bug, the original programmer
-deleted the \texttt{if} and \texttt{elif} and modified the return statement.
+but has empty \texttt{if} and \texttt{elif} statements. 
+To ``fix'' this bug, the user
+deletes the \texttt{if} and \texttt{elif} and modifies the return statement.
 However, this fix does not correctly calculate the greatest common divisor.
 \toolname, on the other hand, adds a template variable to the \texttt{if} and 
-\texttt{break} to the \texttt{elif}. While this repair does not fully implement
-greatest common divisor, it is likely closer to the intended final solution.
-Additionally, this example demonstrates the beneficial ability of our approach
+\texttt{break} to the \texttt{elif}. While this also does not implement
+greatest common divisor, it is likely closer to the intended final solution
+than the user repair. This example also demonstrates the beneficial ability of our approach
 to conduct multi-edit repairs. 
 
 Figure~\ref{fig:progc}, on the other hand, contains an example of when the
