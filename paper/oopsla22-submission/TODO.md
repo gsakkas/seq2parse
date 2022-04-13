@@ -20,3 +20,7 @@
 [x] generate examples for in-house (i.e. us) user study
 
 [x] generate examples for real user study
+
+[] RJ: Sections 1,2,3 -> Related -> Eval (when maddie is done)
+
+[] GS: Rework Section 5

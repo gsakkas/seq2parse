@@ -3,10 +3,10 @@
 
 We start by introducing our approach for abstracting programs with parse errors
 into a suitable sequence of tokens for training sequence classifiers. We explain
-how a traditional Earley parser can be used to extract partial parses, along
-with a Probabilistic Context-Free Grammar (PCFG), in order to get a better level
-of abstraction with richer context information than the simple \emph{Lexer}
-output.
+how a traditional Earley parser can be used to extract partial parses with the
+aid of a Probabilistic Context-Free Grammar (PCFG), in order to get a higher
+level of abstraction with richer context information than the simple
+\emph{Lexer} output.
 
 \input{api.tex}
 
@@ -17,20 +17,21 @@ assigned and thus identified meaning). The program that performs lexical
 analysis is called a \emph{lexer} and is usually combined with a parser, which
 together analyze the syntax of a programming language $L(G)$, defined by the
 grammar $G$. When a program has a syntax error, the output token sequence of the
-lexer is the highest level of abstraction that we can acquire for such a
-program, since the parser returns with an error, usually with an informative
-error message.
+lexer is the highest level of abstraction that we can acquire, since the parser
+fails and returns an error.
 
 \mypara{Token Sequences}
 Our goal is to parse a \emph{program token sequence} $t^i$, which is a lexed
-program with parse errors (\ie $t^i \notin L(G)$), and repair into a \emph{fixed
-token sequence} $t^o \in L(G)$ that can be used to return a repaired program
-without syntax errors. Let $t^i$ be a sequence $t^i_1, t^i_2, \dots, t^i_n$ and
-$t^o$ be the updated sequence $t^o_1, t^o_2, \dots, t^o_i, \dots, t^o_j, \dots,
-t^o_k$. The subsequence $t^o_i, \dots, t^o_j$ is a part of $t^i$ that has been
-replaced, deleted or inserted in order to generate the $t^o$. It can be the
-whole program, part of it or multiple parts of it. $t^o$ will finally be a token
-sequence that can be parsed by the original language's $L(G)$ parser.
+program with parse errors (\ie $t^i \notin L(G)$), and repair it into a
+\emph{fixed token sequence} $t^o \in L(G)$ that can be used to return a repaired
+program without syntax errors. Let $t^i$ be a sequence $t^i_1, t^i_2, \dots,
+t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2, \dots, t^o_i, \dots,
+t^o_j, \dots, t^o_k$. The subsequence $t^o_i, \dots, t^o_j$ can either
+\emph{replace} a subsequence in $t^i$, it can \emph{be inserted} in $t^i$ or can
+be the empty subsequence $\epsilon$ and essentially \emph{delete} a subsequence
+in $t^i$ to generate the $t^o$. It can be the whole program, part of it or
+multiple parts of it. $t^o$ will finally be a token sequence that can be parsed
+by the original language's $L(G)$ parser.
 
 However, programs can be large and, thus, $n$ can take large values, which makes
 them unsuitable for training effectively sequence models. Therefore, our goal is
@@ -61,53 +62,44 @@ Each state is a tuple $(X \rightarrow \alpha \cdot \beta,\ j)$, consisting of
 \end{itemize}
 
 We denote the state set at an input position $k$ as $S(k)$. The parser is seeded
-with $S(0)$ consisting of only the top-level rule. It then repeatedly executes
-three operations: \emph{prediction, scanning,} and \emph{completion}. There
-exists a \emph{complete parse} if $(X \rightarrow \gamma \cdot, 0)$ is found in
-$S(n)$, where $(X \rightarrow \gamma)$ is the top level-rule and $n$ the input
-length. We define a \emph{partial parse} to be any partially completed rules,
-\ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state $S(k)$,
-where $i < k \leq n$.
+with $S(0)$ consisting of only the top-level rule $S \rightarrow \gamma$. It
+then repeatedly executes three operations: \emph{prediction, scanning,} and
+\emph{completion}. There exists a \emph{complete parse} if the complete
+top-level rule $(S \rightarrow \gamma \cdot, 0)$ is found in $S(n)$, where $n$
+the input length. We define a \emph{partial parse} to be any partially completed
+rules, \ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state
+$S(k)$, where $i < k \leq n$.
 
 Let, again, $t^i_1, t^i_2, \dots, t^i_j, \dots, t^i_k, \dots, t^i_n$ be the
 input token sequence $t^i$, where at location $k$ there is a parse error and the
-Earley parser has exhausted all possibilities and can not add any more rules in
-state $S(k + 1)$. We abstract $t^i$ by getting the longest possible part of the
-program that has a partial parse, \ie by finding the largest $j$ for which there
-is a rule $(X \rightarrow \alpha \cdot \beta, 0) \in S(j)$. We use this rule for
-$X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in $t^i$ with $\alpha$, thus getting
-an abstracted sequence $t^a$. We continue abstracting the program until we reach
-the parse error and have no more states available to use, \ie where $S(k + 1) =
-\emptyset$. In the same manner, we use the longest possible partial parses that
-we can extract from the chart to abstract $t^i_{j+1}, \dots, t^i_k$.
+parser has exhausted all possibilities and can not add any more rules in state
+$S(k + 1)$. We want to Sabstract $t^i$ by getting the longest possible part of
+the program that has a partial parse, \ie by finding the largest $j$ for which
+there is a rule $(X \rightarrow \alpha \cdot \beta, 0) \in S(j)$. We use this
+rule for $X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in $t^i$ with $\alpha$,
+thus getting an abstracted sequence $t^a$. In the same manner, we use the
+longest possible partial parses that we can extract from the chart to abstract
+$t^i_{j+1}, \dots, t^i_k$, until we reach the parse error at location $k$, where
+$S(k + 1) = \emptyset$.
 
 % \mypara{Problem: Multiple Partial Parses}
 %
-However, each of the states $S(j)$, where $0 \leq j \leq k$, holds a large
-number of uncompleted rules, \ie partial parses. Our heuristic is to choose the
-longest possible partial parse to abstract our erroneous programs and thus limit
-the size of the program token sequence $t^i$ as much as possible. However, it is
-possible that the longest partial parse cannot generate abstractions until the
-position $k$, where $S(k + 1) = \emptyset$. Additionally, there may be two or
-more partial parses in $S(k)$, with different lengths, \eg $\{(X \rightarrow
-\alpha \cdot \beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\
-j \neq h$. In this case, we want to select the most \emph{probable parse}.
-
-% \mypara{Example} For the running example in \autoref{fig:orig-prog},
-% $\{(Arith\_Expr\ \rightarrow\ Literal\ Arith\_Op\ \cdot\ Arith\_Expr,\ 15)$,
-% $(Arith\_Expr\ \rightarrow\ Literal\ \cdot,\ 15)\} \in S(17)$, where $S(17)$ is
-% the state after the $+$ operator in line 3. Both of those states can lead in
-% valid parses, depending how a candidate repair would complete them.
+However, each of the states $S(j),\ 0 \leq j \leq k$, holds a large number of
+partial parses and, thus, our heuristic to choose the longest possible partial
+parse to abstract programs may not be able to abstract the token sequence fully
+until the error location $k$. Additionally, there may be two or more partial
+parses in $S(k)$, with different lengths, \eg $\{(X \rightarrow \alpha \cdot
+\beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\ j \neq h$.
+We propose selecting the most \emph{probable parse} with the aid of a PCFG.
 
 
 \subsection{Probabilistic Context-Free Grammars}
 \label{sec:prog-abstract:pcfg}
-We propose learning a \emph{Probabilistic Context-Free Grammar} (PCFG) from a
-large corpus of programs $\List{e}, e \in L(G)$, that belong to a language
-$L(G)$ that a grammar $G$ defines, as shown in \autoref{fig:api} with
-$\learnPCFGsym$. We use the learned PCFG within an augmented Earley parser in
-$\partialsym$ to abstract a program $e_{\bot}$ into a abstract token sequence
-$t^a$.
+We learn a PCFG from a large corpus of programs $\List{e}, e \in L(G)$, that
+belong to a language $L(G)$ that a grammar $G$ defines, with $\learnPCFGsym$ as
+shown in \autoref{fig:api}. We use the learned PCFG with an augmented Earley
+parser in $\partialsym$ to abstract a program $e_{\bot}$ into a abstract token
+sequence $t^a$.
 
 % \mypara{Learning a PCFG}
 %
@@ -127,28 +119,27 @@ Given a dataset of programs $\List{e}, e \in L(G)$ that can be parsed, let
 $count(X \rightarrow \alpha)$ be the number of times the production rule $X
 \rightarrow \alpha$ has been used to generate a final complete parse, while
 parsing $\List{e}$, and $count(X)$ be the number of times the non-terminal $X$
-has been seen. The probability for a production rule $X \rightarrow \alpha$ is
-then defined as:
+has been seen in left side of a used production rule. The probability for a
+production rule $X \rightarrow \alpha$ is then defined as:
 
 \begin{equation*}
     p(X \rightarrow \alpha) = \frac{count(X \rightarrow \alpha)}{count(X)}
 \end{equation*}
 
-Of course, under this definition we have the constraint that for any $X \in N$:
+% Of course, under this definition we have the constraint that for any $X \in N$:
 
-\begin{equation*}
-    \sum_{X \rightarrow \alpha \in P, \alpha \in (N \cup \Sigma)^{\ast}}{p(X \rightarrow \alpha)} = 1
-\end{equation*}
+% \begin{equation*}
+%     \sum_{X \rightarrow \alpha \in P, \alpha \in (N \cup \Sigma)^{\ast}}{p(X \rightarrow \alpha)} = 1
+% \end{equation*}
 
-Therefore, $\learnPCFGsym$ invokes an instrumented Earley parser to calculate
-all possible counters $count(X \rightarrow \alpha), \forall X \rightarrow
-\alpha: P$ and $count(X), \forall X: N$. The instrumented Earley parser keeps a
-\emph{global record} for all these counters, while parsing the dataset
-$\List{e}$ of programs. Finally, $\learnPCFGsym$ will output a PCFG that is
-based on the original grammar $G$ that was used to parse the dataset with the
-additional probabilities.
+$\learnPCFGsym$ invokes an instrumented Earley parser to calculate all the
+values $count(X \rightarrow \alpha), \forall X \rightarrow \alpha: P$ and
+$count(X), \forall X: N$. The instrumented parser keeps a \emph{global record}
+of these values, while parsing the dataset $\List{e}$ of programs. Finally,
+$\learnPCFGsym$ outputs a PCFG that is based on the original grammar $G$ that
+was used to parse the dataset with the learned probabilities $W$.
 
-\subsection{From Programs to Abstract Token Sequences}
+\subsection{Abstracted Token Sequences}
 
 Given a program $e_{\bot}$ with a parse error and a learned PCFG, $\partialsym$
 will generate an abstracted token sequence $t^a$. The PCFG will be used with an
@@ -160,19 +151,14 @@ to produce an abstracted token sequence as described in
 %
 We augment Earley states $(X \rightarrow \alpha \cdot \beta,\ j)$ to $(X
 \rightarrow \alpha \cdot \beta,\ j,\ p)$, where $p$ is the probability that $X
-\rightarrow \alpha \cdot \beta$ is a correct partial parse. Therefore, the
-augmented Earley parser, when we have two (or more) conflicting partial parses
-$\{(X \rightarrow \alpha \cdot \beta,\ j,\ p),\ (X' \rightarrow \alpha' \cdot
-\beta',\ h,\ p')\} \in S(k)$, selects the partial parse with the highest
-probability $max(p,\ p')$. The augmented Earley parser calculates the
-probability $p$ for a partial parse $(X \rightarrow \alpha \cdot \beta,\ j,\ p)$
-in the state $S(k)$, as the product $p_1 \cdot p_2 \cdot \dots \cdot p_{k-1}$ of
-the probabilities $p_1,\ p_2,\ \dots,\ p_{k-1}$ that are associated with the
-production rules $(X_1 \rightarrow \alpha_1 \cdot \beta_1,\ i_1,\ p_1), (X_2
-\rightarrow \alpha_2 \cdot \beta_2,\ i_2,\ p_2), \dots$ that have been used so
-far to parse the string of tokens $\alpha$.
-
-% \mypara{Example: Selecting Most Likely Partial Parse}
-
-
-
+\rightarrow \alpha \cdot \beta$ is a correct partial parse. When there are two
+(or more) conflicting partial parses $\{(X \rightarrow \alpha \cdot \beta,\ j,\
+p),\ (X' \rightarrow \alpha' \cdot \beta',\ h,\ p')\} \in S(k)$, the augmented
+parser selects the partial parse with the highest probability $max(p,\ p')$. The
+augmented parser calculates the probability $p$ for a partial parse $(X
+\rightarrow \alpha \cdot \beta,\ j,\ p)$ in the state $S(k)$, as the product
+$p_1 \cdot p_2 \cdot \dots \cdot p_{k-1}$ of the probabilities $p_1,\ p_2,\
+\dots,\ p_{k-1}$ that are associated with the production rules $(X_1 \rightarrow
+\alpha_1 \cdot \beta_1,\ i_1,\ p_1), (X_2 \rightarrow \alpha_2 \cdot \beta_2,\
+i_2,\ p_2), \dots$ that have been used so far to parse the string of tokens
+$\alpha$.

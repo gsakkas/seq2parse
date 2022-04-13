@@ -7,20 +7,20 @@
 \definecolor{green3}{HTML}{31A354}
 
 \begin{figure}[t]
-  \begin{minipage}[c]{0.49\linewidth}
+  % \begin{minipage}[c]{0.49\linewidth}
     \centering
-    \resizebox{\linewidth}{!}{
+    \resizebox{0.6\linewidth}{!}{
       \Large
       \begin{tikzpicture}
       \begin{axis}[
         ybar stacked,
-        width=2.0\linewidth,
+        width=1.1\linewidth,
         height=11cm,
         % title={Accuracy of Repair Template Prediction},
         ylabel={Prediction Accuracy (\%)},
         bar width=1cm,
         ymin=0.0,
-        ymax=107.0,
+        ymax=101.0,
         ytick={0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0},
         yticklabel={\pgfmathparse{\tick}\pgfmathprintnumber{\pgfmathresult}},
         ytick style={draw=none},
@@ -38,11 +38,11 @@
         legend style={legend pos = north east, legend columns=4, font=\small},
       ]
 
-      \addplot[draw=black, fill=blue2, bar shift=-.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.13970059488788)};
+      \addplot[draw=black, fill=blue2, bar shift=-.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 79.28025102961365)};
 
       \resetstackedplots
 
-      \addplot[draw=black, fill=green2, bar shift=.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 66.42335766423358)};
+      \addplot[draw=black, fill=green2, bar shift=.501cm, postaction= { pattern=dots }] coordinates {(original, 0.0) (abstracted, 0.0) (abstracted-best, 69.82968369829683)};
 
       \resetstackedplots
 
@@ -73,11 +73,11 @@
       Results of our error production rule prediction classifiers for the simple original token sequences and their abstracted versions using the PCFG.
     }
     \label{fig:accuracy-results}
-  \end{minipage}
-  \begin{minipage}[c]{0.49\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{accuracy-per-change.pdf}
-    \caption{The repair accuracy for the number of edits needed by the user to repair.}
-    \label{fig:accuracies-per-changes}
-  \end{minipage}
+  % \end{minipage}
+  % \begin{minipage}[c]{0.49\linewidth}
+  %   \centering
+  %   \includegraphics[width=\linewidth]{accuracy-per-change.pdf}
+  %   \caption{The repair accuracy for the number of edits needed by the user to repair.}
+  %   \label{fig:accuracies-per-changes}
+  % \end{minipage}
 \end{figure}

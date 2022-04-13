@@ -138,10 +138,8 @@ error-correcting parsing of programs with syntax errors.
 
 % Results
 We implemented our approach, \toolname, and trained it and tested it on a
-dataset of more than 1,100,000 programs taken from over two years of
-user interactions with an online editor. Given a new erroneous program,
-\toolname first generates a list of potential error production rules ranked by
-likelihood. We evaluate our approach in three ways.
+dataset of more than 1,100,000 programs taken from over two years of user
+interactions with an online editor. We evaluate our approach in three ways.
 %
 First, we measure its \emph{accuracy}: we show that \toolname correctly predicts
 the right set of error rules $81\%$ of the time when considering the top $20$
@@ -155,6 +153,8 @@ while also generating \emph{the user fix in almost 1 out 3 of the cases}.
 Finally, we measure the \emph{quality} of the generated repairs via a human study
 with FIXME participants and show that humans perceive both \toolname's edit
 locations and final repair quality to be FIXME in a statistically-significant manner.
+
+% TODO: Maybe mention the jump in accuracy from previous work from 50\% to 94\%
 
 The rest of the paper is organized as followed: \autoref{sec:error-analysis}
 presents a data analysis of a \python dataset of erroneous programs and their
