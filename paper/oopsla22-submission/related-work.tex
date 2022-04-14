@@ -122,8 +122,10 @@ It also uses \emph{ensemble learning} to train NMT models of different
 hyper-parameters in order to capture different relations between erroneous and
 correct code. This approach uses a minimal level of abstraction over the input
 programs, with only a subword-level tokenization to minimize the vocabulary size
-and make training of such enormous models more attainable. \textsc{CURE}
-\citep{Jiang_2021} suggested a similar \emph{code-aware NMT model} that is
+and make training of such enormous models more attainable.
+%
+\textsc{CURE}~\citep{Jiang_2021}
+suggested a similar \emph{code-aware NMT model} that is
 pre-trained using unsupervised learning on correct programs. It also uses a
 programming language (PL) \textsc{GPT} \citep{GPT2020} model that learns to
 predict the next token in program sequences and uses beam search to maintain a
