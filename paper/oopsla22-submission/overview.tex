@@ -34,10 +34,9 @@ def bar(a):
 \end{figure}
 
 We begin with an overview of \toolname's neurosymbolic
-approach to repairing parse errors.
+approach to repairing parse errors, that uses two components.
 %
-
-\emph{(Neural component)}
+\emph{(Neural)}
 %
 Given a dataset of ill-parsed programs and
 their fixes, we partially parse the programs
@@ -46,16 +45,16 @@ into \emph{abstract sequences} of tokens
 be used to train \emph{transformer classifiers}
 (\S~\ref{sec:overview:train}), that predict
 program-relevant error rules for new erroneous
-programs (\S~\ref{sec:overview:seq-classifiers})
+programs (\S~\ref{sec:overview:seq-classifiers}).
 %
-\emph{(Symbolic component)}
+\emph{(Symbolic)}
 %
 Next, given an erroneous program, and a (small) set of
 predicted \emph{program relevant} error rules, the
 the ECE-parser can exploit the high-level grammatical
 structure of the language to make short work of
 synthesizing the best repair (\S~\ref{sec:overview:ec-parsing}).
-
+%
 We now give an overview of \toolname, describing these
 elements in turn,  using as a running example, the program
 in \autoref{fig:bad-prog} where the programmer has introduced
