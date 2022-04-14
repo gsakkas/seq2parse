@@ -3,11 +3,15 @@
 \label{sec:intro}
 
 Parse errors can vex novices who
-are learning to program, or learning a
-new language as traditional error messages
-only indicate the first error or producing message
-that are not descriptive enough or are too
-verbose~\citep{qian2017, VanDerSpek_2005}).
+are learning to program.
+%
+Traditional error messages
+only indicate the first error
+or produce messages that
+are either incomprehensibly
+verbose or not descriptive
+enough to help swiftly fix
+the error~\citep{qian2017, VanDerSpek_2005}).
 %
 When they occur in larger code bases, parse errors
 even trouble experts, and require a great deal of
@@ -55,7 +59,7 @@ up to 3 syntax errors and~\citep{Wu2020} repairs at most only
 the \emph{58\%} of syntax errors of a real-world dataset.
 
 In this paper, we present \toolname, a new approach
-to automatically repairing parse errors, that is
+to automatically repairing parse errors
 based on the following key insight.
 %
 Symbolic ECE Parsers \citep{Aho_1972} can, in principle,
@@ -98,27 +102,27 @@ error correction rules for a given program (\S~\ref{sec:seq-classifiers}), and t
 (2) use the predicted rules to synthesize repairs
 via EC-Parsing (\S~\ref{sec:whole-system}).
 
-\mypara{3. Compaction}
+\mypara{3. Abstraction}
 %
-It turns out that predicting the rules is also non-trivial as
-Standard ``token-sequence'' based methods are confused by
-by the long trailing context that is had nothing to do with
-the particular parse error.
+Predicting the rules is challenging.
+Standard NLP token-sequence based
+methods are confused by long
+trailing contexts that are
+independent of the parse error.
 %
-This confusion yields to inaccurate classifiers that
-predicted rules that were not relevant relevant to
-repair the error at hand, and hence, a woefully low
-repair rate.
+This confusion yields to inaccurate
+classifiers that predict irrelevant
+rules yielding woefully low repair rates.
 %
-Our second key insight eliminates this neural confusion
-in a symbolic fashion: we show how to use
+Our second key insight eliminates neural confusion
+via a symbolic intervention: we show how to use
 Probabilistic Context Free Grammars (PCFGs)
-to \emph{abstract} long low-level token sequences so that
-the irrelevant trailing context is compressed into single
-non-terminals, yielding compressed abstract token sequences
+to \emph{abstract} long low-level token
+sequences so that the irrelevant trailing
+context is compressed into single non-terminals,
+yielding compressed abstract token sequences
 that can be accurately understood by \dnn~s
 (\S~\ref{sec:prog-abstract}).
-
 
 \mypara{4. Evaluation}
 %
