@@ -54,6 +54,14 @@ def bar(a):
 \label{fig:example-prog}
 \end{figure}
 
+Syntax errors are particularly relevant for computer science education and
+many novice misconceptions relate to syntax~\citep{qian2017}. In our
+benchmark set of 1,100,000 novice Python programs, over 70\% of errors
+are syntax errors. Traditional error messages are
+less helpful for novices (e.g., only indicate the first error or producing
+messages that are not descriptive enough or are too
+verbose~\citep{Kummerfeld2003, Ahadi_2018, VanDerSpek_2005}).
+
 We desire an approach for automatically repairing parse errors in off-the-shelf
 programs. An effective solution must apply to programs in real languages
 efficiently and must produce repairs that are of high quality. Unfortunately,
@@ -70,9 +78,6 @@ are essential in programming systems. Efficient and expressive parsers are used
 in modern programming languages (\eg, LR~\citep{Aho1974} or
 Earley~\citep{Earley_1970} parsing). These approaches can accurately locate
 syntax errors. However, they often fail to provide effective feedback to humans.
-For example, they may only indicate the first syntax error or may produce
-messages that are not descriptive enough or are too
-verbose~\citep{Kummerfeld2003, Ahadi_2018, VanDerSpek_2005}.
 % WRW doesn't understand this claim and does not think it is true without
 % more explanation. GCC is push-button, requiring no SE effort.
 %
@@ -136,7 +141,7 @@ Critically, we show how to perform the abstraction from a particular
 program to an abstract token sequence by using an Earley parser's
 \citep{Earley_1970} partial parses and a learned Probabilistic Context-Free
 Grammar. This abstraction lets us train accurate predictors over low-level
-program sequences and thus allows the efficient and high-quality
+program sequences for efficient and high-quality
 error-correcting parsing of programs with syntax errors.
 
 % Results
@@ -144,18 +149,19 @@ We implemented our approach, \toolname, and trained it and tested it on a
 dataset of more than 1,100,000 programs taken from over two years of user
 interactions with an online editor. We evaluate our approach in three ways.
 %
-First, we measure its \emph{accuracy}: we show that \toolname correctly predicts
+First, we measure its \emph{accuracy}: \toolname correctly predicts
 the right set of error rules $81\%$ of the time when considering the top $20$
 rules and can parse $94\%$ of our tests within $5.3$ seconds with these
 predictions.
 %
-Second, we measure its \emph{efficiency}: we show that \toolname
+Second, we measure its \emph{efficiency}: \toolname
 parses and repairs erroneous programs within $30$ seconds $82\%$ of the time,
 while also generating \emph{the user fix in almost 1 out 3 of the cases}.
 %
 Finally, we measure the \emph{quality} of the generated repairs via a human study
 with FIXME participants and show that humans perceive both \toolname's edit
-locations and final repair quality to be FIXME in a statistically-significant manner.
+locations and final repair quality to be useful and helpful,
+in a statistically-significant manner, even when not equivalent to the user's fix.
 
 % TODO: Maybe mention the jump in accuracy from previous work from 50\% to 94\%
 
