@@ -12,11 +12,9 @@ synthesize repairs, but, in practice, are overwhelmed by
 the many error-correction rules that are irrelevant to the
 particular program that requires repair.
 %
-In contrast, \emph{Neural} approaches
-are fooled by the large space of possible
-token-sequence level edits, but can precisely
-pinpoint the set of EC-rules that are relevant
-to a particular program.
+In contrast, \emph{Neural} approaches are fooled by the large space of possible
+sequence level edits, but can precisely pinpoint the set of EC-rules that are
+relevant to a particular program.
 %
 Thus, \toolname addresses the problem of parse
 error repair by a neurosymbolic approach that
@@ -68,7 +66,7 @@ Next, we give an overview of \toolname, by describing these elements in turn.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[trim={0 3.8cm 0 3.8cm}, clip, width=0.9\linewidth]{overall-approach.pdf}
+  \includegraphics[trim={0 4.1cm 0 3.85cm}, clip, width=\linewidth]{overall-approach.pdf}
   \caption{\toolname's overall approach.}
   \label{fig:overall-approach}
 \end{figure}
@@ -200,10 +198,10 @@ Next, for each terminal |t| in $G$, we add four error rules of the type:
 \end{itemize}
 These four new error rules have the following usage for each terminal |t|:
 \begin{enumerate}
-  \item The |E_t $\rightarrow$ t| rule will match the original terminal |t| without any
-  errors. This error rule is used in cases that the \emph{non-error} version of
-  the rule is needed. For example, in \break
-  |Block $\rightarrow$ E_\n E_indent Stmts E_dedent| it can be the case that only
+  \item The |E_t $\rightarrow$ t| rule will match the original terminal |t|
+  without any errors. This error rule is used in cases that the \emph{non-error}
+  version of the rule is needed. For example, in |Block $\rightarrow$| \break
+  |E_\n E_indent Stmts E_dedent| it can be the case that only
   |E_dedent| is needed to match the error and |E_\n| and |E_indent| can match
   their respective symbols.
   \item Using |E_t $\rightarrow$ $\epsilon$| a \emph{deletion} error is considered. The
@@ -330,9 +328,9 @@ sequences.
 \subsection{Abstracting Program Token Sequences}
 \label{sec:overview:abstraction}
 
-As shown in Figure\ref{fig:overall-approach}, our neural component
-has the task of training a classifier to predict the relevant error
-rules for a given ill-parsed program.
+As shown in \autoref{fig:overall-approach}, our neural component has the task of
+training a classifier to predict the relevant error rules for a given ill-parsed
+program.
 
 \mypara{Problem: Representing Ill-parsed Programs}
 %
@@ -344,10 +342,9 @@ One option is to view the ill-parsed program as a
 plain \emph{sequence of tokens} eliding variable
 names and such, as shown in \autoref{fig:prog-seq}.
 %
-Unfortunately, we found such token sequences yielded inaccurate
-classifiers that were confused by irrelevant trailing
-context, and hence, predicted rules that were not relevant
-to repair the parse error at hand.
+Unfortunately, we found such token sequences yielded inaccurate classifiers that
+were confused by irrelevant trailing context and predicted rules that were not
+relevant to repair the error at hand.
 
 
 \begin{figure}[t]
@@ -386,21 +383,18 @@ dedent end_marker
 
 \mypara{Solution: Abstract with Partial Parses}
 %
-\toolname solves the problem of irrelevant context
-by \emph{abstracting} the token sequences using
-\emph{partial} parses parses to abstract away
-the irrelevant context.
+\toolname solves the problem of irrelevant context by \emph{abstracting} the
+token sequences using \emph{partial parses} to abstract away the irrelevant
+context.
 %
-That is, we can use partial parse trees to represent
-ill-parsed programs as \emph{abstracted token sequence}
-shown in the bottom of \autoref{fig:abstract-prog-seq},
-where any \emph{completed} production rules can be used
-to abstract the relevant \emph{token sub-sequences}
-with the high-level \emph{non-terminal}.
+That is, we can use partial parse trees to represent ill-parsed programs as an
+\emph{abstracted token sequence} shown in \autoref{fig:abstract-prog-seq}, where
+any \emph{completed} production rules can be used to abstract the relevant
+\emph{token sub-sequences} with the high-level \emph{non-terminal}.
 
-Figure~\ref{fig:partial-parse-tree-1} shows how partial
-parses can be used to abstract long low-level
-sequence of tokens into short sequences of non-terminals.
+\autoref{fig:partial-parse-tree-1} shows how partial parses can be used to
+abstract long low-level sequence of tokens into short sequences of
+non-terminals.
 %
 (1)~The function |foo| is completely parsed,
 since it had no parse errors and the highest
@@ -413,9 +407,9 @@ is another completed production rule, therefore the
 low-level sequence of  parameter tokens in the |bar|
 function can be abstracted to just the non-terminal |Params|.
 %
-(3)~However, production rule for |FuncDef|, however, is
-\emph{incomplete} since the last statement |Stmt| (under |Stmts|$^1$)
-has a parse error as shown in \autoref{fig:partial-parse-tree-2}.
+(3)~However, the production rule for |FuncDef| is \emph{incomplete} since the
+last statement |Stmt| (under |Stmts|$^1$) has a parse error as shown in
+\autoref{fig:partial-parse-tree-2}.
 
 \mypara{Problem: Ambiguity}
 %
@@ -553,13 +547,11 @@ which in turn transforms it into an output sequence.
 % (LSTM)-based model \citep{Hochreiter_1997} or a more modern and state-of-the-art
 % \emph{Transformer} \citep{Vaswani_2017}.
 
-\toolname uses a \emph{Transformer classifier}
-that can correctly predict a small set of relevant
-error production rules for a given abstracted token sequence.
-We use an \emph{transformer encoder} to encode
-the input sequences into abstract vectors that
-we then feed into a \emph{\dnn} classifier to
-train and make accurate predictions \citep{Schmidhuber_2015}.
+\toolname uses a \emph{sequence classifier} that can correctly predict a small
+set of relevant error production rules for a given abstracted token sequence. We
+use an \emph{transformer encoder} \citep{Vaswani_2017} to encode the input
+sequences into abstract vectors that we then feed into a \emph{\dnn} classifier
+to train and make accurate predictions \citep{Schmidhuber_2015}.
 
 \mypara{Training From a Dataset}
 %
@@ -624,8 +616,8 @@ with the ECE-Parser.
 
 For our running example, in \autoref{fig:bad-prog}, we abstract the program
 shown in \autoref{fig:abstract-prog-seq} and then we predict the error
-production rules for it with the trained classifier. We rank the full set of
-\emph{terminal} error rules based on their predicted error score from the
+production rules for it with the trained sequence classifier. We rank the full
+set of \emph{terminal} error rules based on their predicted error score from the
 classifier and return the \emph{top 10} predictions for our example. Therefore,
 the predicted set of error rules is the following:
 %
@@ -642,11 +634,9 @@ the predicted set of error rules is the following:
 |Token $\rightarrow$ number|.
 
 The classifier predicts mostly relevant error rules such as the ones that use
-|E_number|, \linebreak
-%
-|E_\n| and |E_return| for example, as we showed previously. There are also rules
-that are not very relevant to this parse error but the classifier predicts
-probably due to them being common parse errors, \eg
+|E_number|, |E_\n| and |E_return| for example, as we showed previously. There
+are also rules that are not very relevant to this parse error but the classifier
+predicts probably due to them being common parse errors, \eg
 %
 |Token $\rightarrow$ )|, |Token $\rightarrow$ :|. Finally, we added the
 \emph{non-terminal} error rules needed to introduce these errors, which can be
@@ -660,20 +650,19 @@ predicted).
 
 We then parse the program in \autoref{fig:bad-prog} with the ECE-Parser and
 these specific error rules to generate a valid parse. We observe that it takes
-our implementation (as we will show later in depth) around \emph{2 seconds} to
-generate a valid parse, which is also the one that leads to the actual user
-repair in \autoref{fig:fixed-prog}! On the other hand, when we use a baseline
-ECE-Parser with the full set of error rules it takes \emph{2 minutes and 55
-seconds} to generate a valid parse, which is, additionally, not the expected
-user parse, but the one presented in \autoref{fig:adding-partial}. These
-examples demonstrate the effectiveness of accurately \emph{predicting error
-rules using sequence classifiers, which are trained on abstracted token
-sequences}.
+our implementation (as we show later in depth) around \emph{2 seconds} to
+generate a valid parse, which is also the one that leads to the user repair in
+\autoref{fig:fixed-prog}! On the other hand, when we use a baseline ECE-Parser
+with the full set of error rules it takes \emph{2 minutes and 55 seconds} to
+generate a valid parse, which is, however, not the expected user parse but the
+one shown in \autoref{fig:adding-partial}. These examples demonstrate the
+effectiveness of accurately \emph{predicting error rules using sequence
+classifiers, which are trained on abstracted token sequences}.
 
 In the next three sections, we describe in depth the specifics of our approach
 by defining all the methods in \autoref{fig:api}. We start by presenting the
 program abstraction (\autoref{sec:prog-abstract}) using partial parses and a
 learnt PCFG, we then explain how we train sequence models for making error rule
 predictions (\autoref{sec:seq-classifiers}) and, finally, we demonstrate our
-algorithms for building \toolname, an approach for efficiency parsing erroneous
+algorithms for building \toolname, an approach for efficiently parsing erroneous
 programs.
