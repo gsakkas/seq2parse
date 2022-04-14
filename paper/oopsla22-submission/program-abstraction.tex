@@ -73,7 +73,7 @@ $S(k)$, where $i < k \leq n$.
 Let, again, $t^i_1, t^i_2, \dots, t^i_j, \dots, t^i_k, \dots, t^i_n$ be the
 input token sequence $t^i$, where at location $k$ there is a parse error and the
 parser has exhausted all possibilities and can not add any more rules in state
-$S(k + 1)$. We want to Sabstract $t^i$ by getting the longest possible part of
+$S(k + 1)$. We want to abstract $t^i$ by getting the longest possible part of
 the program that has a partial parse, \ie by finding the largest $j$ for which
 there is a rule $(X \rightarrow \alpha \cdot \beta, 0) \in S(j)$. We use this
 rule for $X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in $t^i$ with $\alpha$,

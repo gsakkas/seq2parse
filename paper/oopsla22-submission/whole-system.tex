@@ -101,13 +101,12 @@ each program with the appropriate error production rules.
 
 % \mypara{Training the Transformer Classifier}
 %
-We describe in \Cref{algo:training-classifier-algo} how we use a
-(probabilistic) grammar $G$ and a dataset $Ds$ to train a Transformer classifier
-$Model$ that can be used to predict error production rules for erroneous
-programs $\pbad$. We define the $\trainsym$ procedure in
-\Cref{algo:training-classifier-algo} that is responsible for extracting a
-machine-learning appropriate dataset $D_{ML}$ in order to train the Transformer
-classifier with $\trainDLsym$.
+\Cref{algo:training-classifier-algo} presents how we use a (probabilistic)
+grammar $G$ and a dataset $Ds$ to train a Transformer classifier $Model$ that
+can be used to predict error production rules for erroneous programs $\pbad$. We
+define the $\trainsym$ procedure in \Cref{algo:training-classifier-algo} that is
+responsible for extracting a machine-learning appropriate dataset $D_{ML}$ in
+order to train the Transformer classifier with $\trainDLsym$.
 
 The dataset $D_{ML}$ starts as an empty set. For each program pair $\pbad \times
 \pfix$, we, first, employ $\partialsym$ with the PCFG $G$ and the erroneous
