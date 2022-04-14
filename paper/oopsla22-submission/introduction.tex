@@ -2,159 +2,137 @@
 \section{Introduction}
 \label{sec:intro}
 
-% Context
-Although type and runtime errors have received more research
-attention and tool support recently, syntax errors remain important, especially for
-programmers with less experience in a language.
-Consider the program shown in \autoref{fig:bad-prog}.
-% which defines two functions |foo| and |bar|.
-% Function |foo| adds the argument variable |a| and returns
-% it. Function |bar| calls |foo| with the argument variable |a|, adds another
-% number and returns the result.
-The programmer has introduced an extra |+| operator after the
-|return b| on line 6. This extra |+| should be deleted, as shown in the
-developer-fixed program in \autoref{fig:fixed-prog}. This
-example presents a \emph{syntax} (or \emph{parse}) \emph{error}. Such parse errors can easily
-go unnoticed~\citep{Denny_2012, Ahadi_2018} by programmers when they are part of
-bigger programs and may require significant effort to fix~\citep{Kummerfeld2003}.
-
-% Our goal is to use historical data of how programmers have fixed similar errors
-% in their programs to automatically and rapidly guide programmers to come up with
-% candidate solutions like the one above.
-
-\begin{figure}[h]
-\centering
-\begin{minipage}[c]{0.48\linewidth}
-\begin{ecode}
-def foo(a):
-  return a + 42
-
-def bar(a):
-  b = foo(a) + 17
-  return b +
-\end{ecode}
-\subcaption{A Python program with two functions that manipulate an integer. The second one has a parse error.}
-\label{fig:bad-prog}
-\end{minipage}%
-\hspace{0.02\linewidth}%
-\begin{minipage}[c]{0.48\linewidth}
-\begin{ecode}
-def foo(a):
-  return a + 42
-
-def bar(a):
-  b = foo(a) + 17
-  return b
-\end{ecode}
-\subcaption{A fixed version for the previous example that has no parse
- errors.}
-\label{fig:fixed-prog}
-\end{minipage}
-\caption{A Python program example with syntax errors (left) and its fix (right).}
-\label{fig:example-prog}
-\end{figure}
-
-Syntax errors are particularly relevant for computer science education and
-many novice misconceptions relate to syntax~\citep{qian2017}. In our
-benchmark set of 1,100,000 novice Python programs, over 70\% of errors
-are syntax errors. Traditional error messages are
-less helpful for novices (e.g., only indicate the first error or producing
-messages that are not descriptive enough or are too
-verbose~\citep{Kummerfeld2003, Ahadi_2018, VanDerSpek_2005}).
-
-We desire an approach for automatically repairing parse errors in off-the-shelf
-programs. An effective solution must apply to programs in real languages
-efficiently and must produce repairs that are of high quality. Unfortunately,
-the current state of the art is insufficient. First, standard parsing algorithms
-are efficient but do not produce repairs. Second, natural language processing
-sequence models are efficient but lack accuracy. Third, error correcting parsers
-have high quality but are not efficient. \emph{We propose \toolname, an approach
-for repairing syntax errors that combines the efficiency of sequence models with
-the quality of error correcting parsing.}
-
-% Gap
-Standard \emph{parsing algorithms}, which check compliance with syntax rules,
-are essential in programming systems. Efficient and expressive parsers are used
-in modern programming languages (\eg, LR~\citep{Aho1974} or
-Earley~\citep{Earley_1970} parsing). These approaches can accurately locate
-syntax errors. However, they often fail to provide effective feedback to humans.
-% WRW doesn't understand this claim and does not think it is true without
-% more explanation. GCC is push-button, requiring no SE effort.
+Parse errors can vex novices who
+are learning to program, or learning a
+new language as traditional error messages
+only indicate the first error or producing message
+that are not descriptive enough or are too
+verbose~\citep{qian2017, VanDerSpek_2005}).
 %
-% Additionally, these parsers require a lot of manual effort from the software engineers.
+When they occur in larger code bases, parse errors
+even trouble experts, and require a great deal of
+effort to fix~\citep{Denny_2012, Ahadi_2018, Kummerfeld2003}.
 
-Recent advances in the natural language processing (NLP) research domain
-\citep{Sutskever_2014, Hardalov_2018} have produced many automatic approaches
-for natural language applications, such as language translation. In particular,
-deep neural network (\dnn) \emph{sequence models} can learn underlying patterns
-from data and have been shown to be remarkably effective at parsing
-\citep{Vinyals2015}. They are able to learn to effectively parse sentences into
-their associated (serialized) parse trees. Such approaches have been considered
-for automatically parsing and repairing programs, but initial efforts lacked
-accuracy in real-world contexts, \eg~\citep{Ahmed_2021} parses and repairs
-\emph{32\%} of real student code with up to 3 syntax errors and
-state-of-the-art~\citep{Wu2020} repairs at most only the \emph{58\%} of syntax
-errors of a real-world dataset.
+Owing to their ubiquity and importance, there are \emph{two}
+long lines of work on automatically suggesting \emph{fixes}
+for parse errors.
+%
+In the first line, Programming Languages researchers
+have investigated \emph{symbolic} approaches start
+with classical parsing algorithms, \eg, LR~\citep{Aho1974}
+or Earley~\citep{Earley_1970}.
+%
+These algorithms can accurately locate syntax errors,
+but do not provide \emph{actionable} feedback on how
+to fix the error.
+%
+\citet{Aho_1972} extends these ideas to implement
+\emph{error correcting parsers} (EC-Parsers) that
+use special error production rules to handle
+programs with syntax errors, using which an EC-parser
+can synthesize minimal-edit parse error repairs.
+%
+Sadly, EC-parsers have remained mostly of theoretical
+interest, as their running time is cubic in the input
+program size, and quadratic in the size of the language's
+grammar, which has rendered them impractical for large
+real-world programming languages~\citep{McLean1996, Rajasekaran2014}.
 
-In programming languages research, \emph{error
-correcting parsers} (EC-Parsers) \citep{Aho_1972} use special error production
-rules to support parsing programs with syntax errors. These parsers can return
-minimal-edit repairs that make the programs parse and can simultaneously fix
-multiple locations. Their drawback,
-however, is a cubic time complexity with respect to the
-input program size and a quadratic complexity with respect to the grammar.
-% WRW doesn't see why this next bit is a problem the reader cares about. It
-% seems like an internal issue that has the same symptom (bad complexity)
-% and is more like "our problem".
+In the second line, Machine Learning and NLP researchers have
+pursued \emph{Deep Neural Network} (\dnn)
+based approaches using advanced sequence-to-sequence
+models \citep{Sutskever_2014, Hardalov_2018}
+that use a large corpus of existing code to predict
+the next token \eg at a parse error location.
 %
-% Futhermore, there is the added cost of the
-% large number of additional production rules these parsers have to consider while
-% having an explosion of the internal states by maintaining the cost of each
-% possible parse.
-Unfortunately, these scalability issues have remained over the
-decades~\citep{McLean1996, Rajasekaran2014}, leaving EC-Parsers
-impractical for most uses in real-world programming languages.
+Sadly, these methods ignore the high-level structure
+of the language (or have to learn them from vast amounts
+of data) and hence, lack accuracy in real-world contexts.
+%
+For example, state-of-the-art methods like ~\citep{Ahmed_2021}
+parses and repairs only \emph{32\%} of real student code with
+up to 3 syntax errors and~\citep{Wu2020} repairs at most only
+the \emph{58\%} of syntax errors of a real-world dataset.
 
-% Innovation
-\mypara{Sequence Classifiers for Error-Correcting Parsing}
-We propose training sequence classifiers for predicting
-error
-production rules for EC-Parsers to automatically, accurately and
-efficiently parse programs with syntax errors. Our approach exploits the data-driven
-nature of sequence learning, drawing on a large training dataset of pairs
-of syntactically incorrect programs and their fixes.
+In this paper, we present \toolname, a new approach
+to automatically repairing parse errors, that is
+based on the following key insight.
 %
-Specifically, to enable the efficient usage of a scalable EC-Parser we decompose
-the problem into three steps.
+Symbolic ECE Parsers \citep{Aho_1972} can, in principle,
+synthesize repairs, but, in practice, are overwhelmed by
+the many error-correction rules that are not \emph{relevant}
+to the particular program that requires repair.
 %
-First, \emph{learn} the set of error productions rules that fix the dataset of
-programs from a corpus of fix edits from historical users.
+In contrast, Neural approaches are fooled by the large
+space of possible sequence level edits, but can precisely
+pinpoint the set of EC-rules that are \emph{relevant}
+to a particular program.
 %
-Second, \emph{predict} the small set of error rules for a new erroneous program,
-by training sequence multi-class classifiers on abstracted program token
-sequences.
-%
-Third, \emph{parse} a given erroneous program using the predicted error rules,
-thus generating a repair.
-%
-Critically, we show how to perform the abstraction from a particular
-program to an abstract token sequence by using an Earley parser's
-\citep{Earley_1970} partial parses and a learned Probabilistic Context-Free
-Grammar. This abstraction lets us train accurate predictors over low-level
-program sequences for efficient and high-quality
-error-correcting parsing of programs.
+We show how \toolname addresses the problem of parse error
+repair by a neurosymbolic approach by combining the
+complementary strengths of the two lines of work via
+the following concrete contributions.
 
-% Results
-We implemented our approach, \toolname, and trained it and tested it on a
-dataset of more than 1,100,000 programs taken from over two years of user
-interactions with an online editor. We evaluate our approach in three ways.
+\mypara{1. Motivation}
 %
-First, we measure its \emph{accuracy}: \toolname correctly predicts
+Our first contribution is an empirical analysis of a real-world
+dataset of more than a million novice Python programs that shows
+that parse errors constitute the majority of errors, take a long
+time to fix, and that the fixes themselves can often require
+multiple edits.
+%
+This analysis clearly demonstrates that an automated tool that
+suggests parse error repairs in a few seconds, could greatly
+benefit many novices (\S~\ref{sec:error-analysis}).
+
+\mypara{2. Implementation}
+%
+Our second contribution is the design and implementation
+of \toolname, which exploits the insight above to
+efficiently and accurately suggests repairs in a
+neurosymbolic fashion:
+%
+(1) train sequence classifiers to predict the \emph{relevant}
+error correction rules for a given program (\S~\ref{sec:seq-classifiers}), and then
+%
+(2) use the predicted rules to synthesize repairs
+via EC-Parsing (\S~\ref{sec:whole-system}).
+
+\mypara{3. Compaction}
+%
+It turns out that predicting the rules is also non-trivial as
+Standard ``token-sequence'' based methods are confused by
+by the long trailing context that is had nothing to do with
+the particular parse error.
+%
+This confusion yields to inaccurate classifiers that
+predicted rules that were not relevant relevant to
+repair the error at hand, and hence, a woefully low
+repair rate.
+%
+Our second key insight eliminates this neural confusion
+in a symbolic fashion: we show how to use
+Probabilistic Context Free Grammars (PCFGs)
+to \emph{abstract} long low-level token sequences so that
+the irrelevant trailing context is compressed into single
+non-terminals, yielding compressed abstract token sequences
+that can be accurately understood by \dnn~s
+(\S~\ref{sec:prog-abstract}).
+
+
+\mypara{4. Evaluation}
+%
+Our final contribution is an evaluation of \toolname
+using a dataset of more than 1,100,000 Python programs
+that demonstrates its benefits in three ways.
+%
+First, we show its \emph{accuracy}: \toolname correctly predicts
 the right set of error rules $81\%$ of the time when considering the top $20$
 rules and can parse $94\%$ of our tests within $5.3$ seconds with these
-predictions.
+predictions, a significant improvement over prior methods
+which were stuck below a $60\%$ repair rate.
 %
-Second, we measure its \emph{efficiency}: \toolname
+Second, we demonstrate its \emph{efficiency}: \toolname
 parses and repairs erroneous programs within $30$ seconds $82\%$ of the time,
 while also generating \emph{the user fix in almost 1 out 3 of the cases}.
 %
@@ -163,14 +141,41 @@ with 39 participants and show that humans perceive both \toolname's edit
 locations and final repair quality to be useful and helpful,
 in a statistically-significant manner, even when not equivalent to the user's fix.
 
+
+% Syntax errors are particularly relevant for computer science
+% education and many novice misconceptions relate to syntax~\citep{qian2017}.
+% %
+% % Gap
+% Standard \emph{parsing algorithms}, which check compliance with syntax rules,
+% are essential in programming systems. Efficient and expressive parsers are used
+% in modern programming languages (\eg, LR~\citep{Aho1974} or
+% Earley~\citep{Earley_1970} parsing). These approaches can accurately locate
+% syntax errors. However, they often fail to provide effective feedback to humans.
+% % WRW doesn't understand this claim and does not think it is true without
+% % more explanation. GCC is push-button, requiring no SE effort.
+% %
+% % Additionally, these parsers require a lot of manual effort from the software engineers.
+
+% % WRW doesn't see why this next bit is a problem the reader cares about. It
+% % seems like an internal issue that has the same symptom (bad complexity)
+% % and is more like "our problem".
+% %
+% % Futhermore, there is the added cost of the
+% % large number of additional production rules these parsers have to consider while
+% % having an explosion of the internal states by maintaining the cost of each
+% % possible parse.
+
+% Innovation
+
+% Results
 % TODO: Maybe mention the jump in accuracy from previous work from 50\% to 94\%
 
-The rest of the paper is organized as follows: \autoref{sec:error-analysis}
-shows the importance of syntax errors in novice software
-development. 
-In \autoref{sec:overview} we present a high-level overview, while 
-\autoref{sec:prog-abstract}, \autoref{sec:seq-classifiers} and
-\autoref{sec:whole-system} describe the algorithmic implementation of 
-\toolname. Finally, \autoref{sec:eval} presents quantitative and
-qualitative results and \autoref{sec:related-work} places our work in 
-context.
+% The rest of the paper is organized as follows: \autoref{sec:error-analysis}
+% shows the importance of syntax errors in novice software
+% development.
+% In \autoref{sec:overview} we present a high-level overview, while
+% \autoref{sec:prog-abstract}, \autoref{sec:seq-classifiers} and
+% \autoref{sec:whole-system} describe the algorithmic implementation of
+% \toolname. Finally, \autoref{sec:eval} presents quantitative and
+% qualitative results and \autoref{sec:related-work} places our work in
+% context.

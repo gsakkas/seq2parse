@@ -279,58 +279,39 @@ showstringspaces=false
 \email{jhala@cs.ucsd.edu}
 
 \begin{abstract}
-We propose an automated approach for repairing syntax errors that combines the
-efficiency of machine learning sequence models with the quality of error
-correcting parsing. Our approach exploits the data-driven nature of sequence
-learning, drawing on a large training dataset of pairs of syntactically
-incorrect programs and their fixes. Specifically, to enable the efficient usage
-of a scalable error-correcting parser we decompose the problem into three steps:
-(1) \emph{learn} the set of error productions rules that fix the dataset of
-programs from the corpus of user fix edits; (2) \emph{predict} the small set of
-error rules for a new erroneous program, by training sequence multi-class
-classifiers on abstracted program token sequences; (3) \emph{parse} a given
-erroneous program using the predicted error rules, thus generating a repair. We
-have implemented our approach in \toolname, which we trained and tested on a
-dataset of more than 1,100,000 Python programs. We present our evaluation of the
-\emph{accuracy} and \emph{efficiency} of \toolname, showing it can parse $94\%$
-of our tests within $5.3$ seconds, while generating \emph{the user fix in 1 out
-3 of the cases}. Finally, we measure the \emph{quality} of the generated repairs
-via a human study and show that humans perceive both \toolname's edit locations
-and final repair quality to be almost as good as the user's in a
-statistically-significant manner.
+We present \toolname, a neurosymbolic approach
+to automatically repairing parse errors.
+%
+\toolname is based on the insight that
+%
+Symbolic ECE Parsers \citep{Aho_1972} can, in principle,
+synthesize repairs, but, in practice, are overwhelmed by
+the many error-correction rules that are not \emph{relevant}
+to the particular program that requires repair.
+%
+In contrast, Neural approaches are fooled by the large
+space of possible sequence level edits, but can precisely
+pinpoint the set of EC-rules that are \emph{relevant}
+to a particular program.
+%
+We show how to combine their complementary strengths
+by using neural methods to training a sequence classifier
+that predict the small set of relevant error-correcting rules
+for an ill-parsed program, after which, the symbolic
+EC-parsing algorithm can make short work of generating
+useful repairs.
+%
+We train and evaluate our method on a dataset of 1,100,000
+Python programs, and show that \toolname is
+%
+\emph{accurate} and \emph{efficient}: it can parse $94\%$
+of our tests within $5.3$ seconds, while generating the
+exact user fix in 1 out 3 of the cases; and
+%
+\emph{useful}: humans perceive both \toolname-generated
+error-locations and repairs to be almost as good as
+human-generated ones in a statistically-significant manner.
 \end{abstract}
-
-% \begin{abstract}
-% We introduce Analytic Program Repair, a data-driven
-% strategy for providing feedback for type-errors via
-% repairs for the erroneous program.
-% %
-% Our strategy is based on
-% insight that similar errors have similar repairs.
-% Thus, we show how to use a training dataset of
-% pairs of ill-typed programs  and their fixed versions to:
-% %
-% (1)~\emph{learn} a collection of candidate repair templates
-%     by abstracting and partitioning the edits made in the
-%     training set into a representative set of templates;
-% %
-% (2)~\emph{predict} the appropriate template from a given error,
-%     by training multi-class classifiers on the repair templates
-%     used in the training set;
-% %
-% (3)~\emph{synthesize} a concrete repair from the template
-%    by enumerating and ranking correct (\eg well-typed)
-%    terms matching the predicted template.
-% %
-% We have implemented our approach in \toolname: a type error reporting
-% tool for \ocaml programs. We present an evaluation of the
-% \emph{accuracy} and \emph{efficiency} of \toolname on a corpus
-% of 4,500 ill-typed \ocaml programs drawn from two instances of an
-% introductory programming course, and a user-study of the \emph{quality}
-% of the generated error messages that shows the locations and
-% final repair quality to be better than the state-of-the-art tool
-% in a statistically-significant manner.
-% \end{abstract}
 
 
 %% 2012 ACM Computing Classification System (CSS) concepts
