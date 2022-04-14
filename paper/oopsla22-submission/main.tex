@@ -91,7 +91,19 @@
 \lstset{
   language=Python,
   basicstyle=\footnotesize\ttfamily,
-  keywordstyle=\footnotesize\ttfamily\bfseries,
+  keywordstyle=\footnotesize\ttfamily\bfseries\color{deepblue},
+  emphstyle=\footnotesize\ttfamily\bfseries\color{deepred},
+  stringstyle=\footnotesize\ttfamily\color{deepgreen},
+  literate=*
+    {1}{{{\color{deepred}1}}}{1}
+    {2}{{{\color{deepred}2}}}{1}
+    {3}{{{\color{deepred}3}}}{1}
+    {4}{{{\color{deepred}4}}}{1}
+    {5}{{{\color{deepred}5}}}{1}
+    {6}{{{\color{deepred}6}}}{1}
+    {7}{{{\color{deepred}7}}}{1}
+    {8}{{{\color{deepred}8}}}{1}
+    {9}{{{\color{deepred}9}}}{1},
   numbers=left,
   xleftmargin=5.5mm,
   moredelim=[is][\bfseries]{==}{==},
@@ -153,6 +165,16 @@ keywordstyle=\ttb\color{deepblue},
 emph={MyClass,__init__},          % Custom highlighting
 emphstyle=\ttb\color{deepred},    % Custom highlighting style
 stringstyle=\color{deepgreen},
+literate=*
+  {1}{{{\color{deepred}1}}}{1}
+  {2}{{{\color{deepred}2}}}{1}
+  {3}{{{\color{deepred}3}}}{1}
+  {4}{{{\color{deepred}4}}}{1}
+  {5}{{{\color{deepred}5}}}{1}
+  {6}{{{\color{deepred}6}}}{1}
+  {7}{{{\color{deepred}7}}}{1}
+  {8}{{{\color{deepred}8}}}{1}
+  {9}{{{\color{deepred}9}}}{1},
 frame=tb,                         % Any extra options here
 showstringspaces=false
 }}

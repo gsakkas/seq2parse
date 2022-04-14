@@ -85,8 +85,11 @@ deep neural network (\dnn) \emph{sequence models} can learn underlying patterns
 from data and have been shown to be remarkably effective at parsing
 \citep{Vinyals2015}. They are able to learn to effectively parse sentences into
 their associated (serialized) parse trees. Such approaches have been considered
-for automatically parsing and repairing programs~\citep{Ahmed_2021}, but initial
-efforts lacked accuracy in real-world contexts.
+for automatically parsing and repairing programs, but initial efforts lacked
+accuracy in real-world contexts, \eg~\citep{Ahmed_2021} parses and repairs
+\emph{32\%} of real student code with up to 3 syntax errors and
+state-of-the-art~\citep{Wu2020} repairs at most only the \emph{58\%} of syntax
+errors of a real-world dataset.
 
 In programming languages research, \emph{error
 correcting parsers} (EC-Parsers) \citep{Aho_1972} use special error production
