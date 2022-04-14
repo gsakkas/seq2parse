@@ -53,16 +53,16 @@ Sadly, these methods ignore the high-level structure
 of the language (or have to learn them from vast amounts
 of data) and hence, lack accuracy in real-world contexts.
 %
-For example, state-of-the-art methods like ~\citep{Ahmed_2021}
-parses and repairs only \emph{32\%} of real student code with
-up to 3 syntax errors and~\citep{Wu2020} repairs at most only
-the \emph{58\%} of syntax errors of a real-world dataset.
+For example, state-of-the-art methods such as ~\citep{Ahmed_2021} parses and
+repairs only \emph{32\%} of real student code with up to 3 syntax errors
+and~\citep{Wu2020} repairs at most only \emph{58\%} of syntax errors of a
+real-world dataset.
 
 In this paper, we present \toolname, a new approach
 to automatically repairing parse errors
 based on the following key insight.
 %
-Symbolic ECE Parsers \citep{Aho_1972} can, in principle,
+Symbolic EC-Parsers \citep{Aho_1972} can, in principle,
 synthesize repairs, but, in practice, are overwhelmed by
 the many error-correction rules that are not \emph{relevant}
 to the particular program that requires repair.
@@ -73,8 +73,8 @@ pinpoint the set of EC-rules that are \emph{relevant}
 to a particular program.
 %
 Thus, \toolname addresses the problem of parse error
-repair by a neurosymbolic approach that combines 
-the complementary strengths of the two lines of work 
+repair by a neurosymbolic approach that combines
+the complementary strengths of the two lines of work
 via the following concrete contributions.
 
 \mypara{1. Motivation}
@@ -93,11 +93,11 @@ benefit many novices (\S~\ref{sec:error-analysis}).
 %
 Our second contribution is the design and implementation
 of \toolname, which exploits the insight above to
-efficiently and accurately suggests repairs in a
+efficiently and accurately suggest repairs in a
 neurosymbolic fashion:
 %
 (1) train sequence classifiers to predict the \emph{relevant}
-error correction rules for a given program (\S~\ref{sec:seq-classifiers}), and then
+EC-rules for a given program (\S~\ref{sec:seq-classifiers}), and then
 %
 (2) use the predicted rules to synthesize repairs
 via EC-Parsing (\S~\ref{sec:whole-system}).
@@ -121,7 +121,7 @@ to \emph{abstract} long low-level token
 sequences so that the irrelevant trailing
 context is compressed into single non-terminals,
 yielding compressed abstract token sequences
-that can be accurately understood by \dnn~s
+that can be accurately understood by \dnn{}s
 (\S~\ref{sec:prog-abstract}).
 
 \mypara{4. Evaluation}
@@ -132,18 +132,19 @@ that demonstrates its benefits in three ways.
 %
 First, we show its \emph{accuracy}: \toolname correctly predicts
 the right set of error rules $81\%$ of the time when considering the top $20$
-rules and can parse $94\%$ of our tests within $5.3$ seconds with these
+rules and can parse $94\%$ of our tests within $2.5$ seconds with these
 predictions, a significant improvement over prior methods
 which were stuck below a $60\%$ repair rate.
 %
 Second, we demonstrate its \emph{efficiency}: \toolname
-parses and repairs erroneous programs within $30$ seconds $82\%$ of the time,
+parses and repairs erroneous programs within $20$ seconds $82\%$ of the time,
 while also generating \emph{the user fix in almost 1 out 3 of the cases}.
 %
-Finally, we measure the \emph{quality} of the generated repairs via a human study
-with 39 participants and show that humans perceive both \toolname's edit
-locations and final repair quality to be useful and helpful,
-in a statistically-significant manner, even when not equivalent to the user's fix (\S~\ref{sec:eval}).
+Finally, we measure the \emph{quality} of the generated repairs via a human
+study with 39 participants and show that humans perceive both \toolname's edit
+locations and final repair quality to be useful and helpful, in a
+statistically-significant manner, even when not equivalent to the user's fix
+(\S~\ref{sec:eval}).
 
 % Syntax errors are particularly relevant for computer science
 % education and many novice misconceptions relate to syntax~\citep{qian2017}.

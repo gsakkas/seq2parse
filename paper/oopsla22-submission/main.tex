@@ -284,7 +284,7 @@ to automatically repairing parse errors.
 %
 \toolname is based on the insight that
 %
-Symbolic ECE Parsers \citep{Aho_1972} can, in principle,
+Symbolic Error Correcting (EC) Parsers can, in principle,
 synthesize repairs, but, in practice, are overwhelmed by
 the many error-correction rules that are not \emph{relevant}
 to the particular program that requires repair.
@@ -295,8 +295,8 @@ pinpoint the set of EC-rules that \emph{are} relevant
 to a particular program.
 %
 We show how to combine their complementary strengths
-by using neural methods to training a sequence classifier
-that predict the small set of relevant error-correcting rules
+by using neural methods to train a sequence classifier
+that predicts the small set of relevant EC-rules
 for an ill-parsed program, after which, the symbolic
 EC-parsing algorithm can make short work of generating
 useful repairs.
@@ -305,7 +305,7 @@ We train and evaluate our method on a dataset of 1,100,000
 Python programs, and show that \toolname is
 %
 \emph{accurate} and \emph{efficient}: it can parse $94\%$
-of our tests within $5.3$ seconds, while generating the
+of our tests within $2.5$ seconds, while generating the
 exact user fix in 1 out 3 of the cases; and
 %
 \emph{useful}: humans perceive both \toolname-generated
