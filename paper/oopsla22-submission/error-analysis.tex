@@ -89,9 +89,9 @@ as there are various reasons these timings may be exaggerated,
 \eg users stepping away from the computer, internet lag \etc.
 %
 However, in aggregate, due to the large
-dataset of program repairs these timings
-can still be viewed as an appropriate metric
-of the amount of time it took programmers to
+dataset of program repairs, these timings
+can still be viewed as an approximate metric
+of the amount of time it took novice programmers to
 repair their program errors.
 
 \autoref{fig:repair-rate} shows the \emph{programmer repair rate},
@@ -140,13 +140,12 @@ errors, \ie the number of changes in the lexed program token sequence, is
 A variable rename or a different integer are not considered as changes
 as they won't affect the syntax error fix.
 %
-As shown in \autoref{fig:token-changes-ratio}, $14.2\%$ of dataset
-needs only 1 token change, $23.2\%$ needs 2 token changes, $7.0\%$
-needs 3 and $9.0\%$ needs 4, \ie $53.4\%$ of the dataset needs at
-most 4 token changes to be fixed.
+As shown in \autoref{fig:token-changes-ratio}, $14.2\%$ of errors
+need only 1 token change, $23.2\%$ need 2 token changes, $7.0\%$
+need 3 and $9.0\%$ need 4. 
+% Ultimately, $53.4\%$ of these errors needs at most 4 token changes to be fixed.
+Ultimately, $46.6\%$ of these errors require more than 4 token changes. 
 %
-While the majority of the syntax errors can be fixed with only a few
-changes, the are still errors that need a lot of edits.
 % It is also important to see how long it takes the users on average to make
 % those changes.
 
@@ -161,9 +160,9 @@ respectively, which is still a considerable amount of time for such simple and
 short fixes. The repair time jumps to \emph{56 sec} for three token changes.
 
 \smallskip
-These four observations indicate that, while simple syntax errors can usually be
-easily and quickly fixed by programmers using the compiler error messages, they
-can still struggle fixing programs that have more syntax errors.
+These four observations indicate that, while some errors can be
+easily and quickly fixed by programmers using existing error messages, 
+there are many cases where novices struggle with fixing syntax errors.
 %
 Therefore, we can conclude that an automated tool that parses and repairs
-such programs in only a few seconds could benefit many programmers.
+such programs in only a few seconds could benefit many novices.

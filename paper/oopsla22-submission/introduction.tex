@@ -117,7 +117,7 @@ impractical for most uses in real-world programming languages.
 
 % Innovation
 \mypara{Sequence Classifiers for Error-Correcting Parsing}
-In this work, we propose training sequence classifiers for predicting
+We propose training sequence classifiers for predicting
 error
 production rules for EC-Parsers to automatically, accurately and
 efficiently parse programs with syntax errors. Our approach exploits the data-driven
@@ -142,7 +142,7 @@ program to an abstract token sequence by using an Earley parser's
 \citep{Earley_1970} partial parses and a learned Probabilistic Context-Free
 Grammar. This abstraction lets us train accurate predictors over low-level
 program sequences for efficient and high-quality
-error-correcting parsing of programs with syntax errors.
+error-correcting parsing of programs.
 
 % Results
 We implemented our approach, \toolname, and trained it and tested it on a
@@ -165,13 +165,12 @@ in a statistically-significant manner, even when not equivalent to the user's fi
 
 % TODO: Maybe mention the jump in accuracy from previous work from 50\% to 94\%
 
-The rest of the paper is organized as followed: \autoref{sec:error-analysis}
-presents a data analysis of a \python dataset of erroneous programs and their
-fixes, which aims to signify the importance of syntax errors in software
-development and the need of an efficient automated repair tool.
-\autoref{sec:overview} presents a high-level overview of our approach and
+The rest of the paper is organized as follows: \autoref{sec:error-analysis}
+shows the importance of syntax errors in novice software
+development. 
+In \autoref{sec:overview} we present a high-level overview, while 
 \autoref{sec:prog-abstract}, \autoref{sec:seq-classifiers} and
-\autoref{sec:whole-system} provide with the specific details that are needed to
-implement \toolname. Finally, \autoref{sec:eval} summarizes the quantitative and
-qualitative results of our approach and \autoref{sec:related-work} presents
-related work in parsing and sequence models.
+\autoref{sec:whole-system} describe the algorithmic implementation of 
+\toolname. Finally, \autoref{sec:eval} presents quantitative and
+qualitative results and \autoref{sec:related-work} places our work in 
+context.
