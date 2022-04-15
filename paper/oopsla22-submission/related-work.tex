@@ -25,11 +25,14 @@ function definitions) and has suggested an improvement that works with the
 LR parser. Rather than focusing on error production rules, this method adds
 \emph{error-repair transitions} along with the regular shift/reduce operations.
 It employs a simple cost model and heuristics to limit the explosion of the
-repair search space. However, these approaches are impractical and inefficient
-for real-world applications, as they can only successfully parse small examples
-or use tiny grammars. In contrast, \toolname relies on pre-trained sequence
-models to efficiently explore the repair search space for a minimal overhead in
-real-time parsing.
+repair search space. Finally, \citep{Thompson1976} has suggested using
+\emph{probabilistic parsing} to overcome the drawback of selecting the
+minimal-edit repair by using a PCFG to select the most \emph{probable} repair
+parse. However, these approaches are impractical and inefficient for real-world
+applications, as they can only successfully parse small examples or use tiny
+grammars. In contrast, \toolname relies on pre-trained sequence models to
+efficiently explore the repair search space for a minimal overhead in real-time
+parsing.
 
 \mypara{Sequence Models in Software Engineering}
 %
