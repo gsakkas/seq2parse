@@ -11,14 +11,14 @@ level of abstraction with richer context information than the simple
 \input{api.tex}
 
 \mypara{Lexical Analysis}
-\emph{Lexical analysis}, lexing or tokenization is the process of converting a
-sequence of characters \ie a program into a sequence of tokens (strings with an
-assigned and thus identified meaning). The program that performs lexical
-analysis is called a \emph{lexer} and is usually combined with a parser, which
-together analyze the syntax of a programming language $L(G)$, defined by the
-grammar $G$. When a program has a syntax error, the output token sequence of the
-lexer is the highest level of abstraction that we can acquire, since the parser
-fails and returns an error.
+Historically, \emph{lexical analysis}, lexing or tokenization is the process of
+converting a sequence of characters \ie a program into a sequence of tokens
+(strings with an assigned and thus identified meaning). The program that
+performs lexical analysis is called a \emph{lexer} and is usually combined with
+a parser, which together analyze the syntax of a programming language $L(G)$,
+defined by the grammar $G$. When a program has a syntax error, the output token
+sequence of the lexer is the highest level of abstraction that we can acquire,
+since the parser fails and returns an error.
 
 \mypara{Token Sequences}
 Our goal is to parse a \emph{program token sequence} $t^i$, which is a lexed

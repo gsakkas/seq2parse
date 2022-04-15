@@ -6,39 +6,30 @@ We show how $\systemsym$ uses the abstracted token sequences from
 \autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
 $(e_{\bot} \to e)$, that will parse an input program $e_{\bot}$ with syntax
 errors and produce a correct program $e$. We first describe how we extract a
-machine-learning-amendable trainings set from a corpus of fixed programs and
-finally how we structure everything to train our models.
+machine-learning-amendable training set from a corpus of fixed programs and
+finally how we structure everything to train our model.
 
 
 \subsection{Learning Error Production Rules}
 \label{sec:whole-system:error-rules}
-We implement $\diffsym$, a function that extracts the \emph{token differences}
-between an erroneous program $e_{\bot}$ and a fixed program $e$. $\diffsym$
-utilizes an \emph{$O(ND)$ difference algorithm} \citep{Myers_1986} to extract
-the \emph{insertion, deletion,} and \emph{replacement} edits to the original
-program $e_{\bot}$ that produce the fixed program $e$. We then map the extracted
-edits to the relevant error production rules that can be used to repair
-$e_{\bot}$.
 
-% \mypara{Extracting error rules efficiently from a dataset}
-%
 The $\trainDLsym$ method requires a dataset of token sequences $t^a$ that is
 annotated with an \emph{exact and small set} of error production rules, \ie
-$\List{t^a \times \errorrulessym}$. These error productions are just a subset of
-all the possible $\errorrulessym$ that are needed to parse and fix $t^a$. The
-straight-forward approach is to use the ECE-Parser $\ecepsym$ with all possible
-error production rules for each program $e_{\bot}$ in the dataset. Then, when
-$\ecepsym$ returns with a successful parse we extract the rules that where used
-to parse program $e_{\bot}$. This approach would generate a dataset with the
-smallest possible set of error rules per program as labels, since the original
-ECE-Parser returns the minimum-distance edit parse. However, this approach
-completely ignores the programmer's fix $e$ and can take an unreasonable amount
-of time to parse a dataset with millions of programs, due to the inefficient
-nature of the ECE-Parser.
+$\List{t^a \times \errorrulessym}$. These $\errorrulessym$ are just a subset of
+all the possible error rules that are needed to parse and fix $t^a$. The
+straight-forward approach is to use $\ecepsym$ with all possible error
+production rules for each program $e_{\bot}$ in the dataset. Then, when
+$\ecepsym$ returns with a successful parse, we extract the rules that where used
+to parse program $e_{\bot}$. This approach generates a dataset with the smallest
+possible set of error rules per program as labels, since the original ECE-Parser
+returns the minimum-distance edit parse. However, this approach completely
+ignores the programmer's fix and takes an unreasonable amount of time to parse a
+dataset with millions of programs, due to the inefficient nature of the
+ECE-Parser.
 
-We suggest using an $O(ND)$ difference algorithm to get a small but still
-representative set of error production rules for each program $e_{\bot}$. We
-employ this algorithm to find the differences between the input
+We suggest using an $O(ND)$ difference algorithm \citep{Myers_1986} to get a
+small but still representative set of error production rules for each program
+$e_{\bot}$. We employ this algorithm to find the differences between the input
 \emph{program token sequence} $t^i$, which is the lexed program $e_{\bot}$ and
 the \emph{fixed token sequence} $t^o$, which is the lexed program $e$. This
 algorithm returns changes between the token sequences in the form of
@@ -76,11 +67,11 @@ Finally, we further refine the new small set of error productions for each
 program $e_{\bot}$ with ECE-Parser, in order to create the final annotated
 dataset $\List{t^a \times \errorrulessym}$. The changes that we extracted from
 the programmers' fixes might include irrelevant changes to the parse error fix,
-\eg code clean-up. Therefore, running ECE-Parser is still essential to annotate
-each program with the appropriate error production rules.
-% However, limiting the error rules to only the extracted small set instead of
-% every possible error rule, makes the process of generating this dataset a much
-% more tractable and efficient process.
+\eg code clean-up. Therefore, filtering with the ECE-Parser is still essential
+to annotate each program with the appropriate error production rules. We
+implement this error-rule-extracting approach in the function $\diffsym$, which
+extracts the token differences between an erroneous program $e_{\bot}$ and a
+fixed program $e$ and return the appropriate error production rules.
 
 
 \subsection{Training and Using a Transformer Classifier}
@@ -129,7 +120,7 @@ with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure
 predicts a small set of error production rules $Rls$ for the sequence $t^a$
 given the pre-trained $Model$.
 
-\subsection{Generating an efficient error-correcting parser}
+\subsection{Generating an Efficient Error-Correcting Parser}
 \label{sec:whole-system:building-ecp}
 
 \input{ecep-algo.tex}

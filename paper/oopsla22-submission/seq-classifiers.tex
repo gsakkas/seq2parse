@@ -7,8 +7,8 @@ according to a given grammar $G$, by using its (abstracted) program token
 sequence $t^a$.
 %
 We define the function $\predictDLsym$ which takes as input a \emph{pre-trained
-Transformer classifier} $\Model$ and an abstracted token sequence $t^a$ and
-returns as output a \emph{small subset of error rules} $\errorrulessym$.
+sequence classifier} $\Model$ and an abstracted token sequence $t^a$ and returns
+as output a \emph{small subset} of $\errorrulessym$.
 %
 We train the $\Model$ offline with the $\trainDLsym$ method with a dataset
 $\List{t^a \times \errorrulessym}$ of token sequences $t^a$ and the \emph{exact
@@ -17,7 +17,9 @@ to generate the \emph{user parse}. We build our classifier $\Model$ using
 classic \emph{Deep Neural Networks (\dnn{}s)} and parts of state-of-the-art
 \emph{Sequence-to-Sequence (seq2seq)} models. We leave the high level details of
 acquiring the dataset of labeled token sequences and using the predictor for new
-erroneous programs for \autoref{sec:whole-system}.
+erroneous programs for \autoref{sec:whole-system}. In the next few paragraphs,
+we summarize the recent advances in machine learning that help as build the
+sequence classifier.
 
 We encode the task of learning a function that will map token sequences of
 erroneous programs to a small set of error production rules as a
@@ -26,12 +28,9 @@ learning problem is one where, given a labeled training set, the task is to
 learn a function that accurately maps the inputs to output labels and
 generalizes to future inputs. In a \emph{classification} problem, the function
 we are trying to learn maps inputs to a discrete set of two or more output
-labels, called \emph{classes}. We use an \emph{encoder Transformer} to encode
+labels, called \emph{classes}. We use an \emph{Transformer encoder} to encode
 the input sequences into abstract vectors that we then directly feed into a
-\emph{\dnn} classifier to build a Transformer classifier.
-
-% \subsection{Neural Networks and Sequence Models Background}
-% \label{sec:seq-classifiers:background}
+\emph{\dnn} classifier to build a \emph{Transformer classifier}.
 
 \mypara{Neural Networks}
 A neural network can be represented as a directed acyclic graph whose nodes are
@@ -40,8 +39,9 @@ corresponds to the input features, and the final to the output. The output of an
 internal node is the sum of the weighted outputs of the previous layer passed to
 a non-linear \emph{activation function}, which in recent work is commonly chosen
 to be the rectified linear unit (ReLU) \citep{Nair2010-xg}. In this work, we use
-relatively \emph{deep neural networks} (\dnn)~\citep{Schmidhuber_2015}. A
-thorough introduction to neural networks is beyond the scope of this
+relatively \emph{deep neural networks} (\dnn) that have proven to make more
+accurate predictions in recent work~\citep{Schmidhuber_2015}. A thorough
+introduction to neural networks is beyond the scope of this
 work~\citep{Hastie2009-bn, Nielsen2015-pu}.
 
 % For example, the outputs of an internal layer of nodes $l$ is given as $y_l =
@@ -109,15 +109,15 @@ Transformer significantly more easy to parallelize and has as a result a higher
 quality of predictions and sequence translations after only being trained for a
 small amount of time.
 
-The Transformer's architecture is structured as a \emph{stack of $N$ identical
-layers}. Each layer has two main sub-layers. The first is a \emph{multi-head
-self-attention mechanism}, and the second is a position-wise fully connected
-neural network. The output of each sub-layer is $LayerNorm(x + SubLayer(x))$,
-where $SubLayer(x)$ is the function implemented by each sub-layer, followed by a
-residual connection around each of the two sub-layers and  by layer
-normalization $LayerNorm(x)$. To facilitate these residual connections, all
-sub-layers in the model, as well as the input \emph{embedding layers}, produce
-outputs of the same dimension $d_{model}$.
+The novel architecture of a Transformer \citep{Vaswani_2017} is structured as a
+\emph{stack of $N$ identical layers}. Each layer has two main sub-layers. The
+first is a \emph{multi-head self-attention mechanism}, and the second is a
+position-wise fully connected neural network. The output of each sub-layer is
+$LayerNorm(x + SubLayer(x))$, where $SubLayer(x)$ is the function implemented by
+each sub-layer, followed by a residual connection around each of the two
+sub-layers and  by layer normalization $LayerNorm(x)$. To facilitate these
+residual connections, all sub-layers in the model, as well as the input
+\emph{embedding layers}, produce outputs of the same dimension $d_{model}$.
 
 % This architecture is used as described above in a seq2seq model
 % \citep{Vaswani_2017} for the encoder. The decoder would require an extra third
@@ -132,7 +132,6 @@ outputs of the same dimension $d_{model}$.
 % \subsection{Transformer Classifier}
 % \label{sec:seq-classifiers:location-rank}
 
-\mypara{Transformer Classifier}
 
 % \mypara{Multi-class \dnn{}s}
 %
@@ -145,20 +144,22 @@ outputs of the same dimension $d_{model}$.
 
 % \mypara{Multi-class Transformer Classifiers}
 %
-To build the $\Model$, we use a Transformer encoder to represent an abstracted
-token sequence $t^a = (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V
-\in \R^k$. The abstract vector $V$ is then fed as input into a multi-class \dnn.
-We use $\trainDLsym$ to train the $\Model$ given the training set $\List{t^a
-\times \errorrulessym}$. The binary cross-entropy loss function is used per
-class to assign the loss per training cycle. $\Model$ is used to predict error
-production rules for a new input program $t^a$. Critically, we require that the
-classifier outputs a \emph{confidence score} $\Conf$ for each possible error
-rule that measures how sure the classifier is that the rule can be used to parse
-the associated input program $e_{\bot}$. The $\predictDLsym$ function uses the
+\mypara{Transformer Classifier}
+For our task, we choose to structure $\Model$ as a \emph{Transformer
+Classifier}. We use a novel Transformer encoder to represent an abstracted token
+sequence $t^a = (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V \in
+\R^k$. The abstract vector $V$ is then fed as input into a multi-class \dnn. We
+use $\trainDLsym$ to train the $\Model$ given the training set $\List{t^a \times
+\errorrulessym}$. The binary cross-entropy loss function is used per class to
+assign the loss per training cycle. $\Model$ is used to predict error production
+rules for a new input program $t^a$. Critically, we require that the classifier
+outputs a \emph{confidence score} $\Conf$ for each possible error rule that
+measures how sure the classifier is that the rule can be used to parse the
+associated input program $e_{\bot}$. The $\predictDLsym$ function uses the
 trained $\Model$ to predict the confidence scores $\List{\errorrulessym\ \times\
 \Conf}$ for every error production rule $\errorrulessym$ for a new unknown
 program $e_\bot$ with syntax errors. The $\errorrulessym$ are then sorted based
 on their predicted confidence score $\Conf$ and finally the \emph{top-N} rules
-are returned for error-correcting parsing. $N$ is small number in the 10s that
+are returned for error-correcting parsing. $N$ is a small number in the 10s that
 will give accurate predictions without making the ECE-Parser too slow, as we
-discuss in \autoref{sec:whole-system}.
+discuss in \autoref{sec:eval}.
