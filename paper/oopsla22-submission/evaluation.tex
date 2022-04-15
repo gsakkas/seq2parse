@@ -157,7 +157,7 @@ also a high user fix accuracy of 18.56\%. The \textsc{AllParses} parser has a
 lower parse accuracy of 61.82\%, however it manages to generate the user fix
 33.92\% of the time and achieve a high 72.22\% rare accuracy. Finally, the
 \textsc{Threshold} parser is almost as accurate as the efficient
-\textsc{MinimumCost} parser with 94.09\% parse accuracy and 93.42\% rare parse
+\textsc{MinimumCost} parser with 94.19\% parse accuracy and 93.42\% rare parse
 accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
 
 \begin{framed}
@@ -179,7 +179,7 @@ accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
         50 Most Popular       & 90.89\%          & 81.26\%          & 18.56\% \\
         \textsc{AllParses}    & 61.82\%          & 72.22\%          & \textbf{33.92\%} \\
         \textsc{MinimumCost}  & \textbf{94.25\%} & \textbf{94.01\%} & 20.55\% \\
-        \textsc{Threshold}    & 94.09\%          & 93.42\%          & 21.19\% \\
+        \textsc{Threshold}    & 94.19\%          & 93.42\%          & 21.19\% \\
       \end{tabular}
     }
     \caption{Experimental results of \toolname's repair approaches.}
@@ -215,7 +215,7 @@ all the versions of \autoref{tab:seq2parse_full_results}.
 \toolname approaches' repair rates over their repair time. We observe that using
 \textsc{Threshold} predictions with the \textsc{MinimumCost} ECE-Parser is the
 most efficient and it maintains a highest parse accuracy at all times, with a
-repair rate of 81.59\% within 20 seconds and a median parse time of 2.5 seconds.
+repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
 time of 5.3 seconds.
@@ -237,7 +237,7 @@ cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
 
 \begin{framed}
   \noindent \toolname can parse programs with syntax errors for the vast
-  majority of the test set in under 20 seconds with a median parse time of 2.5
+  majority of the test set in under 20 seconds with a median parse time of 2.1
   seconds.
 \end{framed}
 
