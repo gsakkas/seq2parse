@@ -1,12 +1,11 @@
 \section{Abstracting Programs with Parse Errors}
 \label{sec:prog-abstract}
 
-We start by introducing our approach for abstracting programs with parse errors
-into a suitable sequence of tokens for training sequence classifiers. We explain
-how a traditional Earley parser can be used to extract partial parses with the
-aid of a Probabilistic Context-Free Grammar (PCFG), in order to get a higher
-level of abstraction with richer context information than the simple
-\emph{Lexer} output.
+We introduce here our approach for abstracting programs with parse errors into a
+suitable sequence of tokens for training sequence classifiers. We explain how a
+traditional Earley parser can be used to extract partial parses with the aid of
+a Probabilistic Context-Free Grammar (PCFG), in order to get a higher level of
+abstraction with richer context information than the simple Lexer output.
 
 \input{api.tex}
 
@@ -14,11 +13,12 @@ level of abstraction with richer context information than the simple
 Historically, \emph{lexical analysis}, lexing or tokenization is the process of
 converting a sequence of characters \ie a program into a sequence of tokens
 (strings with an assigned and thus identified meaning). The program that
-performs lexical analysis is called a \emph{lexer} and is usually combined with
-a parser, which together analyze the syntax of a programming language $L(G)$,
-defined by the grammar $G$. When a program has a syntax error, the output token
-sequence of the lexer is the highest level of abstraction that we can acquire,
-since the parser fails and returns an error.
+performs the lexical analysis is called a \emph{lexer} and is usually combined
+with a parser, which together analyze the syntax of a programming language
+$L(G)$, defined by the grammar $G$. When a program has a syntax error, the
+output token sequence of the lexer is the highest level of abstraction that we
+can acquire, since the parser fails and returns an error, meaning that we have
+no available parse trees.
 
 \mypara{Token Sequences}
 Our goal is to parse a \emph{program token sequence} $t^i$, which is a lexed

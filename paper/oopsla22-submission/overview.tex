@@ -603,16 +603,14 @@ For example, the diff for the program pair in
 deleted |+| operator, thus extracting
 the error rules |Token $\rightarrow$ +|
 and |E_\n $\rightarrow$ Insert \n|,
-since the extra token |+| precedes
+since the extra |+| precedes
 a newline character |\n|.
 %
 Similarly, if a token |t| is added in
 the fixed program, the error rule
 %
-|E_t $\rightarrow$ $\epsilon$| is
-added and if a token |t| replaces
-a token |a| in the fix the error
-rules |E_t $\rightarrow$ Replace| and
+|E_t $\rightarrow$ $\epsilon$| is added and if a token |t| replaces a token |a|,
+the error rules |E_t $\rightarrow$ Replace| and
 %
 |Replace $\rightarrow$ a| are added.
 
