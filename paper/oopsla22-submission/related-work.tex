@@ -9,23 +9,23 @@ errors.
 %
 As we have already demonstrated, error-correcting parses have been proposed for
 repairing syntax errors and we have extensively described ECE-Parsers
-\citep{Aho_1972}. The technique presented by \citep{Burke1987} describes another
+\citep{Aho_1972}. The technique presented by \citet{Burke1987} describes another
 EC-Parser, which is applicable with LR and LL parsing. It uses three phases:
 first attempts to repair the parse error by symbol insertions, deletions, or
-substitutions. If that fails, tries to close one or more open code blocks and if
+substitutions. If that fails, it tries to close one or more open code blocks and if
 that fails, it removes code surrounding the erroneous symbol. Finally, it uses
 \emph{deferred parsing} that may be viewed as double parsing, where one main
 parser moves forward as much as possible, whereas a second parser is $k$ steps
 behind, so that it can backtrack to a state $k$ steps before efficiently if a
-phase fails. \citep{VanDerSpek_2005} has shown that the previous approach is not
+phase fails. \citet{VanDerSpek_2005} have shown that the previous approach is not
 applicable in real-world languages for some specific cases (\eg multiple
 function definitions) and has suggested an improvement that works with the
 \textsc{JavaCC} parser generator and a form of \emph{follow-set error recovery}.
-\citep{Corchuelo2002} has suggested an error-correcting version of the popular
+\citet{Corchuelo2002} have suggested an error-correcting version of the popular
 LR parser. Rather than focusing on error production rules, this method adds
 \emph{error-repair transitions} along with the regular shift/reduce operations.
 It employs a simple cost model and heuristics to limit the explosion of the
-repair search space. Finally, \citep{Thompson1976} has suggested using
+repair search space. Finally, \citet{Thompson1976} has suggested using
 \emph{probabilistic parsing} to overcome the drawback of selecting the
 minimal-edit repair by using a PCFG to select the most \emph{probable} repair
 parse. However, these approaches are impractical and inefficient for real-world
@@ -36,7 +36,7 @@ parsing.
 
 \mypara{Sequence Models in Software Engineering}
 %
-\citep{Rahmani2021, Verbruggen2021} have suggested using pre-trained
+\citet{Rahmani2021} and \citet{Verbruggen2021} have suggested using pre-trained
 auto-regressive transformer models, such as \textsc{GPT-3} \citep{GPT2020}, to
 augment pre-existing program synthesis techniques. They use pretrained models to
 acquire semantic power over smaller subproblems that can't be solved with the
@@ -54,7 +54,7 @@ systems that use seq2seq models consisting of Long Short-Term Memory networks
 task-specific patterns for fixing erroneous task solutions. \textsc{SynFix} uses
 a model per task and uses as an input sequence the program prefix until the
 error locations that the language parser provides. \emph{sk\_p} (while it
-doesn't solely focus on syntax errors) makes sequence predictions per program
+does not solely focus on syntax errors) makes sequence predictions per program
 line, by considering only the abstracted context lines (previous and next
 lines). The model is applied to every program line and the predictions with the
 highest probabilities are selected. \toolname manages to parse and repair a
@@ -72,40 +72,39 @@ syntactical errors in \textsc{C} programs. It relies on stacked gated recurrent
 units (GRUs) with attention and applies some simple abstraction over the
 terminal tokens. The input programs are broken into subsequences for each line
 and the model gets as input all the line subsequences with their associated line
-numbers. \textsc{DeepFix} only predicts single line fixes to reduce its
-complexity. The predictions are applied iteratively multiple times, if multiple
+numbers. \textsc{DeepFix} only predicts single line fixes. 
+The predictions are applied iteratively multiple times, if multiple
 parse errors exist or until the parse error is fixed. \textsc{DeepFix} struggles
 with the same problems as previous work, as it solely relies on the sequence
 models' capability to learn the full grammar and repair programs with minimal
-abstraction and prior knowledge over the programming language.
+abstraction and prior knowledge over the language.
 
 \emph{Lenient parsing} \citep{Ahmed_2021} presents another sequence model
-approach. This approach, however, utilizes \emph{two seq2seq Transformer models}
+approach. It uses \emph{two seq2seq Transformer models}
 and trains them with a large corpus of code. One model is trained to repair and
-create proper nested blocks of code, called \textsc{BlockFix} and the second
-one, called \textsc{FragFix}, to repair and parse fragments of code (\eg program
+create proper nested blocks of code, called \textsc{BlockFix}, and the second
+one, called \textsc{FragFix}, repairs and parses fragments of code (\eg program
 statements) within a repaired block. \textsc{BlockFix} tokenizes input program
 block in a similar manner to our abstracted token sequences, by abstracting
-identifiers, constants, expressions etc. and is trained on pairs of blocks and
-manually corrupted versions of them. On the other hand, \textsc{FragFix} repairs
-on a program statement level within blocks (mostly focuses on missing semicolons
+identifiers, constants, expressions, etc., and is trained on pairs of valid and manually-corrupted 
+blocks. On the other hand, \textsc{FragFix} repairs
+on a program statement level within blocks (mostly focusing on missing semicolons
 and commas), by using serialized versions of ASTs and error hints manually
-injected on the ASTs. Finally, \emph{Lenient parsing} tries to combine
-everything back to parsable code and generate a valid AST. While this approach
-is mostly automatic, it relies on the corruption of a dataset to generate
+injected on the ASTs. While this overall approach
+is mostly automatic, it relies on the manual corruption of a dataset to generate
 erroneous programs that may not correlate to the errors actual developers make
 and solely relies on the seq2seq models to learn the underlying language model
 and make repairs. In contrast, \toolname mitigates this problem by learning how
-programmers fixed their programs from a large corpus and by abstracting them
-with their partial parses. Additionally, the usage of an EC-Parser and the
-language grammar adds significant value in the repair of the programs.
+programmers fixed programs from a large corpus and by abstracting via
+partial parses. Additionally, our use of EC-Parsers and the
+language grammar significantly improves program repairs.
 
 \mypara{Graph models for parsing}
 %
 Graph-based Grammar Fix (\textsc{GGF}) \citep{Wu2020} suggested using a
 \emph{Gated Graph Neural Network} encoder for the partial parse trees that can
 be acquired from a LALR parser and a \emph{GRU} for the parts of the program
-sequence that are not parsed. This approach tries to better summarize the
+sequence that are not parsed. This approach aims to better summarize the
 context of the program in order to train more accurate models. Its models then
 predict an error location in the program sequence and a token suggestion for the
 repair. This single-token repair approach is applied iteratively multiple times
@@ -122,13 +121,13 @@ language.
 a new \emph{context-aware NMT model} that has two separate \emph{Convolutional
 Neural Network (CNN)} encoders, one for the buggy lines and one for their
 surrounding lines. It also uses \emph{ensemble learning} to train NMT models of
-different hyper-parameters in order to capture different relations between
+different hyper-parameters to capture different relations between
 erroneous and correct code. This approach uses a minimal level of abstraction
 over the input programs, with only a subword-level tokenization to minimize the
-vocabulary size and make training of such enormous models more attainable.
+vocabulary size and make training tractable.
 %
 \textsc{CURE}~\citep{Jiang_2021} suggested a similar \emph{code-aware NMT model}
 that is pre-trained using unsupervised learning on correct programs. It also
-uses a programming language (PL) \textsc{GPT} \citep{GPT2020} model that learns
+uses a programming language \textsc{GPT} \citep{GPT2020} model that learns
 to predict the next token in program sequences and uses beam search to maintain
 a small set of accurate repairs.
