@@ -147,19 +147,19 @@ residual connections, all sub-layers in the model, as well as the input
 \mypara{Transformer Classifier}
 For our task, we choose to structure $\Model$ as a \emph{Transformer
 Classifier}. We use a novel Transformer encoder to represent an abstracted token
-sequence $t^a = (t^a_1, t^a_2, \dots, t^a_n)$ into an abstract vector $V \in
-\R^k$. The abstract vector $V$ is then fed as input into a multi-class \dnn. We
-use $\trainDLsym$ to train the $\Model$ given the training set $\List{t^a \times
-\errorrulessym}$. The binary cross-entropy loss function is used per class to
-assign the loss per training cycle. $\Model$ is used to predict error production
-rules for a new input program $t^a$. Critically, we require that the classifier
-outputs a \emph{confidence score} $\Conf$ for each possible error rule that
-measures how sure the classifier is that the rule can be used to parse the
-associated input program $e_{\bot}$. The $\predictDLsym$ function uses the
-trained $\Model$ to predict the confidence scores $\List{\errorrulessym\ \times\
-\Conf}$ for every error production rule $\errorrulessym$ for a new unknown
-program $e_\bot$ with syntax errors. The $\errorrulessym$ are then sorted based
-on their predicted confidence score $\Conf$ and finally the \emph{top-N} rules
-are returned for error-correcting parsing. $N$ is a small number in the 10s that
-will give accurate predictions without making the ECE-Parser too slow, as we
-discuss in \autoref{sec:eval}.
+sequence $t^a$ into an abstract vector $V \in \R^k$. The abstract vector $V$ is
+then fed as input into a multi-class \dnn. We use $\trainDLsym$ to train the
+$\Model$ given the training set $\List{t^a \times \errorrulessym}$. The binary
+cross-entropy loss function is used per class to assign the loss per training
+cycle. $\Model$ is used to predict error production rules for a new input
+program $t^a$. Critically, we require that the classifier outputs a
+\emph{confidence score} $\Conf$ for each possible error rule that measures how
+sure the classifier is that the rule can be used to parse the associated input
+program $e_{\bot}$. The $\predictDLsym$ function uses the trained $\Model$ to
+predict the confidence scores $\List{\errorrulessym\ \times\ \Conf}$ for every
+error production rule $\errorrulessym$ for a new unknown program $e_\bot$ with
+syntax errors. The $\errorrulessym$ are then sorted based on their predicted
+confidence score $\Conf$ and finally the \emph{top-N} rules are returned for
+error-correcting parsing. $N$ is a small number in the 10s that will give
+accurate predictions without making the ECE-Parser too slow, as we discuss in
+\autoref{sec:eval}.
