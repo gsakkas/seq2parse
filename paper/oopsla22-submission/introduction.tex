@@ -14,15 +14,15 @@ enough to help swiftly fix
 the error~\citep{qian2017, VanDerSpek_2005}).
 %
 When they occur in larger code bases, parse errors
-even trouble experts, and require a great deal of
+may even trouble experts, and can require a great deal of
 effort to fix~\citep{Denny_2012, Ahadi_2018, Kummerfeld2003}.
 
 Owing to their ubiquity and importance, there are \emph{two}
-long lines of work on automatically suggesting \emph{fixes}
+established lines of work on automatically suggesting \emph{fixes}
 for parse errors.
 %
 In the first line, Programming Languages researchers
-have investigated \emph{symbolic} approaches start
+have investigated \emph{symbolic} approaches starting
 with classical parsing algorithms, \eg, LR~\citep{Aho1974}
 or Earley~\citep{Earley_1970}.
 %
@@ -33,29 +33,29 @@ to fix the error.
 \citet{Aho_1972} extends these ideas to implement
 \emph{error correcting parsers} (EC-Parsers) that
 use special error production rules to handle
-programs with syntax errors, using which an EC-parser
-can synthesize minimal-edit parse error repairs.
+programs with syntax errors and 
+synthesize minimal-edit parse error repairs.
 %
 Sadly, EC-parsers have remained mostly of theoretical
-interest, as their running time is cubic in the input
+interest, as their running time is cubic in the 
 program size, and quadratic in the size of the language's
-grammar, which has rendered them impractical for large
-real-world programming languages~\citep{McLean1996, Rajasekaran2014}.
+grammar, which has rendered them impractical for 
+real-world languages~\citep{McLean1996, Rajasekaran2014}.
 
 In the second line, Machine Learning and NLP researchers have
 pursued \emph{Deep Neural Network} (\dnn)
-based approaches using advanced sequence-to-sequence
+approaches using advanced sequence-to-sequence
 models \citep{Sutskever_2014, Hardalov_2018}
-that use a large corpus of existing code to predict
-the next token \eg at a parse error location.
+that use a large corpus of code to predict
+the next token (\eg, at a parse error location).
 %
 Sadly, these methods ignore the high-level structure
-of the language (or have to learn them from vast amounts
-of data) and hence, lack accuracy in real-world contexts.
+of the language (or must learn it from vast amounts
+of data) and typically lack accuracy in real-world contexts.
 %
-For example, state-of-the-art methods such as ~\citep{Ahmed_2021} parses and
-repairs only \emph{32\%} of real student code with up to 3 syntax errors
-and~\citep{Wu2020} repairs at most only \emph{58\%} of syntax errors of a
+For example, state-of-the-art methods such as \citet{Ahmed_2021} parse and
+repair only \emph{32\%} of real student code with up to 3 syntax errors
+while \citet{Wu2020} repair only \emph{58\%} of syntax errors in a
 real-world dataset.
 
 In this paper, we present \toolname, a new approach
@@ -81,12 +81,12 @@ via the following concrete contributions.
 %
 Our first contribution is an empirical analysis of a real-world
 dataset of more than a million novice Python programs that shows
-that parse errors constitute the majority of errors, take a long
+that parse errors constitute the majority of novice errors, take a long
 time to fix, and that the fixes themselves can often require
 multiple edits.
 %
 This analysis clearly demonstrates that an automated tool that
-suggests parse error repairs in a few seconds, could greatly
+suggests parse error repairs in a few seconds could greatly
 benefit many novices (\S~\ref{sec:error-analysis}).
 
 \mypara{2. Implementation}
