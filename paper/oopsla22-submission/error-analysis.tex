@@ -49,8 +49,8 @@ usually easier to locate and repair than other algorithmic
 or runtime errors \citep{Denny_2012}.
 %
 For example, the Python parser will immediately inform the programmer
-about missing parentheses in function argument lists or for not having
-the proper indents in a statement block.
+about missing parentheses in function argument lists or improper
+indentation.
 %
 However, as has also been shown in previous
 work \citep{Ahadi_2018, Kummerfeld2003}, our
@@ -71,28 +71,27 @@ programs.
 %
 The second category is merely $13.6\%$ of the dataset and
 represents Python type errors. This is a strong indication
-that parse errors are a very common type of error.
+that parse errors are a very common category of error.
 
 \mypara{Observation 2: Parse errors take time to fix}
 %
-The web-based compiler that we used to generate this
-dataset provides us with a \emph{server timestamp}.
+The web-based compiler used to obtain this
+dataset provides \emph{server timestamps}.
 %
 The timestamp is associated with each program attempt
 submission, erroneous or not. The \emph{repair time}
-of an erroneous program is calculated by taking the
-difference of the two timestamps of the erroneous and
-fixed program.
+is the difference between the erroneous and
+fixed program timestamps.
 %
-This method can be an inaccurate metric of repair time,
+This timing can be imprecise,
 as there are various reasons these timings may be exaggerated,
-\eg users stepping away from the computer, internet lag \etc.
+(\eg, users stepping away from the computer, internet lag \etc).
 %
 However, in aggregate, due to the large
-dataset of program repairs, these timings
+dataset size, these timings
 can still be viewed as an approximate metric
-of the amount of time it took novice programmers to
-repair their program errors.
+of the time it took novice programmers to
+repair their errors.
 
 \autoref{fig:repair-rate} shows the \emph{programmer repair rate},
 \ie the dataset percentage that is repaired under a given amount of time.
@@ -104,13 +103,13 @@ As expected, parse errors are fixed faster than the rest,
 but \emph{not by a large difference}.
 %
 For example, we observe that within 2 minutes,
-usually $46\%$ of the runtime errors are repaired, while
-around $63\%$ of the syntax errors are.
+$46\%$ of the runtime errors are repaired, while
+$63\%$ of the syntax errors are.
 %
-Although, this is a considerable difference,
-we observe that there is still a large number
-of the ``simpler'' parse errors that required
-more than 2 minutes to be fixed.
+Although this is a non-trivial difference,
+we observe that there are still many
+``simpler'' parse errors that required
+more than 2 minutes to fix.
 
 \begin{figure}[t]
   \centering
@@ -137,8 +136,8 @@ The average \emph{token-level changes} needed to fix a program with syntax
 errors, \ie the number of changes in the lexed program token sequence, is
 \emph{10.7 token changes}, while the \emph{median is 4}.
 %
-A variable rename or a different integer are not considered as changes
-as they won't affect the syntax error fix.
+(This does not count lexeme content changes, such as variable renamings, 
+and thus underapproximates the work required.) 
 %
 As shown in \autoref{fig:token-changes-ratio}, $14.2\%$ of errors
 need only 1 token change, $23.2\%$ need 2 token changes, $7.0\%$
@@ -151,12 +150,12 @@ Ultimately, $46.6\%$ of these errors require more than 4 token changes.
 
 \mypara{Observation 4: Parse errors with more edits take longer to fix}
 %
-\autoref{fig:token-changes} shows the average time that it takes a user to fix
-all of their syntax errors per the number of token-level changes in their
-programs. As expected, with an increasing number of token changes needed,
+\autoref{fig:token-changes} shows the average time for users to fix
+syntax errors as a function of the number of token changes needed. 
+As expected, with an increasing number of token changes needed,
 programmers need more time to implement those changes. Most importantly, even
-for 1 or 2 token changes the average user spends \emph{26 and 25 sec}
-respectively, which is still a considerable amount of time for such simple and
+for 1 or 2 token changes the average user spends \emph{25 sec},
+which is still a considerable amount of time for such simple and
 short fixes. The repair time jumps to \emph{56 sec} for three token changes.
 
 \smallskip
