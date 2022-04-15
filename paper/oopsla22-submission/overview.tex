@@ -49,11 +49,10 @@ programs (\S~\ref{sec:overview:seq-classifiers}).
 %
 \emph{(Symbolic)}
 %
-Next, given an erroneous program, and a (small) set of
-predicted \emph{program relevant} error rules, the
-the ECE-parser can exploit the high-level grammatical
-structure of the language to make short work of
-synthesizing the best repair (\S~\ref{sec:overview:ec-parsing}).
+Next, given an erroneous program, and a (small) set of predicted \emph{program
+relevant} error rules, the ECE-parser can exploit the high-level grammatical
+structure of the language to make short work of synthesizing the best repair
+(\S~\ref{sec:overview:ec-parsing}).
 %
 We now give an overview of \toolname, describing these
 elements in turn,  using as a running example, the program
@@ -188,7 +187,7 @@ create a new \emph{error grammar} $G'$ which has
 rules to handle \emph{insertion}, \emph{deletion},
 and \emph{replacement} errors.
 %
-Lets see how to adapt Python's
+Let's see how to adapt Python's
 production rules for an ECE-Parser.
 %
 First, the ECE-Parser adds to $G'$ a new start symbol |New_S|, the helper
@@ -203,7 +202,7 @@ of an insertion error at the end:
 \begin{itemize}
   \item \lstinline{New_S  $\rightarrow$ S | S Insert}
 \end{itemize}
-Also, for each production rule of a non-terminal |T| in $G$, another
+Additionally, for each production rule of a non-terminal |T| in $G$, another
 non-terminal error rule is added that introduces the terminal symbols |E_t|, for
 each original terminal |t| it has. For example, the |Stmts|, |Block| and
 |RetStmt| rules are updated as:
@@ -224,9 +223,9 @@ These four new error rules have the following usage for each terminal |t|:
   |E_\n E_indent Stmts E_dedent| it can be the case that only
   |E_dedent| is needed to match the error and |E_\n| and |E_indent| can match
   their respective symbols.
-  \item Using |E_t $\rightarrow$ $\epsilon$| a \emph{deletion} error is considered. The
-  error rule will match \emph{nothing} or the \emph{empty token} $\epsilon$ in
-  the program, meaning the terminal is missing.
+  \item Using |E_t $\rightarrow$ $\epsilon$| a \emph{deletion} error is
+  considered. The error rule will match \emph{nothing}, or the \emph{empty
+  token} $\epsilon$, in the program, meaning the terminal is missing.
   \item Using |E_t $\rightarrow$ Replace| a \emph{replacement} error is considered.
   |Replace| will match any terminal token that is \emph{different} than |t|,
   making a replacement possible.
@@ -304,16 +303,18 @@ languages like Python.
 parse} of the problematic statements |Stmts|$^1$ of
 \autoref{fig:partial-parse-tree-1}.
 %
-Considering a deletion error, the
+Considering a deletion error (\autoref{fig:adding-partial}), the
 %
 |E_number $\rightarrow$ $\epsilon$| error rule is used to match the empty symbol
 and generate a parse that suggests that a \emph{number} is missing after the |+|
 operator. On the other hand, the
 %
 |E_\n $\rightarrow$ Insert \n| error rule can be used to consider a insertion
-error before the new line character, basically \emph{deleting} the |+| operator.
-In this case, |ArExpr $\rightarrow$ Literal| is used to parse the program
-instead of |ArExpr $\rightarrow$ ArExpr BinOp Literal|.
+error (\autoref{fig:deleting-partial}) before the new line character, basically
+\emph{deleting} the |+| operator. In this case, |ArExpr $\rightarrow$ Literal|
+is used to parse the program instead of
+%
+|ArExpr $\rightarrow$ ArExpr BinOp Literal|.
 
 The ECE-Parser is an effective approach on finding minimum distance parses for
 programs than do not belong in the given programming language, \ie have parse
@@ -542,10 +543,9 @@ the partial parses present us with short abstracted
 sequences that abstract irrelevant details of the context
 into non-terminals.
 %
-Next, \toolname uses the NLP technique of
-\emph{sequence models} \citep{Sutskever_2014, Hardalov_2018}
-to (use the abstract token sequences) to train
-a classifier that can predict the relevant EC rules.
+Next, \toolname uses the NLP approach of \emph{sequence models}
+\citep{Sutskever_2014, Hardalov_2018} to (use the abstract token sequences) to
+train a classifier that can predict the relevant error rules.
 
 \mypara{Seq2Seq Architectures}
 %
@@ -569,7 +569,7 @@ which in turn transforms it into an output sequence.
 
 \toolname uses a \emph{sequence classifier} that can correctly predict a small
 set of relevant error production rules for a given abstracted token sequence. We
-use an \emph{transformer encoder} \citep{Vaswani_2017} to encode the input
+use a \emph{transformer encoder} \citep{Vaswani_2017} to encode the input
 sequences into abstract vectors that we then feed into a \emph{\dnn} classifier
 to train and make accurate predictions \citep{Schmidhuber_2015}.
 
@@ -632,14 +632,14 @@ us select the top-$N$ ones that will
 yield accurate repairs when used
 with the ECE-Parser.
 
-For our running example, in \autoref{fig:bad-prog}, we abstract the program
+For our running example, in \autoref{fig:bad-prog}, we abstract the program as
 shown in \autoref{fig:abstract-prog-seq} and then we predict the error
 production rules for it with the trained sequence classifier. We rank the full
-set of \emph{terminal} error rules based on their predicted error score from the
-classifier and return the \emph{top 10} predictions for our example. Therefore,
-the predicted set of error rules is the following:
+set of \emph{terminal} error rules based on their predicted confidence score
+from the classifier and return the \emph{top 10} predictions for our example.
+Therefore, the predicted set of error rules is the following:
 %
-|E_number $\rightarrow$ $\epsilon$|, \linebreak
+|E_number $\rightarrow$ $\epsilon$|,
 %
 |E_number $\rightarrow$ Insert number|, |E_\n $\rightarrow$ Insert \n|,
 %
@@ -668,7 +668,7 @@ predicted).
 
 We then parse the program in \autoref{fig:bad-prog} with the ECE-Parser and
 these specific error rules to generate a valid parse. We observe that it takes
-our implementation (as we show later in depth) around \emph{2 seconds} to
+our implementation (as we show later in depth) less than \emph{2 seconds} to
 generate a valid parse, which is also the one that leads to the user repair in
 \autoref{fig:fixed-prog}! On the other hand, when we use a baseline ECE-Parser
 with the full set of error rules it takes \emph{2 minutes and 55 seconds} to
@@ -682,5 +682,5 @@ by defining all the methods in \autoref{fig:api}. We start by presenting the
 program abstraction (\autoref{sec:prog-abstract}) using partial parses and a
 learnt PCFG, we then explain how we train sequence models for making error rule
 predictions (\autoref{sec:seq-classifiers}) and, finally, we demonstrate our
-algorithms for building \toolname, an approach for efficiently parsing erroneous
-programs.
+algorithms for building \toolname (\autoref{sec:whole-system}), an approach for
+efficiently parsing erroneous programs.

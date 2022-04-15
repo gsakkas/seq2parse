@@ -33,13 +33,13 @@ to fix the error.
 \citet{Aho_1972} extends these ideas to implement
 \emph{error correcting parsers} (EC-Parsers) that
 use special error production rules to handle
-programs with syntax errors and 
+programs with syntax errors and
 synthesize minimal-edit parse error repairs.
 %
 Sadly, EC-parsers have remained mostly of theoretical
-interest, as their running time is cubic in the 
+interest, as their running time is cubic in the
 program size, and quadratic in the size of the language's
-grammar, which has rendered them impractical for 
+grammar, which has rendered them impractical for
 real-world languages~\citep{McLean1996, Rajasekaran2014}.
 
 In the second line, Machine Learning and NLP researchers have
@@ -145,34 +145,6 @@ study with 39 participants and show that humans perceive both \toolname's edit
 locations and final repair quality to be useful and helpful, in a
 statistically-significant manner, even when not equivalent to the user's fix
 (\S~\ref{sec:eval}).
-
-% Syntax errors are particularly relevant for computer science
-% education and many novice misconceptions relate to syntax~\citep{qian2017}.
-% %
-% % Gap
-% Standard \emph{parsing algorithms}, which check compliance with syntax rules,
-% are essential in programming systems. Efficient and expressive parsers are used
-% in modern programming languages (\eg, LR~\citep{Aho1974} or
-% Earley~\citep{Earley_1970} parsing). These approaches can accurately locate
-% syntax errors. However, they often fail to provide effective feedback to humans.
-% % WRW doesn't understand this claim and does not think it is true without
-% % more explanation. GCC is push-button, requiring no SE effort.
-% %
-% % Additionally, these parsers require a lot of manual effort from the software engineers.
-
-% % WRW doesn't see why this next bit is a problem the reader cares about. It
-% % seems like an internal issue that has the same symptom (bad complexity)
-% % and is more like "our problem".
-% %
-% % Futhermore, there is the added cost of the
-% % large number of additional production rules these parsers have to consider while
-% % having an explosion of the internal states by maintaining the cost of each
-% % possible parse.
-
-% Innovation
-
-% Results
-% TODO: Maybe mention the jump in accuracy from previous work from 50\% to 94\%
 
 % The rest of the paper is organized as follows: \autoref{sec:error-analysis}
 % shows the importance of syntax errors in novice software
