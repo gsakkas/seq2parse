@@ -92,23 +92,22 @@ fixed program $e$ and return the appropriate error production rules.
 
 % \mypara{Training the Transformer Classifier}
 %
-\Cref{algo:training-classifier-algo} presents how we use a (probabilistic)
-grammar $G$ and a dataset $Ds$ to train a Transformer classifier $Model$ that
-can be used to predict error production rules for erroneous programs $\pbad$. We
-define the $\trainsym$ procedure in \Cref{algo:training-classifier-algo} that is
-responsible for extracting a machine-learning appropriate dataset $D_{ML}$ in
-order to train the Transformer classifier with $\trainDLsym$.
+Given a (probabilistic) grammar $G$ and a dataset $Ds$,
+\Cref{algo:training-classifier-algo} extracts a machine-learning appropriate
+dataset $D_{ML}$ in order to $\trainsym$ a Transformer classifier $Model$ with
+$\trainDLsym$. The classifier $Model$ can then be used to predict error rules
+for new erroneous programs $\pbad$.
 
 The dataset $D_{ML}$ starts as an empty set. For each program pair $\pbad \times
-\pfix$, we, first, employ $\partialsym$ with the PCFG $G$ and the erroneous
+\pfix$, we, first, employ $\partialsym$ with the PCFG $G$ and an erroneous
 program $\pbad$ to extract the abstracted token sequence $t^a$. Second, we use
 the token difference algorithm $\diffsym$ to extract the specific error $rules$
 that fix $\pbad$ based on $\pfix$. The abstracted sequence $t^a$ is annotated
-with the label $rules$ and is added to $D_{ML}$. Finally, the Transformer
-classifier $Model$ is then learned by $\trainDLsym$ that uses the newly
-extracted dataset $D_{ML}$ and is returned by the algorithm. The $\trainsym$
-with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure can is
-performed offline and thus won't affect the performance of the final repair.
+with the label $rules$ and is added to $D_{ML}$. The Transformer classifier
+$Model$ is trained with $\trainDLsym$ and the newly extracted dataset $D_{ML}$,
+which is finally returned by the algorithm. Finally, the $\trainsym$ing
+procedure can be performed offline and thus won't affect the performance of the
+final repair.
 
 % \mypara{Predicting Error Rules}
 %
@@ -125,14 +124,14 @@ given the pre-trained $Model$.
 
 \input{ecep-algo.tex}
 
-We now describe our approach for $\systemsym$ in \Cref{algo:ecep-algo}. This is
-the high-level algorithm that combines everything that we described so far in
-the last three sections. $\systemsym$ first extracts the fixed programs $ps$
-from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$ for
-the input grammar $G$. Then it $\trainsym$s the $Model$ to predict error
-production rules. Then we define an error rule predictor function
-\textsc{ERulePredictor} using $\predictsym$ with the pre-trained $Model$ and
-grammar $PCFG$. Finally, the algorithm returns the error correcting parser
-$Prs$, which we define as a function that takes as input an erroneous program
-$\pbad$ that uses \textsc{ERulePredictor} to get the set of error rules needed
-by $\ecepsym$ to parse and repair it.
+\Cref{algo:ecep-algo} presents our \emph{neurosymbolic} approach, $\systemsym$.
+This is the high-level algorithm that combines everything that we described so
+far in the last three sections. $\systemsym$ first extracts the fixed programs
+$ps$ from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$
+for the input grammar $G$ with $\learnPCFGsym$. It then $\trainsym$s the
+Transformer classifier $Model$ to predict error production rules. We define an
+error rule predictor, \textsc{ERulePredictor}, using the $\predictsym$ procedure
+with the pre-trained $Model$ and grammar $PCFG$. Finally, the algorithm returns
+the ECE-Parser $Prs$, which we define as a function that takes as input an
+erroneous program $\pbad$ that uses the \textsc{ERulePredictor} to get the set
+of error rules needed by $\ecepsym$ to parse and repair it.
