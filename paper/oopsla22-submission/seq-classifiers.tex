@@ -28,8 +28,8 @@ learning problem is one where, given a labeled training set, the task is to
 learn a function that accurately maps the inputs to output labels and
 generalizes to future inputs. In a \emph{classification} problem, the function
 we are trying to learn maps inputs to a discrete set of two or more output
-labels, called \emph{classes}. We use an \emph{Transformer encoder} to encode
-the input sequences into abstract vectors that we then directly feed into a
+labels, called \emph{classes}. We use a \emph{Transformer encoder} to encode the
+input sequences into abstract vectors that we then directly feed into a
 \emph{\dnn} classifier to build a \emph{Transformer classifier}.
 
 \mypara{Neural Networks}
@@ -151,15 +151,14 @@ sequence $t^a$ into an abstract vector $V \in \R^k$. The abstract vector $V$ is
 then fed as input into a multi-class \dnn. We use $\trainDLsym$ to train the
 $\Model$ given the training set $\List{t^a \times \errorrulessym}$. The binary
 cross-entropy loss function is used per class to assign the loss per training
-cycle. $\Model$ predicts error production rules for a new input
-program $t^a$. Critically, we require that the classifier outputs 
-\emph{confidence scores} $\Conf$ that measure how
-sure the classifier is that a rule can be used to parse the associated input
-program $e_{\bot}$. The $\predictDLsym$ function uses the trained $\Model$ to
-predict the confidence scores $\List{\errorrulessym\ \times\ \Conf}$ for every
-error production rule $\errorrulessym$ for a new unknown program $e_\bot$ with
-syntax errors. The $\errorrulessym$ are then sorted based on their predicted
-confidence score $\Conf$ and finally the \emph{top-N} rules are returned for
-error-correcting parsing. $N$ is a small number in the 10s that will give
-accurate predictions without making the ECE-Parser too slow, as we discuss in
-\autoref{sec:eval}.
+cycle. $\Model$ predicts error production rules for a new input program $t^a$.
+Critically, we require that the classifier outputs \emph{confidence scores}
+$\Conf$ that measure how sure the classifier is that a rule can be used to parse
+the associated input program $e_{\bot}$. The $\predictDLsym$ function uses the
+trained $\Model$ to predict the confidence scores $\List{\errorrulessym\ \times\
+\Conf}$ for all error production rules $\errorrulessym$ for a new unknown
+program $e_\bot$ with syntax errors. The $\errorrulessym$ are then sorted based
+on their predicted confidence score $\Conf$ and finally the \emph{top-N} rules
+are returned for error-correcting parsing. $N$ is a small number in the 10s that
+will give accurate predictions without making the ECE-Parser too slow, as we
+discuss in \autoref{sec:eval}.

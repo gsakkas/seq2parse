@@ -45,13 +45,13 @@ and 12 attention heads. The output of the transformer blocks is then connected
 to a \dnn based classifier with \emph{two} fully-connected hidden layers of 256
 and 128 neurons respectively. The neurons use rectified linear units (ReLU) as
 their activation function, while the output layer uses the sigmoid function for
-each class. Additionally, there are \emph{two input embedding layers} of a length
-of 128, one for input tokens and one for their positions in the sequence. We
-also limit the input abstracted token sequences to a length of 128 units, which
-covers $95.7\%$ of the training set, without the need of pruning them. Finally,
-the Transformer classifier was trained using an \textsc{Adam} optimizer
-\citep{Kingma2014-ng}, a variant of stochastic gradient descent, for a total of
-50 epochs.
+each class. Additionally, there are \emph{two input embedding layers} of a
+length of 128 units, one for input tokens and one for their positions in the
+sequence. We also limit the input abstracted token sequences to a length of 128
+tokens, which covers $95.7\%$ of the training set, without the need of pruning
+them. Finally, the Transformer classifier was trained using an \textsc{Adam}
+optimizer \citep{Kingma2014-ng}, a variant of stochastic gradient descent, for a
+total of 50 epochs.
 
 \subsection{RQ1: Accuracy}
 \label{sec:eval:accuracy}
@@ -74,7 +74,7 @@ the \textsc{Abstracted} token sequences to train the classifier. Finally, the
 last two dotted bars show the results for when a probability \textsc{Threshold}
 is set in order to select the predicted error rules (instead of picking the
 static top-K ones) but using again the \textsc{Abstracted} sequences as input.
-The predicted error rule set ranges between 1--20 elements. 
+The predicted error rule set ranges between 1--20 elements.
 
 The blue bars show the accuracy on the full test set of \textsc{All} 15,000 test
 programs, while the green bars show the results on a subset of \textsc{Rare}
@@ -112,7 +112,6 @@ accurate for the \textsc{Rare} programs as the rest of the dataset with a
 \label{sec:eval:precise}
 
 Next we evaluate \toolname's end-to-end accuracy and preciseness in generating
-valid parses for programs with syntax errors. For all of our tests we limit
 \toolname's parsing time to \emph{5 mins} and run our experiments on the
 15,000-program test set. Additionally, we use here the highest-performing
 transformer classifiers, \ie the \textsc{Abstracted} and \textsc{Threshold}
@@ -120,44 +119,45 @@ classifiers.
 
 We compare \emph{three versions} of our \toolname implementation
 (\textsc{AllParses}, \textsc{MinimumCost} and \textsc{Threshold}) against two
-versions of the EC-Parser with a static selection of the 20 and 50 most popular
+versions of the ECE-Parser with a static selection of the 20 and 50 most popular
 error production rules in our training set. We make this choice because we
 observe that the 50 most popular error rules are used as labels for as much as
 \emph{86\%} of the training set.
 
-Our \textsc{AllParses} ECE-Parser and \textsc{MinimumCost} ECE-Parser both use
-the \emph{Top-20 predictions} from our \textsc{Abstracted} classifier to parse
-and repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
+Our \textsc{AllParses} and \textsc{MinimumCost} ECE-Parsers both use the
+\emph{Top-20 predictions} from our \textsc{Abstracted} classifier to parse and
+repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
 \emph{all possible states} that arise from using the predicted error rules
-similarly to the original ECE-Parser described in \citep{Aho_1972}. We use a
+similarly to the original ECE-Parser described by \citet{Aho_1972}. We use a
 maximum repair cost of 2 edits (\ie a maximum of 2 insertions, deletions or
 replacements) to limit the search space. The \textsc{MinimumCost} version
 however keeps always the minimum-edit repair and discards all other states that
 may lead to a higher cost. This allows for a higher maximum cost of 10 edits. We
 use the same ECE-Parser and cost as in \textsc{MinimumCost} for our
-\textsc{MinimumCost} parser. Finally, while \textsc{AllParses} can generate a
-large number of repairs, we keep only the top 3 repairs after filtering with a
+\textsc{Threshold} parser. Finally, while \textsc{AllParses} can generate a
+large number of repairs, we keep only the top 5 repairs after filtering with a
 static code checker (\textsc{Pylint}, \url{https://www.pylint.org/}) as most
 developers will consider only a few suggestions before falling back to manual
 debugging \citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
-each of these four versions can parse successfully (\ie the parse accuracy), the
-rare programs parse accuracy, and the amount of parses that match the one that
-the user compiled. We observe that the \textsc{MinimumCost} parser
-\emph{outperforms} every other option with 94.25\% parse accuracy and 94.01\%
-rare parse accuracy. It also generates the intended user parse for 20.55\% of
-the set, \ie over 1 out 5 of the cases. The 20 most popular parser with 79.87\%
-parse accuracy and 65.01\% rare parse accuracy is much less accurate, and is
-4.24\% less likely to generate the user parse, while the 50 most popular is
-slightly less accurate with 90.89\% and 81.26\% accuracy, as expected from the
-usage of a large number of popular error rules. The 50 most popular parser has
-also a high user fix accuracy of 18.56\%. The \textsc{AllParses} parser has a
-lower parse accuracy of 61.82\%, however it manages to generate the user fix
-33.92\% of the time and achieve a high 72.22\% rare accuracy. Finally, the
-\textsc{Threshold} parser is almost as accurate as the efficient
-\textsc{MinimumCost} parser with 94.19\% parse accuracy and 93.42\% rare parse
-accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
+each of these four versions can parse successfully (\ie the \emph{parse
+accuracy}), the rare programs parse accuracy, and the \emph{user equivalent
+parse accuracy}, \ie the amount of parses that match the one that the user
+compiled. We observe that the \textsc{MinimumCost} parser \emph{outperforms}
+every other option with 94.25\% parse accuracy and 94.01\% rare parse accuracy.
+It also generates the intended user parse for 20.55\% of the set, \ie over 1 out
+5 of the cases. The 20 most popular parser with 79.87\% parse accuracy and
+65.01\% rare parse accuracy is much less accurate, and is 4.24\% less likely to
+generate the user parse, while the 50 most popular is slightly less accurate
+with 90.89\% and 81.26\% accuracy, as expected from the usage of a large number
+of popular error rules. The 50 most popular parser has also a high user fix
+accuracy of 18.56\%. The \textsc{AllParses} parser has the lowest parse accuracy
+of 61.82\%, however it manages to generate the user fix 33.92\% of the time and
+achieve a high 72.22\% rare accuracy. Finally, the \textsc{Threshold} parser is
+almost as accurate as the efficient \textsc{MinimumCost} parser with 94.19\% and
+93.42\% parse and rare accuracy, while achieving a slightly higher user fix
+accuracy of 21.19\%.
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
@@ -213,19 +213,17 @@ all the versions of \autoref{tab:seq2parse_full_results}.
 \autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
 \toolname approaches' repair rates over their repair time. We observe that using
 \textsc{Threshold} predictions with the \textsc{MinimumCost} ECE-Parser is the
-most efficient and it maintains a highest parse accuracy at all times, with a
+most efficient and it maintains the highest parse accuracy at all times, with a
 repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
 time of 5.3 seconds.
 
-We observe that, using a fixed set of the 20 and 50 most popular rules, 
-\toolname (with the \textsc{MinimumCost}
-ECE-Parser) repairs 61.41\% and 58.61\% of the programs respectively within 20
-seconds, and has median parse times of 7.0 and 13.6 seconds respectively. The
-50 most popular rules admit parsing fewer programs quickly than the do the 20
-most popular. 
-% ECE-Parser, but the extra number of error rules aids the ECE-Parser to parse programs that the other version could not.
+We observe that, using a fixed set of the 20 and 50 most popular rules,
+\toolname (with the \textsc{MinimumCost} ECE-Parser) repairs 61.41\% and 58.61\%
+of the programs respectively within 20 seconds, and has median parse times of
+7.0 and 13.6 seconds respectively. The 50 most popular rules admit parsing fewer
+programs quickly than the 20 most popular.
 
 We also observe that \toolname successfully parses around 38.50\% of the
 programs with its \textsc{AllParses} approach in 20 seconds and has a median
@@ -244,15 +242,15 @@ cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
 
 % FIXME - define word for non-equivalent repairs
 
-As \toolname is intended as an aid for programmers (especially novices) faced with parse errors, we
-are also interested subjective human judgments of the quality and
-helpfulness of our repairs. Around 34\% of repairs produced by \toolname using
-its \textsc{AllParses} approach are identical to the historical human repair and
-thus likely helpful for programmers. However, it may be that \toolname's parses
-(and thus repairs) are still helpful for debugging even when they differ slightly from
-the human repair (\ie \textit{non-equivalent} repairs). To investigate this
-hypothesis, we conduct a human study of the quality and debugging helpfulness of
-\toolname's non-equivalent repairs.
+As \toolname is intended as an aid for programmers (especially novices) faced
+with parse errors, we are also interested in subjective human judgments of the
+quality and helpfulness of our repairs. Around 34\% of repairs produced by
+\toolname using its \textsc{AllParses} approach are identical to the historical
+human repair and thus likely helpful for programmers. However, it may be that
+\toolname's parses (and thus repairs) are still helpful for debugging even when
+they differ slightly from the human repair (\ie \textit{non-equivalent}
+repairs). To investigate this hypothesis, we conduct a human study of the
+quality and debugging helpfulness of \toolname's non-equivalent repairs.
 
 \mypara{Human Study Setup} We recruited participants from two large public
 research institutions (names omitted for blind review) and through Twitter.
@@ -280,24 +278,25 @@ if the debugging hint provided helpful information beyond that in the Python
 error message.
 %\footnote{In this study, we used error messages from Python 3.10. Compared to earlier Python versions, 3.10 includes improved error messages for Syntax Errors.}.
 Participants were unaware of whether any given hint was generated by a human or
-\toolname, and participants were never shown multiple 
+\toolname, and participants were never shown multiple
 fixes to the same program. To be included in the analysis, participants
 had to assess at least four stimuli. Overall, we analyze 527 unique stimuli
 ratings from $n=39$ valid participants (246 for human fixes and 281 for
 \toolname).
 
-\mypara{Overall Results} While humans in our study find that non-equivalent repairs produced by
-\toolname are lower in both quality and debugging helpfulness than those produced
-manually (2.9/5 helpfulness for tool-produced repairs vs. 3.7/5 for human-produced
-repairs, $p < 0.001$), humans still often find \toolname's fixes
-helpful for debugging. Participants found that \toolname repairs contained helpful
-debugging information beyond that contained in the Python Error message 48\% of
-the time (134/281). This additional debugging information was helpful in terms of both
-the content (73\% of the time) and location (55\% of the time).
-Additionally, \toolname fixes are helpful for easy and hard Syntax Errors
-alike: we found no statistically-significant difference between the helpfulness or
-quality of \toolname's repairs for easy (those repaired by the human in under
-40 seconds) or hard parse errors (over 40 seconds).
+\mypara{Overall Results} While humans in our study find that non-equivalent
+repairs produced by \toolname are lower in both quality and debugging
+helpfulness than those produced manually (2.9/5 helpfulness for tool-produced
+repairs vs. 3.7/5 for human-produced repairs, $p < 0.001$), humans still often
+find \toolname's fixes helpful for debugging. Participants found that \toolname
+repairs contained helpful debugging information beyond that contained in the
+Python Error message 48\% of the time (134/281). This additional debugging
+information was helpful in terms of both the content (73\% of the time) and
+location (55\% of the time). Additionally, \toolname fixes are helpful for easy
+and hard Syntax Errors alike: we found no statistically-significant difference
+between the helpfulness or quality of \toolname's repairs for easy (those
+repaired by the human in under 40 seconds) or hard parse errors (over 40
+seconds).
 %p = 0.07 and 0.13 respectively if we have room to include
 Overall, these results indicate that even when \toolname repairs differ from
 historical human repairs, they can still be helpful for debugging.
@@ -305,11 +304,12 @@ historical human repairs, they can still be helpful for debugging.
 \mypara{Individual Stimuli} Beyond an analysis of \toolname's overall quality, we also
 analyze the helpfulness of each stimulus. % FIXME: If room, can add more statistical details if needed
 Of the 48 programs for which we collected sufficient data to permit statistical
-comparison, the historical repair was statistically more helpful for debugging than \toolname's
-repair for 33\% of stimuli (16/48, $p<0.05$). However, we found that \toolname's
-repair was actually \emph{more helpful} for debugging than the human's repair for 15\% of
-stimuli (7/48, $p<0.05$). For the remaining 52\% of stimuli, we found no evidence of a
-statistical difference in the debugging helpfulness of the two repairs.
+comparison, the historical repair was statistically more helpful for debugging
+than \toolname's repair for 33\% of stimuli (16/48, $p<0.05$). However, we found
+that \toolname's repair was actually \emph{more helpful} for debugging than the
+human's repair for 15\% of stimuli (7/48, $p<0.05$). For the remaining 52\% of
+stimuli, we found no evidence of a statistical difference in the debugging
+helpfulness of the two repairs.
 
 \begin{figure}[h]
   \centering

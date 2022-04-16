@@ -6,7 +6,7 @@ We show how $\systemsym$ uses the abstracted token sequences from
 \autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
 $(e_{\bot} \to e)$, that will parse an input program $e_{\bot}$ with syntax
 errors and produce a correct program $e$. We first describe how we extract a
-machine-learning-amendable training set from a corpus of fixed programs and
+machine-learning-amenable training set from a corpus of fixed programs and
 finally how we structure everything to train our model.
 
 
@@ -20,25 +20,24 @@ all the possible error rules that are needed to parse and fix $t^a$. The
 straight-forward approach is to use $\ecepsym$ with all possible error
 production rules for each program $e_{\bot}$ in the dataset. Then, when
 $\ecepsym$ returns with a successful parse, we extract the rules that where used
-to parse program $e_{\bot}$. This approach generates a dataset with the smallest
-possible set of error rules per program as labels, since the original ECE-Parser
-returns the minimum-distance edit parse. However, this approach completely
-ignores the programmer's fix and takes an unreasonable amount of time to parse a
-dataset with millions of programs, due to the inefficient nature of the
-ECE-Parser.
+to parse the program $e_{\bot}$. This approach generates a dataset with the
+smallest possible set of error rules as labels per program, since the original
+ECE-Parser returns the minimum-distance edit parse. However, this approach
+completely ignores the programmer's fix and takes an unreasonable amount of time
+to parse a dataset with millions of programs, due to the inefficient nature of
+the ECE-Parser.
 
 We suggest using an $O(ND)$ difference algorithm \citep{Myers_1986} to get a
 small but still representative set of error production rules for each program
 $e_{\bot}$. We employ this algorithm to find the differences between the input
 \emph{program token sequence} $t^i$, which is the lexed program $e_{\bot}$ and
 the \emph{fixed token sequence} $t^o$, which is the lexed program $e$. This
-algorithm returns changes between the token sequences in the form of
-\emph{inserted or deleted tokens}. It is possible that this algorithm returns a
-sequence of deletions followed by a sequence of insertions, which can in turn
-interpreted as a single \emph{replacement} of tokens. We map these three types
-of changes to the respective error production rules. Let $t^i$ be a sequence
-$t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
-\dots, t^o_k$. We map:
+algorithm returns changes between token sequences in the form of \emph{inserted
+or deleted tokens}. It is possible that this algorithm returns a sequence of
+deletions followed by a sequence of insertions, which can in turn be interpreted
+as a \emph{replacement} of tokens. We map these three types of changes to the
+respective error production rules. Let $t^i$ be a sequence $t^i_1, t^i_2, \dots,
+t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2, \dots, t^o_m$. We map:
 \begin{itemize}
     \item an inserted output token $t^o_j$ to a \emph{deletion} error $E_{t^o_j}
     \rightarrow \epsilon$.
@@ -50,9 +49,10 @@ $t^i_1, t^i_2, \dots, t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2,
 \end{itemize}
 
 In the case of an insertion error, we also include the helper rules $Ins\
-\rightarrow\ Tok\ \vert\ Ins\ Tok$, that can derive any nonempty sequence of
-insertions. To introduce (possible) insertion errors at the end of a program, we
-include the production rules $S' \rightarrow S$ and $S' \rightarrow S\ Ins$.
+\rightarrow\ Tok$ and $Ins\ \rightarrow\ Ins\ Tok$, that can derive any nonempty
+sequence of insertions. To introduce (possible) insertion errors at the end of a
+program, we include the starting production rules $S' \rightarrow S$ and $S'
+\rightarrow S\ Ins$.
 
 The above algorithm, so far, adds only the \emph{terminal error productions}. We
 have to include the \emph{non-terminal error productions} that will invoke the
@@ -60,7 +60,7 @@ terminal ones. If $X \rightarrow a_0b_0a_1b_1 \dots a_mb_m,\ m \geq 0$, is a
 production in $P$ such that $a_i$ is in $N^*$ and $b_i$ is in $\Sigma$, then we
 add the error production $X \rightarrow a_0X_{b_0}a_1X_{b_1} \dots a_mX_{b_m},\
 m \geq 0$ to $P'$, where each $X_{b_i}$, is either a new non-terminal $E_{b_i}$
-that was added with the above algorithm, or just $b_i$ again if it was not
+that was added with the previous algorithm, or just $b_i$ again if it was not
 added.
 
 Finally, we further refine the new small set of error productions for each
@@ -71,7 +71,7 @@ the programmers' fixes might include irrelevant changes to the parse error fix,
 to annotate each program with the appropriate error production rules. We
 implement this error-rule-extracting approach in the function $\diffsym$, which
 extracts the token differences between an erroneous program $e_{\bot}$ and a
-fixed program $e$ and return the appropriate error production rules.
+fixed program $e$ and returns the appropriate error production rules.
 
 
 \subsection{Training and Using a Transformer Classifier}
@@ -107,7 +107,7 @@ with the label $rules$ and is added to $D_{ML}$. The Transformer classifier
 $Model$ is trained with $\trainDLsym$ and the newly extracted dataset $D_{ML}$,
 which is finally returned by the algorithm. Finally, the $\trainsym$ing
 procedure can be performed offline and thus won't affect the performance of the
-final repair.
+final program repair.
 
 % \mypara{Predicting Error Rules}
 %

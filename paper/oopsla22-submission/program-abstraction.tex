@@ -73,14 +73,14 @@ $S(k)$, where $i < k \leq n$.
 Let, again, $t^i_1, t^i_2, \dots, t^i_j, \dots, t^i_k, \dots, t^i_n$ be the
 input token sequence $t^i$, where at location $k$ there is a parse error and the
 parser has exhausted all possibilities and can not add any more rules in state
-$S(k + 1)$. We want to abstract $t^i$ by getting the longest possible part of
-the program that has a partial parse, \ie by finding the largest $j$ for which
-there is a rule $(X \rightarrow \alpha \cdot \beta, 0) \in S(j)$. We use this
-rule for $X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in $t^i$ with $\alpha$,
-thus getting an abstracted sequence $t^a$. In the same manner, we use the
-longest possible partial parses that we can extract from the chart to abstract
-$t^i_{j+1}, \dots, t^i_k$, until we reach the parse error at location $k$, where
-$S(k + 1) = \emptyset$.
+$S(k + 1)$, \ie $S(k + 1) = \emptyset$. We want to abstract $t^i$ by getting the
+longest possible part of the program that has a partial parse, \ie by finding
+the largest $j$ for which there is a rule $(X \rightarrow \alpha \cdot \beta, 0)
+\in S(j)$. We use this rule for $X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in
+$t^i$ with $\alpha$, thus getting an abstracted sequence $t^a$. In the same
+manner, we use the longest possible partial parses that we can extract from the
+chart to abstract $t^i_{j+1}, \dots, t^i_k$, until we reach the parse error at
+location $k$.
 
 % \mypara{Problem: Multiple Partial Parses}
 %
@@ -96,10 +96,10 @@ We propose selecting the most \emph{probable parse} with the aid of a PCFG.
 \subsection{Probabilistic Context-Free Grammars}
 \label{sec:prog-abstract:pcfg}
 We learn a PCFG from a large corpus of programs $\List{e}, e \in L(G)$, that
-belong to a language $L(G)$ that a grammar $G$ defines, with $\learnPCFGsym$ as
-shown in \autoref{fig:api}. We use the learned PCFG with an augmented Earley
-parser in $\partialsym$ to abstract a program $e_{\bot}$ into a abstract token
-sequence $t^a$.
+belong to a language $L(G)$, that a grammar $G$ defines, with the
+$\learnPCFGsym$ procedure as shown in \autoref{fig:api}. We use the learned PCFG
+with an augmented Earley parser in $\partialsym$ to abstract a program
+$e_{\bot}$ into a abstract token sequence $t^a$.
 
 % \mypara{Learning a PCFG}
 %
@@ -119,7 +119,7 @@ Given a dataset of programs $\List{e}, e \in L(G)$ that can be parsed, let
 $count(X \rightarrow \alpha)$ be the number of times the production rule $X
 \rightarrow \alpha$ has been used to generate a final complete parse, while
 parsing $\List{e}$, and $count(X)$ be the number of times the non-terminal $X$
-has been seen in left side of a used production rule. The probability for a
+has been seen in the left side of a used production rule. The probability for a
 production rule $X \rightarrow \alpha$ is then defined as:
 
 \begin{equation*}
@@ -134,17 +134,17 @@ production rule $X \rightarrow \alpha$ is then defined as:
 
 $\learnPCFGsym$ invokes an instrumented Earley parser to calculate all the
 values $count(X \rightarrow \alpha), \forall X \rightarrow \alpha: P$ and
-$count(X), \forall X: N$. The instrumented parser keeps a \emph{global record}
-of these values, while parsing the dataset $\List{e}$ of programs. Finally,
-$\learnPCFGsym$ outputs a PCFG that is based on the original grammar $G$ that
-was used to parse the dataset with the learned probabilities $W$.
+$count(X), \forall X: N$. The \emph{instrumented parser} keeps a \emph{global
+record} of these values, while parsing the dataset $\List{e}$ of programs.
+Finally, $\learnPCFGsym$ outputs a PCFG that is based on the original grammar
+$G$ that was used to parse the dataset with the learned probabilities $W$.
 
 \subsection{Abstracted Token Sequences}
 
 Given a program $e_{\bot}$ with a parse error and a learned PCFG, $\partialsym$
 will generate an abstracted token sequence $t^a$. The PCFG will be used with an
-augmented Earley parser to disambiguate partial parses and choose one, in order
-to produce an abstracted token sequence as described in
+\emph{augmented Earley parser} to disambiguate partial parses and choose one, in
+order to produce an abstracted token sequence as described in
 \S~\ref{sec:prog-abstract:partial}.
 
 % \mypara{Probabilistic Earley Parsing}

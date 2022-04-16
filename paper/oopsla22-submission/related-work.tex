@@ -72,7 +72,7 @@ syntactical errors in \textsc{C} programs. It relies on stacked gated recurrent
 units (GRUs) with attention and applies some simple abstraction over the
 terminal tokens. The input programs are broken into subsequences for each line
 and the model gets as input all the line subsequences with their associated line
-numbers. \textsc{DeepFix} only predicts single line fixes. 
+numbers. \textsc{DeepFix} only predicts single line fixes.
 The predictions are applied iteratively multiple times, if multiple
 parse errors exist or until the parse error is fixed. \textsc{DeepFix} struggles
 with the same problems as previous work, as it solely relies on the sequence
@@ -86,7 +86,7 @@ create proper nested blocks of code, called \textsc{BlockFix}, and the second
 one, called \textsc{FragFix}, repairs and parses fragments of code (\eg program
 statements) within a repaired block. \textsc{BlockFix} tokenizes input program
 block in a similar manner to our abstracted token sequences, by abstracting
-identifiers, constants, expressions, etc., and is trained on pairs of valid and manually-corrupted 
+identifiers, constants, expressions, etc., and is trained on pairs of valid and manually-corrupted
 blocks. On the other hand, \textsc{FragFix} repairs
 on a program statement level within blocks (mostly focusing on missing semicolons
 and commas), by using serialized versions of ASTs and error hints manually
