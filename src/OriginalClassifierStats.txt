@@ -1,0 +1,27 @@
+>> Parameters:
+embed_dim = 128
+num_heads = 8
+ff_dim = 256
+transformer_blks = 2
+dense_dims = [256, 128]
+------------------------------------------
+>> Test set results:
+Top 10 predictions accuracy: 56.712132089016514
+Top 10 predictions acc. (not popular): 12.875536480686696
+Top 20 predictions accuracy: 68.48186510785219
+Top 20 predictions acc. (not popular): 32.975679542203146
+Top 50 predictions accuracy: 87.1329436297132
+Top 50 predictions acc. (not popular): 64.94992846924177
+Best predictions accuracy: 70.8645267152087
+Best predictions acc. (not popular): 35.336194563662374
+Num. of non-popular (not top 50): 1398 (4.778997025946057%)
+Avg. Number of best predictions: 18.33709363142242
+Median Number of best predictions: 19
+Min Number of best predictions: 4
+Max Number of best predictions: 25
+Top 10 preds acc. (at least one): 90.31894164701056
+Top 20 preds acc. (at least one): 94.67746897754077
+Top 20 preds acc. (at least one) (not popular): 42.63233190271817
+Top 50 preds acc. (at least one): 98.43093016100913
+Best preds acc. (at least one): 95.10135712576488
+Best preds acc. (at least one) (not popular): 44.70672389127325

@@ -1,0 +1,231 @@
+Dataset size: 12918/15000
+Parse accuracy within time limit (%): 85.57052175259328
+Timed out (%): 13.88
+=> Total parse accuracy (%): 73.69333333333333
+=> Not popular parse accuracy (%): 74.8905109489051
+=> Mean parse time (sec): 73.88378756392777
+=> Median parse time (sec): 10.630372665997129
+=> Avg. parse time / 50 tokens (sec): 60.805633880261794
+=> Dataset parsed faster than user (%): 72.60411828456418
+=> Mean parse time speedup (sec): 1886.9844582945645
+=> Median parse time speedup (sec): 28.35601081699133
+=> Same as user accuracy (%): 39.053333333333335
+=> All locations fixed accuracy (%): 52.93333333333333
+=> Any locations fixed accuracy (%): 61.9
+=> Average used error rule position: 8.413126666924356
+1 sec: Parse accuracy = 15.722248026010218
+2 sec: Parse accuracy = 26.149558755225268
+3 sec: Parse accuracy = 31.514166279609846
+4 sec: Parse accuracy = 35.632450843783865
+5 sec: Parse accuracy = 38.930174949682616
+6 sec: Parse accuracy = 41.747948598854315
+7 sec: Parse accuracy = 43.96191360891779
+8 sec: Parse accuracy = 45.70366929865304
+9 sec: Parse accuracy = 47.62347112556123
+10 sec: Parse accuracy = 49.11751045053414
+11 sec: Parse accuracy = 50.472209320328226
+12 sec: Parse accuracy = 51.71853228053878
+13 sec: Parse accuracy = 52.88744387676111
+14 sec: Parse accuracy = 54.08732001857873
+15 sec: Parse accuracy = 54.915621613252824
+16 sec: Parse accuracy = 55.82907570831398
+17 sec: Parse accuracy = 56.518036847809256
+18 sec: Parse accuracy = 57.25344480569748
+19 sec: Parse accuracy = 57.95014708159158
+20 sec: Parse accuracy = 58.72426072147391
+21 sec: Parse accuracy = 59.47515095215978
+22 sec: Parse accuracy = 60.17185322805388
+23 sec: Parse accuracy = 60.829849821953864
+24 sec: Parse accuracy = 61.371729369871495
+25 sec: Parse accuracy = 61.9677968725809
+26 sec: Parse accuracy = 62.67998142127264
+27 sec: Parse accuracy = 63.190896423594985
+28 sec: Parse accuracy = 63.725034835113796
+29 sec: Parse accuracy = 64.23594983743614
+30 sec: Parse accuracy = 64.84749961294318
+31 sec: Parse accuracy = 65.32745006967022
+32 sec: Parse accuracy = 65.83836507199257
+33 sec: Parse accuracy = 66.34153893791608
+34 sec: Parse accuracy = 66.81374825824432
+35 sec: Parse accuracy = 67.34014553336429
+36 sec: Parse accuracy = 67.76590803529959
+37 sec: Parse accuracy = 68.18392940083605
+38 sec: Parse accuracy = 68.57098622077721
+39 sec: Parse accuracy = 68.9348196315219
+40 sec: Parse accuracy = 69.37606440625484
+41 sec: Parse accuracy = 69.74763895339836
+42 sec: Parse accuracy = 70.14243690973835
+43 sec: Parse accuracy = 70.49852918408422
+44 sec: Parse accuracy = 70.79269236723951
+45 sec: Parse accuracy = 71.21845486917479
+46 sec: Parse accuracy = 71.40424214274655
+47 sec: Parse accuracy = 71.69840532590185
+48 sec: Parse accuracy = 71.99256850905714
+49 sec: Parse accuracy = 72.20932032822418
+50 sec: Parse accuracy = 72.39510760179594
+51 sec: Parse accuracy = 72.65056510295712
+52 sec: Parse accuracy = 72.93698714971357
+53 sec: Parse accuracy = 73.1769623780771
+54 sec: Parse accuracy = 73.43241987923827
+55 sec: Parse accuracy = 73.63368942560768
+56 sec: Parse accuracy = 73.85818238117356
+57 sec: Parse accuracy = 74.12912215513238
+58 sec: Parse accuracy = 74.40780306549001
+59 sec: Parse accuracy = 74.59359033906178
+60 sec: Parse accuracy = 74.82582443102648
+61 sec: Parse accuracy = 74.98838829540176
+62 sec: Parse accuracy = 75.19739897817
+63 sec: Parse accuracy = 75.38318625174176
+64 sec: Parse accuracy = 75.57671466171234
+65 sec: Parse accuracy = 75.84765443567116
+66 sec: Parse accuracy = 76.1263353460288
+67 sec: Parse accuracy = 76.36631057439232
+68 sec: Parse accuracy = 76.55209784796408
+69 sec: Parse accuracy = 76.69917943954172
+70 sec: Parse accuracy = 76.90044898591113
+71 sec: Parse accuracy = 77.03204830469113
+72 sec: Parse accuracy = 77.25654126025701
+73 sec: Parse accuracy = 77.38039944263818
+74 sec: Parse accuracy = 77.57392785260876
+75 sec: Parse accuracy = 77.8835733085617
+76 sec: Parse accuracy = 78.06936058213346
+77 sec: Parse accuracy = 78.1854776281158
+78 sec: Parse accuracy = 78.33255921969345
+79 sec: Parse accuracy = 78.46415853847344
+80 sec: Parse accuracy = 78.63446353924756
+81 sec: Parse accuracy = 78.80476854002167
+82 sec: Parse accuracy = 78.95185013159931
+83 sec: Parse accuracy = 79.1453785415699
+84 sec: Parse accuracy = 79.2769778603499
+85 sec: Parse accuracy = 79.45502399752283
+86 sec: Parse accuracy = 79.60210558910047
+87 sec: Parse accuracy = 79.7414460442793
+88 sec: Parse accuracy = 79.9427155906487
+89 sec: Parse accuracy = 80.11302059142282
+90 sec: Parse accuracy = 80.22913763740517
+91 sec: Parse accuracy = 80.42266604737576
+92 sec: Parse accuracy = 80.54652422975693
+93 sec: Parse accuracy = 80.67812354853693
+94 sec: Parse accuracy = 80.7710171853228
+95 sec: Parse accuracy = 80.87165195850751
+96 sec: Parse accuracy = 80.99551014088868
+97 sec: Parse accuracy = 81.10388605047221
+98 sec: Parse accuracy = 81.27419105124632
+99 sec: Parse accuracy = 81.38256696082985
+100 sec: Parse accuracy = 81.45223718841926
+101 sec: Parse accuracy = 81.5296485524075
+102 sec: Parse accuracy = 81.63802446199102
+103 sec: Parse accuracy = 81.72317696237808
+104 sec: Parse accuracy = 81.84703514475925
+105 sec: Parse accuracy = 81.94766991794395
+106 sec: Parse accuracy = 82.0637869639263
+107 sec: Parse accuracy = 82.1953862827063
+108 sec: Parse accuracy = 82.28827991949218
+109 sec: Parse accuracy = 82.41987923827217
+110 sec: Parse accuracy = 82.58244310264747
+111 sec: Parse accuracy = 82.72178355782629
+112 sec: Parse accuracy = 82.81467719461217
+113 sec: Parse accuracy = 82.8920885586004
+114 sec: Parse accuracy = 82.98498219538628
+115 sec: Parse accuracy = 83.10884037776745
+116 sec: Parse accuracy = 83.14754605976157
+117 sec: Parse accuracy = 83.23269856014863
+118 sec: Parse accuracy = 83.36429787892862
+119 sec: Parse accuracy = 83.44945037931568
+120 sec: Parse accuracy = 83.52686174330391
+121 sec: Parse accuracy = 83.60427310729214
+122 sec: Parse accuracy = 83.73587242607215
+123 sec: Parse accuracy = 83.8210249264592
+124 sec: Parse accuracy = 83.92165969964391
+125 sec: Parse accuracy = 83.99132992723332
+126 sec: Parse accuracy = 84.0532590184239
+127 sec: Parse accuracy = 84.10744697321567
+128 sec: Parse accuracy = 84.22356401919802
+129 sec: Parse accuracy = 84.36290447437683
+130 sec: Parse accuracy = 84.47902152035918
+131 sec: Parse accuracy = 84.59513856634153
+132 sec: Parse accuracy = 84.64158538473448
+133 sec: Parse accuracy = 84.72673788512154
+134 sec: Parse accuracy = 84.79640811271095
+135 sec: Parse accuracy = 84.90478402229448
+136 sec: Parse accuracy = 84.95897197708624
+137 sec: Parse accuracy = 85.03638334107447
+138 sec: Parse accuracy = 85.12927697786034
+139 sec: Parse accuracy = 85.18346493265211
+140 sec: Parse accuracy = 85.21442947824741
+141 sec: Parse accuracy = 85.26861743303917
+142 sec: Parse accuracy = 85.29958197863446
+143 sec: Parse accuracy = 85.3460287970274
+144 sec: Parse accuracy = 85.42344016101563
+145 sec: Parse accuracy = 85.48536925220623
+146 sec: Parse accuracy = 85.55503947979564
+147 sec: Parse accuracy = 85.62470970738505
+148 sec: Parse accuracy = 85.69437993497445
+149 sec: Parse accuracy = 85.7408267533674
+150 sec: Parse accuracy = 85.77953243536152
+151 sec: Parse accuracy = 85.84920266295092
+152 sec: Parse accuracy = 85.89564948134387
+153 sec: Parse accuracy = 85.96531970893327
+154 sec: Parse accuracy = 86.03498993652268
+155 sec: Parse accuracy = 86.1433658461062
+156 sec: Parse accuracy = 86.2362594828921
+157 sec: Parse accuracy = 86.26722402848738
+158 sec: Parse accuracy = 86.29818857408267
+159 sec: Parse accuracy = 86.35237652887444
+160 sec: Parse accuracy = 86.42204675646384
+161 sec: Parse accuracy = 86.47623471125561
+162 sec: Parse accuracy = 86.55364607524385
+163 sec: Parse accuracy = 86.6078340300356
+164 sec: Parse accuracy = 86.6697631212262
+165 sec: Parse accuracy = 86.72395107601795
+166 sec: Parse accuracy = 86.78588016720855
+167 sec: Parse accuracy = 86.84780925839914
+168 sec: Parse accuracy = 86.91747948598854
+169 sec: Parse accuracy = 86.97940857717913
+170 sec: Parse accuracy = 87.04907880476854
+171 sec: Parse accuracy = 87.11874903235795
+172 sec: Parse accuracy = 87.19616039634619
+173 sec: Parse accuracy = 87.28905403313206
+174 sec: Parse accuracy = 87.35098312432265
+175 sec: Parse accuracy = 87.42839448831089
+176 sec: Parse accuracy = 87.45935903390618
+177 sec: Parse accuracy = 87.5290292614956
+178 sec: Parse accuracy = 87.58321721628735
+179 sec: Parse accuracy = 87.68385198947206
+180 sec: Parse accuracy = 87.79222789905558
+Costs for user repair:Cost = 1: Test set % = 52.52397322236295
+Cost = 2: Test set % = 91.39677944635426
+Cost = 3: Test set % = 100.0
+Cost = 4: Test set % = 100.0
+Cost = 5: Test set % = 100.0
+Cost = 6: Test set % = 100.0
+Cost = 7: Test set % = 100.0
+Cost = 8: Test set % = 100.0
+Cost = 9: Test set % = 100.0
+Cost = 10: Test set % = 100.0
+Costs for pylint repair:Cost = 1: Test set % = 52.134973765152886
+Cost = 2: Test set % = 88.51094626379592
+Cost = 3: Test set % = 100.0
+Cost = 4: Test set % = 100.0
+Cost = 5: Test set % = 100.0
+Cost = 6: Test set % = 100.0
+Cost = 7: Test set % = 100.0
+Cost = 8: Test set % = 100.0
+Cost = 9: Test set % = 100.0
+Cost = 10: Test set % = 100.0
+Top 5 error rules: Test set % = 36.02315903745251
+Top 10 error rules: Test set % = 44.92491405825945
+Top 15 error rules: Test set % = 66.1570472227248
+Top 20 error rules: Test set % = 100.0
+User solution in:
+Top 1 repairs: Test set % = 31.418491043965986
+Top 2 repairs: Test set % = 34.37669621856342
+Top 3 repairs: Test set % = 36.27646100958929
+Top 4 repairs: Test set % = 37.117785417043606
+Top 5 repairs: Test set % = 37.95910982449792
+Top 6 repairs: Test set % = 41.76768590555455
+Top 7 repairs: Test set % = 41.84910439659852
+Top 8 repairs: Test set % = 42.02098787769133
+Top 9 repairs: Test set % = 42.09335986973041
+Top 10 repairs: Test set % = 42.09335986973041
+Top 10+ repairs: Test set % = 100.0

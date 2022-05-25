@@ -1,0 +1,201 @@
+Err_Literals -> H Literals
+Err_Close_Paren -> 
+InsertErr -> _NAME_
+InsertErr -> _DEDENT_
+InsertErr -> _INDENT_
+Err_Colon -> 
+Err_Open_Paren -> 
+Err_Newline -> H Newline
+Err_Dedent -> 
+Err_Indent -> 
+Err_Literals -> 
+InsertErr -> (
+InsertErr -> :
+Err_Endmarker -> H Endmarker
+Err_Comp_Op -> Err_Tag
+Err_Tag -> =
+InsertErr -> )
+Err_Open_Paren -> H Open_Paren
+Err_Close_Paren -> H Close_Paren
+InsertErr -> =
+InsertErr -> if
+InsertErr -> _NUMBER_
+InsertErr -> _STRING_
+InsertErr -> _UNKNOWN_
+InsertErr -> else
+Err_Tag -> _NAME_
+Err_Colon -> H Colon
+Err_Return_Keyword -> H Return_Keyword
+Err_Comma -> 
+Err_If_Keyword -> H If_Keyword
+Err_For_Keyword -> H For_Keyword
+InsertErr -> for
+Err_Comp_Op -> H Comp_Op
+Err_Tag -> _UNKNOWN_
+Err_Assign_Op -> 
+Err_Close_Sq_Bracket -> 
+Err_Close_Paren -> Err_Tag
+Err_Comma -> H Comma
+Err_Colon -> Err_Tag
+Err_Comma -> Err_Tag
+InsertErr -> def
+InsertErr -> [
+Err_Tag -> (
+Err_Open_Paren -> Err_Tag
+InsertErr -> ]
+Err_Literals -> Err_Tag
+Err_If_Keyword -> Err_Tag
+Err_Tag -> :
+InsertErr -> elif
+Err_Arith_Op -> 
+Err_Def_Keyword -> 
+InsertErr -> return
+Err_Tag -> _INDENT_
+Err_Assign_Op -> H Assign_Op
+Err_Comp_Op -> 
+InsertErr -> .
+InsertErr -> ,
+Err_Arith_Op -> H Arith_Op
+Err_Dedent -> Err_Tag
+Err_Open_Sq_Bracket -> 
+Err_Dedent -> H Dedent
+Err_If_Keyword -> 
+Err_While_Keyword -> H While_Keyword
+Err_Tag -> elif
+Err_Simple_Name -> 
+Err_Tag -> else
+Err_MulDiv_Op -> H MulDiv_Op
+Err_Return_Keyword -> 
+Err_In_Keyword -> 
+InsertErr -> while
+Err_Arith_Op -> Err_Tag
+Err_Open_Sq_Bracket -> H Open_Sq_Bracket
+Err_Assign_Op -> Err_Tag
+Err_Vfpdef -> Err_Tag
+Err_Indent -> Err_Tag
+Err_Tag -> _NUMBER_
+Err_MulDiv_Op -> 
+Err_Def_Keyword -> H Def_Keyword
+Err_Close_Sq_Bracket -> H Close_Sq_Bracket
+Err_Simple_Name -> H Simple_Name
+Err_Tag -> _STRING_
+Err_For_Keyword -> 
+Err_Tag -> ;
+Err_In_Keyword -> Err_Tag
+Err_Star_Op -> 
+Err_Tag -> for
+Err_Tag -> _DEDENT_
+InsertErr -> ==
+Err_Else_Keyword -> H Else_Keyword
+Err_Close_Sq_Bracket -> Err_Tag
+Err_Return_Keyword -> Err_Tag
+Err_Elif_Keyword -> Err_Tag
+Err_Def_Keyword -> Err_Tag
+Err_Break_Stmt -> H Break_Stmt
+Err_Tag -> )
+InsertErr -> <
+Err_While_Keyword -> Err_Tag
+InsertErr -> +=
+Err_MulDiv_Op -> Err_Tag
+InsertErr -> +
+InsertErr -> >
+Err_Else_Keyword -> Err_Tag
+Err_Tag -> if
+InsertErr -> %
+Err_While_Keyword -> 
+Err_Close_Curl_Bracket -> 
+Err_And_Bool_Op -> Err_Tag
+InsertErr -> in
+Err_Unary_Op -> Err_Tag
+Err_Open_Sq_Bracket -> Err_Tag
+Err_Or_Bool_Op -> Err_Tag
+Err_For_Keyword -> Err_Tag
+InsertErr -> try
+InsertErr -> and
+Err_Elif_Keyword -> H Elif_Keyword
+Err_Tag -> +=
+InsertErr -> global
+Err_Vfpdef -> H Vfpdef
+Err_Break_Stmt -> 
+InsertErr -> -
+InsertErr -> }
+Err_Dot -> 
+Err_Tag -> ,
+InsertErr -> *
+Err_Tag -> .
+Err_Simple_Name -> Err_Tag
+InsertErr -> True
+InsertErr -> is
+Err_Tag -> [
+Err_Tag -> return
+InsertErr -> {
+Err_Else_Keyword -> 
+Err_In_Keyword -> H In_Keyword
+InsertErr -> break
+InsertErr -> ;
+Err_Open_Curl_Bracket -> 
+Err_Tag -> ]
+Err_Close_Curl_Bracket -> H Close_Curl_Bracket
+Err_Tag -> ...
+InsertErr -> except
+Err_Vfpdef -> 
+Err_Aug_Assign -> H Aug_Assign
+InsertErr -> /
+Err_And_Bool_Op -> 
+Err_And_Bool_Op -> H And_Bool_Op
+InsertErr -> ...
+Err_Dot -> H Dot
+Err_Tag -> in
+Err_Tag -> not
+InsertErr -> or
+Err_Pass_Stmt -> 
+Err_Open_Curl_Bracket -> H Open_Curl_Bracket
+InsertErr -> !=
+Err_Unary_Op -> H Unary_Op
+Err_Tag -> }
+Err_Or_Bool_Op -> H Or_Bool_Op
+Err_Continue_Stmt -> H Continue_Stmt
+Err_Not_Bool_Op -> H Not_Bool_Op
+InsertErr -> from
+InsertErr -> False
+Err_Or_Bool_Op -> 
+InsertErr -> lambda
+InsertErr -> not
+Err_Elif_Keyword -> 
+Err_Tag -> <
+Err_Tag -> del
+InsertErr -> class
+InsertErr -> >=
+InsertErr -> <=
+Err_Semicolon -> 
+Err_Tag -> def
+Err_Tag -> {
+InsertErr -> del
+Err_Double_Star_Op -> H Double_Star_Op
+Err_Tag -> while
+Err_Close_Curl_Bracket -> Err_Tag
+Err_Class_Keyword -> Err_Tag
+Err_Import_Keyword -> H Import_Keyword
+InsertErr -> as
+InsertErr -> continue
+Err_Tag -> ==
+Err_Continue_Stmt -> 
+InsertErr -> //
+InsertErr -> **
+Err_Tag -> try
+Err_Tag -> is
+Err_Aug_Assign -> 
+Err_Semicolon -> Err_Tag
+Err_Not_Bool_Op -> Err_Tag
+Err_Tag -> >
+Err_Tag -> break
+Err_Star_Op -> Err_Tag
+Err_Dot -> Err_Tag
+InsertErr -> import
+Err_Tag -> /
+Err_Del_Keyword -> H Del_Keyword
+Err_Tag -> pass
+InsertErr -> pass
+InsertErr -> _arrow_
+Err_Tag -> or
+Err_Star_Op -> H Star_Op
