@@ -1,5 +1,0 @@
-Dataset size: 38262/38600
-Parse accuracy within time limit (%): 90.08154304531912
-Timed out (%): 0.8756476683937824
-=> Total parse accuracy (%): 89.29274611398964
-2.5539961319324656
