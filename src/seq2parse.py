@@ -41,9 +41,9 @@ if __name__ == "__main__":
 
     if repaired_prog:
         result["status"] = "error"
-        result["errors"] = [{ "message": repaired_prog
-                            , "start"  : {"line": 0, "column": 0}
-                            , "stop"   : {"line": 1, "column": 0}
+        result["errors"] = [{ "message": "repaired_prog"
+                            , "start"  : {"line": 1, "column": 1}
+                            , "stop"   : {"line": 1, "column": 10}
                             }]
 
     with open(inputPath.with_suffix(".json"), "w") as out_file:
