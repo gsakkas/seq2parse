@@ -43,16 +43,8 @@ def read_sample(samp):
     else:
         return (samp_1[0], samp_1[1], samp_2, int(samp_1[3]), float(samp_1[4]), [samp_1[5]], samp_1[6], samp_1[7], samp_1[8], samp_1[9])
 
-
-if __name__ == "__main__":
-    grammarFile = sys.argv[1]
-    inputPath = Path(sys.argv[2])
-    modelsDir = Path(sys.argv[3])
-    gpuToUse = '/device:GPU:' + sys.argv[4]
+def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog):
     saved_model_file = join(modelsDir, 'transformer-classifier-partial-parses-probs.h5')
-
-    input_prog = inputPath.read_text()
-
     INTERIM_GRAMMAR = earleyparser_interm_repr.read_grammar(grammarFile)
     rules_used = {}
     with open(join(modelsDir, "rules_usage.json"), "r") as in_file:
@@ -135,6 +127,18 @@ if __name__ == "__main__":
             else:
                 sys.exit(-1)
             y_pred = transformerClfr.predict(xs_test)
-            print(labelize(y_pred[0], 20))
+            return labelize(y_pred[0], 20)
     except RuntimeError as e:
         print(e)
+
+
+if __name__ == "__main__":
+    grammarFile = sys.argv[1]
+    inputPath = Path(sys.argv[2])
+    modelsDir = Path(sys.argv[3])
+    gpuToUse = '/device:GPU:' + sys.argv[4]
+
+    input_prog = inputPath.read_text()
+
+    erules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
+    print(erules)

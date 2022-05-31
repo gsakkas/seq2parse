@@ -3,6 +3,7 @@ from copy import deepcopy
 from pathlib import Path
 import json
 from ecpp_individual_grammar import read_grammar, fixed_lexed_prog, get_token_list, get_actual_token_list, repair_prog
+from predict_eccp_classifier_partials import predict_error_rules
 
 def has_parse(egrammar, max_cost, tokns, eruls, actual_tokns):
     upd_grammar = deepcopy(egrammar)
@@ -18,7 +19,9 @@ if __name__ == "__main__":
     # For single (erroneous) file:
     # >>> python seq2parse.py python-grammar.txt input_prog.py repairs/fix_0.py test-set-top-20-partials-probs.txt 20
     grammarFile = sys.argv[1]
-    inputPath = Path(sys.argv[2])
+    modelsDir = Path(sys.argv[2])
+    gpuToUse = '/device:GPU:' + sys.argv[3]
+    inputPath = Path(sys.argv[4])
 
     max_cost = 5
     input_prog = inputPath.read_text()
@@ -29,7 +32,7 @@ if __name__ == "__main__":
     terminals = ERROR_GRAMMAR.get_alphabet()
 
     prog_tokens = get_token_list(input_prog, terminals)
-    error_rules = ['Err_Close_Paren -> H Close_Paren', 'Err_Close_Sq_Bracket -> H Close_Sq_Bracket', 'Err_Colon -> H Colon', 'Err_Comma -> H Comma', 'Err_Comp_Op -> H Comp_Op', 'Err_Literals -> ', 'Err_Literals -> Err_Tag', 'Err_Literals -> H Literals', 'Err_MulDiv_Op -> H MulDiv_Op', 'Err_Newline -> H Newline', 'Err_Open_Paren -> ', 'Err_Return_Keyword -> ', 'InsertErr -> %', 'InsertErr -> )', 'InsertErr -> *', 'InsertErr -> +', 'InsertErr -> ,', 'InsertErr -> -', 'InsertErr -> :', 'InsertErr -> =']
+    error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
     repaired_prog = has_parse(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)
@@ -41,7 +44,7 @@ if __name__ == "__main__":
 
     if repaired_prog:
         result["status"] = "error"
-        result["errors"] = [{ "message": "repaired_prog"
+        result["errors"] = [{ "message": repaired_prog[:-3].replace("\\n", '\n')
                             , "start"  : {"line": 1, "column": 1}
                             , "stop"   : {"line": 1, "column": 10}
                             }]
