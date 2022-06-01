@@ -5,7 +5,7 @@ import json
 from ecpp_individual_grammar import read_grammar, fixed_lexed_prog, get_token_list, get_actual_token_list, repair_prog
 from predict_eccp_classifier_partials import predict_error_rules
 
-def has_parse(egrammar, max_cost, tokns, eruls, actual_tokns):
+def repair(egrammar, max_cost, tokns, eruls, actual_tokns):
     upd_grammar = deepcopy(egrammar)
     upd_grammar.update_error_grammar_with_erules(eruls)
     _, fixed_seq, fixed_seq_ops, _, _ = fixed_lexed_prog(tokns, upd_grammar, max_cost)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
-    repaired_prog = has_parse(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)
+    repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)
 
     result = { "status": "safe"
              , "errors": []
@@ -43,14 +43,14 @@ if __name__ == "__main__":
              }
 
     if repaired_prog:
-        result["status"] = "error"
+        result["status"] = "unsafe"
         result["errors"] = [{ "message": repaired_prog[:-3].replace("\\n", '\n')
                             , "start"  : {"line": 1, "column": 1}
                             , "stop"   : {"line": 1, "column": 10}
                             }]
 
-    with open(inputPath.with_suffix(".json"), "w") as out_file:
-        json.dump(result, out_file, indent=4)
+    with open(inputPath.with_suffix(".py.json"), "w") as out_file:
+        json.dump(result, out_file)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     print("-------------Original Buggy Program---------------")
