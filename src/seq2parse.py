@@ -1,5 +1,7 @@
 import sys
 from copy import deepcopy
+from os import mkdir
+from os.path import join, exists
 from pathlib import Path
 import json
 from ecpp_individual_grammar import read_grammar, fixed_lexed_prog, get_token_list, get_actual_token_list, repair_prog
@@ -48,8 +50,12 @@ if __name__ == "__main__":
                             , "start"  : {"line": 1, "column": 1}
                             , "stop"   : {"line": 1, "column": 10}
                             }]
-
-    with open(inputPath.with_suffix(".py.json"), "w") as out_file:
+    tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
+    if not exists(tmpDir):
+        mkdir(tmpDir)
+    newInputPath = Path(join(tmpDir, inputPath.name))
+    print(newInputPath)
+    with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
         json.dump(result, out_file)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
