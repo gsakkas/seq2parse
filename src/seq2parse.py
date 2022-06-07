@@ -79,23 +79,27 @@ if __name__ == "__main__":
     error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
-    repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)[:-3].replace("\\n", '\n')
+    repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens).replace("\\n", '\n')
+    diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
+    line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, change in get_changes(list(diff_lines))]
 
     result = { "status": "safe"
              , "errors": []
              , "types": {}
              }
 
-    if repaired_prog:
-        diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
-        line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, change in get_changes(list(diff_lines))]
-
+    if line_changes:
         result["status"] = "unsafe"
         for ch_type, line_num, length, change in line_changes:
-            result["errors"] = [{ "message": ch_type + " line " + str(line_num) + " with:\n" + change.rstrip()
-                                , "start"  : {"line": line_num, "column": 1}
-                                , "stop"   : {"line": line_num, "column": length}
-                                }]
+            msg = ch_type + " line " + str(line_num) + " with:\n" + change.rstrip()
+            if ch_type == 'Add':
+                msg = ch_type + " on line " + str(line_num) + ":\n" + change.rstrip()
+            elif ch_type == 'Delete':
+                msg = ch_type + " on line " + str(line_num) + ":\n" + change.rstrip()
+            result["errors"].append({ "message": msg
+                                    , "start"  : {"line": line_num, "column": 1}
+                                    , "stop"   : {"line": line_num, "column": length if length > 1 else 10}
+                                    })
     tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
     if not exists(tmpDir):
         mkdir(tmpDir)
