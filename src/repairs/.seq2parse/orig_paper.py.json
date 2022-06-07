@@ -1,5 +1,5 @@
 {
-    "status": "error",
+    "status": "unsafe",
     "errors": [
         {
             "message": "def foo1(a): \n    a += 14 \n    return a + 42 \ndef foo2(a): \n    print(a) \n    return a + 42 \ndef foo3(a): \n    b = foo2(foo1(a)) \n    return b \ndef bar(a): \n    b = foo3(a) + 17 \n    return b \n   ",

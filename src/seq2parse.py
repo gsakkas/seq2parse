@@ -56,7 +56,7 @@ if __name__ == "__main__":
     newInputPath = Path(join(tmpDir, inputPath.name))
     print(newInputPath)
     with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
-        json.dump(result, out_file)
+        json.dump(result, out_file, indent=4)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     print("-------------Original Buggy Program---------------")
