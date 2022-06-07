@@ -942,14 +942,14 @@ class Lexer():
 
     def remove_comments_and_strings(self, input_prog):
         prog = input_prog.replace("\r\n", "\n")
-        prog = re.sub(re.compile(r"\\\s*?\n") , "" , prog)
+        prog = re.sub(re.compile(r"\\\s*?\n") , "\n" , prog)
         # Temporary replacements
         prog = prog.replace("\\\\", "__temporary__")
         prog = prog.replace("\\\"", "__double_quote__")
         prog = prog.replace("\\\'", "__single_quote__")
         prog = prog.replace("__temporary__", "\\\\")
         # String and comment replacements
-        prog = re.sub(re.compile(r"\n\s*#.*?\n") , "\n" , prog)
+        prog = re.sub(re.compile(r"\n\s*#.*?\n") , "\n\n" , prog)
         prog = re.sub(re.compile(r"\"\"\".*?\"\"\"", flags=re.DOTALL) , "__triple_dstring__" , prog)
         prog = re.sub(re.compile(r"\'\'\'.*?\'\'\'", flags=re.DOTALL) , "__triple_sstring__" , prog)
         in_double_quote = False
@@ -995,9 +995,9 @@ class Lexer():
         prog = prog.replace("__triple_dstring__", "\"__string__\"")
         prog = prog.replace("__triple_sstring__", "\'__string__\'")
         prog = re.sub(re.compile(r"#.*?\n" ) , "\n" , prog)
-        prog = re.sub(re.compile(r"\n\s+\n" ) , "\n" , prog)
-        while prog.find('\n\n') >= 0:
-            prog = prog.replace('\n\n', '\n')
+        prog = re.sub(re.compile(r"\n\s+\n" ) , "\n\n" , prog)
+        # while prog.find('\n\n') >= 0:
+        #     prog = prog.replace('\n\n', '\n')
         return prog
 
     def get_comments_and_strings(self, input_prog, prog):
@@ -1225,8 +1225,8 @@ class Lexer():
             tokens = tokens.replace("- >", "->")
         while tokens.find('_STRING_ _STRING_') >= 0:
             tokens = tokens.replace('_STRING_ _STRING_', '_STRING_')
-        while tokens.find(' : _NEWLINE_ _NEWLINE_ ') >= 0:
-            tokens = tokens.replace(' : _NEWLINE_ _NEWLINE_ ', ' : _NEWLINE_ ')
+        # while tokens.find(' : _NEWLINE_ _NEWLINE_ ') >= 0:
+        #     tokens = tokens.replace(' : _NEWLINE_ _NEWLINE_ ', ' : _NEWLINE_ ')
         while tokens.find('. _NUMBER_') >= 0:
             tokens = tokens.replace('. _NUMBER_', '_NUMBER_')
         while tokens.find('_NEWLINE_ )') >= 0:

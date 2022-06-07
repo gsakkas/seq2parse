@@ -2,14 +2,14 @@
     "status": "unsafe",
     "errors": [
         {
-            "message": "def foo1(a): \n    a += 14 \n    return a + 42 \ndef foo2(a): \n    print(a) \n    return a + 42 \ndef foo3(a): \n    b = foo2(foo1(a)) \n    return b \ndef bar(a): \n    b = foo3(a) + 17 \n    return b \n   ",
+            "message": "Replace line 15 with:\n return b",
             "start": {
-                "line": 1,
+                "line": 15,
                 "column": 1
             },
             "stop": {
-                "line": 1,
-                "column": 10
+                "line": 15,
+                "column": 12
             }
         }
     ],

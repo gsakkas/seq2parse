@@ -1,11 +1,14 @@
 import sys
+import re
 from copy import deepcopy
 from os import mkdir
 from os.path import join, exists
 from pathlib import Path
+import difflib as df
 import json
 from ecpp_individual_grammar import read_grammar, fixed_lexed_prog, get_token_list, get_actual_token_list, repair_prog
 from predict_eccp_classifier_partials import predict_error_rules
+
 
 def repair(egrammar, max_cost, tokns, eruls, actual_tokns):
     upd_grammar = deepcopy(egrammar)
@@ -15,6 +18,45 @@ def repair(egrammar, max_cost, tokns, eruls, actual_tokns):
     if fixed_seq is not None:
         repaired_prog = repair_prog(actual_tokns, fixed_seq_ops)
     return repaired_prog
+
+
+def get_changes(diff):
+    line_changes = []
+    line_num = 0
+    for i, change in enumerate(diff):
+        line = change[2:]
+        if change[0] == '-':
+            if i-1 >= 0 and diff[i-1][0] == '?':
+                if i-2 >= 0 and diff[i-2][0] == '+' and line_changes != [] and line_changes[-1][0] == 'Add':
+                    prev_line = line_changes.pop()[-2]
+                    line_changes.append(('Replace', line_num, prev_line, line))
+                else:
+                    line_changes.append(('Delete', line_num, None, line))
+            elif i-1 >= 0 and diff[i-1][0] == '+' and line_changes != [] and line_changes[-1][0] == 'Add':
+                prev_line = line_changes.pop()[-2]
+                line_changes.append(('Replace', line_num, prev_line, line))
+            elif len(re.sub(r"[\n\t\s]*", "", line)) > 0:
+                line_changes.append(('Delete', line_num, None, line))
+            line_num += 1
+        elif change[0] == '+':
+            if i-1 >= 0 and diff[i-1][0] == '?':
+                if i-2 >= 0 and diff[i-2][0] == '-' and line_changes != [] and line_changes[-1][0] == 'Delete':
+                    prev_line = line_changes.pop()[-1]
+                    line_changes.append(('Replace', line_num-1, line, prev_line))
+                else:
+                    line_changes.append(('Add', line_num, line, None))
+            elif i-1 >= 0 and diff[i-1][0] == '-' and line_changes != [] and line_changes[-1][0] == 'Delete':
+                prev_line = line_changes.pop()[-1]
+                line_changes.append(('Replace', line_num-1, line, prev_line))
+            elif len(re.sub(r"[\n\t\s]*", "", line)) > 0:
+                line_changes.append(('Add', line_num, line, None))
+        elif change[0] == ' ':
+            if change[2:].strip() == '':
+                line_num += 1
+                continue
+            line_changes.append(('no_change', line_num, line, line))
+            line_num += 1
+    return [(ch_type, k, line) for ch_type, k, line, _ in line_changes if ch_type != 'no_change']
 
 
 if __name__ == "__main__":
@@ -37,7 +79,7 @@ if __name__ == "__main__":
     error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
-    repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)
+    repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens)[:-3].replace("\\n", '\n')
 
     result = { "status": "safe"
              , "errors": []
@@ -45,11 +87,15 @@ if __name__ == "__main__":
              }
 
     if repaired_prog:
+        diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
+        line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, change in get_changes(list(diff_lines))]
+
         result["status"] = "unsafe"
-        result["errors"] = [{ "message": repaired_prog[:-3].replace("\\n", '\n')
-                            , "start"  : {"line": 1, "column": 1}
-                            , "stop"   : {"line": 1, "column": 10}
-                            }]
+        for ch_type, line_num, length, change in line_changes:
+            result["errors"] = [{ "message": ch_type + " line " + str(line_num) + " with:\n" + change.rstrip()
+                                , "start"  : {"line": line_num, "column": 1}
+                                , "stop"   : {"line": line_num, "column": length}
+                                }]
     tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
     if not exists(tmpDir):
         mkdir(tmpDir)
