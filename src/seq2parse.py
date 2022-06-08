@@ -56,7 +56,17 @@ def get_changes(diff):
                 continue
             line_changes.append(('no_change', line_num, line, line))
             line_num += 1
-    return [(ch_type, k, line) for ch_type, k, line, _ in line_changes if ch_type != 'no_change']
+    return [(ch_type, k, prev_line, line) for ch_type, k, line, prev_line in line_changes if ch_type != 'no_change']
+
+
+def get_line_location(orig_line, parsed_line, token_num, option):
+    prev_tokens = parsed_line.split()[:token_num]
+    column = 0
+    for token in prev_tokens:
+        orig_line = orig_line.replace(token, '')
+        column += len(token)
+    column += len(orig_line) - len(orig_line.lstrip(' '))
+    return column
 
 
 if __name__ == "__main__":
@@ -81,7 +91,10 @@ if __name__ == "__main__":
 
     repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens).replace("\\n", '\n')
     diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
-    line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, change in get_changes(list(diff_lines))]
+    line_changes = [(ch_type, line_num + 1, get_line_location(input_prog.split('\n')[line_num], prev_line.replace('_INDENT_', ''), token_num, ch_type) + 1, len(input_prog.split('\n')[line_num]), (prev, change), ch_line.replace('_INDENT_', ''))
+                    for _, line_num, prev_line, ch_line in get_changes(list(diff_lines))
+                        for ch_type, token_num, prev, change in get_changes(list(df.ndiff(prev_line.replace('_INDENT_', '').split(), ch_line.replace('_INDENT_', '').split())))]
+    # line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, prev, change in get_changes(list(diff_lines))]
 
     result = { "status": "safe"
              , "errors": []
@@ -90,21 +103,28 @@ if __name__ == "__main__":
 
     if line_changes:
         result["status"] = "unsafe"
-        for ch_type, line_num, length, change in line_changes:
-            msg = ch_type + " line " + str(line_num) + " with:\n" + change.rstrip()
+        for ch_type, line_num, start, line_len, (prev, change), ch_line in line_changes:
             if ch_type == 'Add':
-                msg = ch_type + " on line " + str(line_num) + ":\n" + change.rstrip()
+                msg = ch_type + " \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = 1
+                length = line_len
             elif ch_type == 'Delete':
-                msg = ch_type + " on line " + str(line_num) + ":\n" + change.rstrip()
+                msg = ch_type + " \'" + prev.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = start
+                length = len(prev)
+            else:
+                msg = ch_type + " \'" + prev.strip() + "\' with \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = start
+                length = len(prev)
             result["errors"].append({ "message": msg
-                                    , "start"  : {"line": line_num, "column": 1}
-                                    , "stop"   : {"line": line_num, "column": length if length > 1 else 10}
+                                    , "start"  : {"line": line_num, "column": column}
+                                    , "stop"   : {"line": line_num, "column": column + length if column + length > 1 else 20}
                                     })
     tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
     if not exists(tmpDir):
         mkdir(tmpDir)
     newInputPath = Path(join(tmpDir, inputPath.name))
-    print(newInputPath)
+
     with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
         json.dump(result, out_file, indent=4)
 
