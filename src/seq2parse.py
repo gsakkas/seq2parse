@@ -1,11 +1,12 @@
 import sys
 import re
 from copy import deepcopy
-from os import mkdir
+from os import mkdir, environ
 from os.path import join, exists
 from pathlib import Path
 import difflib as df
 import json
+import tensorflow as tf
 from ecpp_individual_grammar import read_grammar, fixed_lexed_prog, get_token_list, get_actual_token_list, repair_prog
 from predict_eccp_classifier_partials import predict_error_rules
 
@@ -71,13 +72,14 @@ def get_line_location(orig_line, parsed_line, token_num, option):
 
 if __name__ == "__main__":
     # For single (erroneous) file:
-    # >>> python seq2parse.py python-grammar.txt input_prog.py repairs/fix_0.py test-set-top-20-partials-probs.txt 20
+    # >>> python seq2parse.py python-grammar.txt ./models 0 input_prog.py
     grammarFile = sys.argv[1]
     modelsDir = Path(sys.argv[2])
     gpuToUse = '/device:GPU:' + sys.argv[3]
     inputPath = Path(sys.argv[4])
 
     max_cost = 5
+    environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     input_prog = inputPath.read_text()
     # print('*' * 42)
     # print(input_prog)
@@ -86,7 +88,7 @@ if __name__ == "__main__":
     terminals = ERROR_GRAMMAR.get_alphabet()
 
     prog_tokens = get_token_list(input_prog, terminals)
-    error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
+    error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, True)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
     repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens).replace("\\n", '\n')
@@ -95,6 +97,13 @@ if __name__ == "__main__":
                     for _, line_num, prev_line, ch_line in get_changes(list(diff_lines))
                         for ch_type, token_num, prev, change in get_changes(list(df.ndiff(prev_line.replace('_INDENT_', '').split(), ch_line.replace('_INDENT_', '').split())))]
     # line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, prev, change in get_changes(list(diff_lines))]
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print("-------------Original Buggy Program---------------")
+    print(input_prog)
+    print("-----------------Repaired Program-----------------")
+    print(repaired_prog[:-3].replace("\\n", '\n'))
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
     result = { "status": "safe"
              , "errors": []
@@ -127,10 +136,3 @@ if __name__ == "__main__":
 
     with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
         json.dump(result, out_file, indent=4)
-
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    print("-------------Original Buggy Program---------------")
-    print(input_prog)
-    print("-----------------Repaired Program-----------------")
-    print(repaired_prog[:-3].replace("\\n", '\n'))
-    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
