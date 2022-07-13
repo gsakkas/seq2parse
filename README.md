@@ -162,10 +162,11 @@ Run the `human_study` evaluation with `run_parse_test_time_top_n_small.py`, a
 smaller version of `run_parse_test_time_top_n_preds_partials.py` which runs the
 full test set evaluation but requires the private dataset. This evaluation will
 take approximately 6 minutes on a modern laptop to complete the automated repair
-and data analysis.
+and data analysis using the pre-trained transformer classifier for the
+predicting error rules.
 
 ``` shell
-~/seq2parse/src $ python run_parse_test_time_top_n_small.py python-grammar.txt ./human_study ./models 20 10
+~/seq2parse/src $ python run_parse_test_time_top_n_small.py python-grammar.txt ./human_study ./models 20 10 predict
 ```
 
 and we expect an output similar to this:
@@ -205,6 +206,44 @@ and uses the *MinimumCost* approach from Figure 14. `Median parse time` shows
 the median time needed to repair and parse a program in this set. The rest of
 the results are also self-explanatory.
 
+For the *20 Most Popular* approach on Figure 14, use:
+
+``` shell
+~/seq2parse/src $ python run_parse_test_time_top_n_small.py python-grammar.txt ./human_study ./models 20 10 top-20
+```
+
+and expect an output similar to:
+
+``` shell
+_________________________________________________________________
+2/2 [==============================] - 1s 31ms/step
+Programs to repair: 50
+100%|████████████████████████████████████████████████████████████| 50/50 [06:15<00:00,  7.50s/it]
+---------------------------------------------------
+Dataset size: 50
+Parse accuracy (%): 82.0
+Mean parse time (sec): 7.398970724940446
+Median parse time (sec): 2.4660917939982028
+Dataset repaired faster than user (%): 94.0
+User fix accuracy (%): 14.0
+All error locations fixed accuracy (%): 64.0
+Any error locations fixed accuracy (%): 74.0
+1 sec: Parse accuracy = 14.0
+5 sec: Parse accuracy = 70.0
+10 sec: Parse accuracy = 82.0
+15 sec: Parse accuracy = 86.0
+20 sec: Parse accuracy = 92.0
+25 sec: Parse accuracy = 94.0
+30 sec: Parse accuracy = 96.0
+35 sec: Parse accuracy = 96.0
+40 sec: Parse accuracy = 96.0
+45 sec: Parse accuracy = 96.0
+50 sec: Parse accuracy = 96.0
+55 sec: Parse accuracy = 96.0
+60 sec: Parse accuracy = 98.0
+---------------------------------------------------
+```
+
 ### Usefulness (Sec. 7.4)
 
 The rest of our evaluation was based on a user study. We used a web interface
@@ -217,12 +256,14 @@ smaller version of Seq2Parse. Additionally, these programs or any other *Python
 program with syntax errors* can use our website demo or the local command:
 
 ``` shell
-~/seq2parse/src $ python seq2parse.py python-grammar.txt ./models GPU_NUM INPUT_PROG.py
+~/seq2parse/src $ [CUDA_VISIBLE_DEVICES=GPU_NUM] python seq2parse.py python-grammar.txt ./models GPU_NUM INPUT_PROG.py
 ```
 
 where `INPUT_PROG.py` is a Python program file and `GPU_NUM` is the ID of the
-local GPU to use (if multiple exist), otherwise set to 0. If no GPUs are
-available, the script will default to CPU usage.
+local GPU to use (if multiple exist). If the script variable `GPU_NUM` is not
+working, try exporting `CUDA_VISIBLE_DEVICES=GPU_NUM` as well at the beginning.
+If only one GPU is available set `GPU_NUM` to 0. If no GPUs are available, the
+script will default to CPU usage.
 
 The output of the above Seq2Parse command is the original program and the
 Seq2Parse repair. The command will also generate a `INPUT_PROG.py.json` file at
@@ -230,3 +271,20 @@ a `.seq2parse` directory (generated if it doesn't exist, at the same directory
 as `INPUT_PROG.py`). `INPUT_PROG.py.json` has information used by the [website
 demo] for line-by-line syntax error feedback (and will also be used on a future
 VS Code plugin).
+
+## Conclusion
+
+While the lack of the Python dataset, makes it infeasible to recreate the full
+paper evaluation, we believe that the code we have provided can *help future
+researchers to build on and compare with our work*.
+
+**Additional scripts** are provided to *train* on *any* programming language
+dataset and repair *new* programs, as long as a dataset of fixed buggy programs
+and the language grammar are given. For example, `create_ecpp_dataset_full.py`
+extracts a machine learning appropriate dataset from the dataset of fixed buggy
+program pairs after performing the appropriate program abstraction,
+`learn_PCFG.py` learns the probabilistic grammar needed for the abstraction,
+`train_eccp_classifier_partials.py` trains the transformer classifier on the
+abstracted programs and the ground truth error production rules and, finally,
+`run_parse_test_time_top_n_preds_partials.py` run all the relevant repair
+experiments on a fixed buggy program test set.

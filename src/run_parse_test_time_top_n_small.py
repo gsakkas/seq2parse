@@ -136,7 +136,7 @@ def has_parse(egrammar, max_cost, tup):
         return (bparse, run_time, dt, False, False, False, None)
 
 
-def do_all_test(grammar_file, data_dir, models_dir, top_rules_num, ecpp_max_cost):
+def do_all_test(grammar_file, data_dir, models_dir, top_rules_num, ecpp_max_cost, do_predict):
     ERROR_GRAMMAR = read_grammar(grammar_file)
     terminals = ERROR_GRAMMAR.get_alphabet()
     parses_bad = 0
@@ -163,7 +163,13 @@ def do_all_test(grammar_file, data_dir, models_dir, top_rules_num, ecpp_max_cost
         user_fix_file = join(prog_path, "user_fix.py")
         with open(user_fix_file, "r") as inFile:
             user_fixes.append(inFile.read())
-    all_error_rules = predict_error_rules(grammar_file, models_dir, '/device:GPU:0', dataset, False, do_sfile=True, max_erules=top_rules_num)
+    all_error_rules = []
+    if do_predict:
+        all_error_rules = predict_error_rules(grammar_file, models_dir, '/device:GPU:0', dataset, False, do_sfile=True, max_erules=top_rules_num)
+    else:
+        top_20_erules = ['InsertErr -> (', 'InsertErr -> )', 'Err_Endmarker -> H Endmarker', 'InsertErr -> :', 'Err_Literals -> ', 'Err_Dedent -> ', 'Err_Indent -> ', 'Err_Close_Paren -> H Close_Paren', 'Err_Literals -> H Literals', 'Err_Colon -> ', 'Err_Close_Paren -> ', 'InsertErr -> _INDENT_', 'Err_Comp_Op -> Err_Tag', 'InsertErr -> _DEDENT_', 'InsertErr -> =', 'InsertErr -> _NAME_', 'Err_Open_Paren -> H Open_Paren', 'Err_Newline -> H Newline', 'Err_Open_Paren -> ', 'Err_Tag -> =']
+        # top_50_erules = ['InsertErr -> _NUMBER_', 'Err_Endmarker -> H Endmarker', 'Err_Open_Sq_Bracket -> H Open_Sq_Bracket', 'InsertErr -> =', 'Err_Open_Paren -> H Open_Paren', 'Err_Assign_Op -> ', 'InsertErr -> elif', 'Err_Def_Keyword -> ', 'Err_Def_Keyword -> H Def_Keyword', 'InsertErr -> if', 'Err_Colon -> H Colon', 'Err_Colon -> ', 'Err_Close_Paren -> ', 'InsertErr -> :', 'InsertErr -> else', 'Err_Arith_Op -> ', 'InsertErr -> _INDENT_', 'InsertErr -> (', 'InsertErr -> )', 'Err_Newline -> H Newline', 'Err_Return_Keyword -> H Return_Keyword', 'Err_Comp_Op -> ', 'Err_Dedent -> Err_Tag', 'Err_If_Keyword -> ', 'Err_Open_Paren -> ', 'Err_Indent -> Err_Tag', 'InsertErr -> def', 'Err_If_Keyword -> H If_Keyword', 'Err_Close_Sq_Bracket -> ', 'Err_Literals -> H Literals', 'Err_Tag -> _INDENT_', 'InsertErr -> _UNKNOWN_', 'InsertErr -> _DEDENT_', 'InsertErr -> [', 'Err_Literals -> ', 'Err_Dedent -> H Dedent', 'Err_Dedent -> ', 'InsertErr -> _NAME_', 'Err_Tag -> _NAME_', 'Err_Tag -> =', 'Err_Comp_Op -> H Comp_Op', 'InsertErr -> for', 'Err_Close_Paren -> H Close_Paren', 'Err_For_Keyword -> H For_Keyword', 'Err_Tag -> _UNKNOWN_', 'Err_Comp_Op -> Err_Tag', 'Err_Close_Paren -> Err_Tag', 'InsertErr -> _STRING_', 'Err_Comma -> ', 'Err_Indent -> ']
+        all_error_rules = [top_20_erules for _ in dataset]
     dataset = [(get_token_list(prog, terminals), erules, user_time, get_token_list(user_fix, terminals), prog, user_fix, get_actual_token_list(prog, terminals))
                 for prog, erules, user_time, user_fix in zip(dataset, all_error_rules, user_times, user_fixes)]
     print("Programs to repair:", len(dataset))
@@ -179,9 +185,6 @@ def do_all_test(grammar_file, data_dir, models_dir, top_rules_num, ecpp_max_cost
                 finds_any_lines += 1
             if user_same:
                 same_as_users += 1
-        else:
-            print(i)
-            # print(sample)
         avg_run_time += run_time
         parsed_progs_times.append(run_time)
         time_gains.append(dt)
@@ -195,7 +198,10 @@ if __name__ == "__main__":
     modelsDir = Path(sys.argv[3])
     num_of_tops = int(sys.argv[4])
     max_cost = int(sys.argv[5])
+    predict_erules = True
+    if len(sys.argv) > 6:
+        predict_erules =  sys.argv[6] == 'predict'
 
     environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    do_all_test(grammarFile, dataDir, modelsDir, num_of_tops, max_cost)
+    do_all_test(grammarFile, dataDir, modelsDir, num_of_tops, max_cost, predict_erules)
