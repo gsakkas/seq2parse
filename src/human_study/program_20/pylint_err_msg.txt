@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_20/original.py:6:10: E0001: invalid syntax. Maybe you meant '==' or ':=' instead of '='? (<unknown>, line 6) (syntax-error)

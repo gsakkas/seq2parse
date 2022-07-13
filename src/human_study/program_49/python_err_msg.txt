@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_49/original.py", line 3
+    print "List : ", aList
+    ^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?

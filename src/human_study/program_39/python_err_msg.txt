@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_39/original.py", line 1
+    def etudiant(name.id,university):
+                     ^
+SyntaxError: invalid syntax

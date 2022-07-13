@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_27/original.py", line 4
+    (print) a-b-c
+            ^
+SyntaxError: invalid syntax

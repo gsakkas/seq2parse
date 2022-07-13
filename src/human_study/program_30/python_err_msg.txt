@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_30/original.py", line 3
+    c = b // 10(%10)
+                ^
+SyntaxError: invalid syntax

@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_28/original.py", line 2
+    if (i  100 !=0):
+        ^^^^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?

@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_26/original.py", line 9
+    elif valor > self.raiz.getDado():
+    ^^^^
+SyntaxError: invalid syntax

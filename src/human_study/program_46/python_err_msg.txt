@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_46/original.py", line 4
+    if b === a:
+           ^
+SyntaxError: invalid syntax

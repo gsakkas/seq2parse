@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_15/original.py", line 2
+    if 1 <= n <= 20
+                   ^
+SyntaxError: expected ':'

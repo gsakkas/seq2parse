@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_36/original.py", line 3
+    if age < (18)
+                 ^
+SyntaxError: expected ':'

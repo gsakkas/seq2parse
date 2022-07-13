@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_18/original.py:10:5: E0001: Missing parentheses in call to 'print'. Did you mean print(...)? (<unknown>, line 10) (syntax-error)

@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_37/original.py", line 12
+    i.remove(i[0]
+            ^
+SyntaxError: '(' was never closed

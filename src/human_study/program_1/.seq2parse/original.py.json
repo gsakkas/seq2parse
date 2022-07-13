@@ -1,0 +1,17 @@
+{
+    "status": "unsafe",
+    "errors": [
+        {
+            "message": "Add ':' on line 6, column 17:\n'_DEDENT_ def g ( y ) :'\n",
+            "start": {
+                "line": 6,
+                "column": 1
+            },
+            "stop": {
+                "line": 6,
+                "column": 9
+            }
+        }
+    ],
+    "types": {}
+}

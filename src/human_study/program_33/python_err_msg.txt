@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_33/original.py", line 4
+    return sum += i
+               ^^
+SyntaxError: invalid syntax

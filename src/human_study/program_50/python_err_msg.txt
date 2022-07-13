@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_50/original.py", line 3
+    while x  0:
+             ^
+SyntaxError: invalid syntax

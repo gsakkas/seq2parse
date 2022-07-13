@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_24/original.py", line 2
+    print(a \n)
+             ^
+SyntaxError: unexpected character after line continuation character

@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_29/original.py", line 3
+    while (number - (2x) > 0):
+                     ^
+SyntaxError: invalid decimal literal

@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_42/original.py:4:5: E0001: expected an indented block after 'while' statement on line 3 (<unknown>, line 4) (syntax-error)

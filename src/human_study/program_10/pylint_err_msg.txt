@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_10/original.py:3:7: E0001: invalid syntax. Perhaps you forgot a comma? (<unknown>, line 3) (syntax-error)

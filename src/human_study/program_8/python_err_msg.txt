@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_8/original.py", line 3
+    hello world = hello + world
+          ^^^^^
+SyntaxError: invalid syntax

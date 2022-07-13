@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_40/original.py", line 4
+    print(format_string %s data)
+          ^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?

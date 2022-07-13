@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_16/original.py", line 6
+    print(anos"anos")
+              ^^^^^^
+SyntaxError: invalid syntax

@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_34/original.py:6:29: E0001: invalid syntax (<unknown>, line 6) (syntax-error)

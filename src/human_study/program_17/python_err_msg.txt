@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_17/original.py", line 9
+    sentence += word[1:] + word[0] + "ay " + end = " "
+                                                 ^
+SyntaxError: invalid syntax

@@ -1,0 +1,2 @@
+Easy programs (< 40s)  = 29
+Hard programs (>= 40s) = 21

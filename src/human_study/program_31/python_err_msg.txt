@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_31/original.py", line 3
+    for i in range(k)
+                     ^
+SyntaxError: expected ':'

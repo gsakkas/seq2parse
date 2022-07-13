@@ -5,8 +5,8 @@ from os import mkdir
 import autopep8
 from ecpp_individual_grammar import read_grammar, prog_has_parse, prog_error_rules, get_token_list, get_actual_token_list
 
-file_path = Path('./human-study/repaired_prog_pairs.jsonl')
-out_dir = Path('./human-study')
+file_path = Path('./human_study/repaired_prog_pairs.jsonl')
+out_dir = Path('./human_study')
 
 i = 0
 for line in file_path.read_text().strip().split('\n'):

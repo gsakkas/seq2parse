@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_2/original.py", line 2
+    if a == 0 OR 0 < a < 10:
+              ^^
+SyntaxError: invalid syntax

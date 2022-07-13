@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_7/original.py", line 1
+    a = int(input(enter a))
+                  ^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?

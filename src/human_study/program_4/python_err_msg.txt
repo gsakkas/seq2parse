@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_4/original.py", line 3
+    if exp = 1:
+       ^^^^^^^
+SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?

@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_20/original.py", line 6
+    (vowels = vowels + 1) and (cons = cons + 1)
+     ^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?

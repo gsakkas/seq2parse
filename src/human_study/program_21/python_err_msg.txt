@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_21/original.py", line 5
+    if x == [i: i+2]:
+              ^
+SyntaxError: invalid syntax

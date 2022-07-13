@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_47/original.py", line 2
+    if !n:
+       ^
+SyntaxError: invalid syntax

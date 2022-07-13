@@ -1,0 +1,4 @@
+File "./seq2parse/human_study/program_44/original.py", line 12
+    >>> simetrica(m)
+    ^^
+SyntaxError: invalid syntax

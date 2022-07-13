@@ -1,0 +1,2 @@
+************* Module original
+human_study/program_24/original.py:2:10: E0001: unexpected character after line continuation character (<unknown>, line 2) (syntax-error)
