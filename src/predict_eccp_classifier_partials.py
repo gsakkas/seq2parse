@@ -28,10 +28,10 @@ def read_sample(samp):
     return (samp_1[0], samp_2, int(samp_1[2]), float(samp_1[3]), samp_1[4] == "popular")
 
 
-def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, sfile):
+def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, sfile, do_sfile=False, max_erules=20):
     saved_model_file = join(modelsDir, 'transformer-classifier-partial-parses-probs.h5')
     xs_test = input_prog
-    if sfile:
+    if sfile or do_sfile:
         INTERIM_GRAMMAR = earleyparser_interm_repr.read_grammar(grammarFile)
         rules_used = {}
         with open(join(modelsDir, "rules_usage.json"), "r") as in_file:
@@ -40,9 +40,12 @@ def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, sfile):
 
         ERROR_GRAMMAR = read_grammar(grammarFile)
         terminals = ERROR_GRAMMAR.get_alphabet()
-        tokens = get_token_list(input_prog, terminals)
-        upd_tokens, _ = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
-        xs_test = [upd_tokens]
+        if sfile:
+            tokens = get_token_list(input_prog, terminals)
+            upd_tokens, _ = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
+            xs_test = [upd_tokens]
+        elif do_sfile:
+            xs_test = [earleyparser_interm_repr.get_updated_seq(get_token_list(x, terminals), INTERIM_GRAMMAR)[0] for x in xs_test]
 
     tokens = dict()
     reverse_tokens = dict()
@@ -115,7 +118,9 @@ def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, sfile):
                 sys.exit(-1)
             y_pred = transformerClfr.predict(xs_test)
             if sfile:
-                return labelize(y_pred[0], 20)
+                return labelize(y_pred[0], max_erules)
+            elif do_sfile:
+                return [labelize(y, max_erules) for y in y_pred]
             else:
                 return y_pred
     except RuntimeError as e:
