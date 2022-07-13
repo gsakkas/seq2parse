@@ -1,5 +1,5 @@
 import sys
-import resource
+from os import environ
 from os.path import join, exists
 import itertools
 from collections import defaultdict
@@ -22,40 +22,27 @@ from ecpp_individual_grammar import read_grammar, lexed_prog_has_parse, get_toke
 import earleyparser_interm_repr
 
 
-def limit_memory():
-    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
-    if soft < 0:
-        soft = 8 * 1024 * 1024 * 1024
-    else:
-        soft = soft * 6 // 10
-    if hard < 0:
-        hard = 32 * 1024 * 1024 * 1024
-    else:
-        hard = hard * 8 // 10
-    resource.setrlimit(resource.RLIMIT_AS, (soft, hard))
-
-
 def read_sample(samp):
     samp_1 = samp.split(" <||> ")
-    samp_2 = samp_1[2].split(" <++> ")
-    if len(samp_1) < 9:
-        return (samp_1[0], samp_1[1], samp_2, int(samp_1[3]), float(samp_1[4]), [samp_1[5]], samp_1[6], samp_1[7])
-    else:
-        return (samp_1[0], samp_1[1], samp_2, int(samp_1[3]), float(samp_1[4]), [samp_1[5]], samp_1[6], samp_1[7], samp_1[8], samp_1[9])
+    samp_2 = samp_1[1].split(" <++> ")
+    return (samp_1[0], samp_2, int(samp_1[2]), float(samp_1[3]), samp_1[4] == "popular")
 
-def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog):
+
+def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, sfile):
     saved_model_file = join(modelsDir, 'transformer-classifier-partial-parses-probs.h5')
-    INTERIM_GRAMMAR = earleyparser_interm_repr.read_grammar(grammarFile)
-    rules_used = {}
-    with open(join(modelsDir, "rules_usage.json"), "r") as in_file:
-        rules_used = json.load(in_file)
-    INTERIM_GRAMMAR.update_probs(rules_used)
+    xs_test = input_prog
+    if sfile:
+        INTERIM_GRAMMAR = earleyparser_interm_repr.read_grammar(grammarFile)
+        rules_used = {}
+        with open(join(modelsDir, "rules_usage.json"), "r") as in_file:
+            rules_used = json.load(in_file)
+        INTERIM_GRAMMAR.update_probs(rules_used)
 
-    ERROR_GRAMMAR = read_grammar(grammarFile)
-    terminals = ERROR_GRAMMAR.get_alphabet()
-    tokens = get_token_list(input_prog, terminals)
-    upd_tokens, _ = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
-    xs_test = [upd_tokens]
+        ERROR_GRAMMAR = read_grammar(grammarFile)
+        terminals = ERROR_GRAMMAR.get_alphabet()
+        tokens = get_token_list(input_prog, terminals)
+        upd_tokens, _ = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
+        xs_test = [upd_tokens]
 
     tokens = dict()
     reverse_tokens = dict()
@@ -98,7 +85,7 @@ def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog):
         return " ".join(list(map(lambda x: "_UNKNOWN_" if x == 0 else reverse_tokens[x], xx))).strip()
 
     def labelize(yy, num_preds):
-        top_preds = [0] * 150
+        top_preds = [0] * num_of_labels
         for i in argsort(yy)[::-1][:num_preds]:
             top_preds[i] = 1
         top_preds = list(mlb.inverse_transform(array(top_preds).reshape(1, num_of_labels))[0])
@@ -127,7 +114,10 @@ def predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog):
             else:
                 sys.exit(-1)
             y_pred = transformerClfr.predict(xs_test)
-            return labelize(y_pred[0], 20)
+            if sfile:
+                return labelize(y_pred[0], 20)
+            else:
+                return y_pred
     except RuntimeError as e:
         print(e)
 
@@ -137,8 +127,128 @@ if __name__ == "__main__":
     inputPath = Path(sys.argv[2])
     modelsDir = Path(sys.argv[3])
     gpuToUse = '/device:GPU:' + sys.argv[4]
+    single_file = True
+    if len(sys.argv) > 5:
+        single_file = sys.argv[5] == 'true'
+    environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-    input_prog = inputPath.read_text()
+    if single_file:
+        input_prog = inputPath.read_text()
 
-    erules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog)
-    print(erules)
+        erules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, True)
+        print(erules)
+    else:
+        dataset = []
+        top_rules_num = 20
+        num_of_labels = 150
+        with open(inputPath, "r") as inFile:
+                dataset = list(map(read_sample, inFile.read().split('\n')[:-1]))
+        dataset = [(tokns, erules[:top_rules_num], tok_chgs, user_time, popular)
+                    for tokns, erules, tok_chgs, user_time, popular in dataset]
+        xs_test, ys_test, _, _, popularities = zip(*dataset)
+        labels = dict()
+        labels_file = join(modelsDir, "erule_labels-partials-probs.json")
+        if exists(labels_file):
+            with open(labels_file, "r") as fin:
+                labels = json.load(fin)
+        else:
+            sys.exit(-1)
+        ys_test = [list(filter(lambda xx: xx != 0, map(lambda yy: labels[yy] if yy in labels else 0, y))) for y in ys_test]
+
+        mlb = MultiLabelBinarizer()
+        with open(join(modelsDir, 'myMultiLabelBinarizer.pkl'), 'rb') as f:
+            mlb = pickle.load(f)
+
+        progs_top_10 = 0
+        progs_top_10_one = 0
+        progs_top_10_not_pop = 0
+        progs_top_20 = 0
+        progs_top_20_one = 0
+        progs_top_20_not_pop = 0
+        progs_top_20_one_not_pop = 0
+        progs_top_50 = 0
+        progs_top_50_one = 0
+        progs_top_50_not_pop = 0
+        not_pop_tests = 0
+        all_tests = len(ys_test)
+        progs_best = 0
+        progs_best_one = 0
+        progs_best_not_pop = 0
+        progs_best_one_not_pop = 0
+        avg_num_of_preds = 0
+        all_best_preds_lens = []
+        for y_pred, y_true, popular in zip(predict_error_rules(grammarFile, modelsDir, gpuToUse, xs_test, False), ys_test, popularities):
+            top_50 = argsort(y_pred)[::-1][:50]
+            top_20 = top_50[:20]
+            top_10 = top_20[:10]
+            top_50_preds = [0] * num_of_labels
+            for i in top_50:
+                top_50_preds[i] = 1
+            top_50_preds = list(mlb.inverse_transform(array(top_50_preds).reshape(1, num_of_labels))[0])
+            top_20_preds = [0] * num_of_labels
+            for i in top_20:
+                top_20_preds[i] = 1
+            top_20_preds = list(mlb.inverse_transform(array(top_20_preds).reshape(1, num_of_labels))[0])
+            top_10_preds = [0] * num_of_labels
+            for i in top_10:
+                top_10_preds[i] = 1
+            top_10_preds = list(mlb.inverse_transform(array(top_10_preds).reshape(1, num_of_labels))[0])
+            list_of_erules = list(y_true)
+            best = list(map(lambda y_tup: y_tup[0], filter(lambda yy: yy[1] > 0.01, enumerate(y_pred))))
+            best_preds = [0] * num_of_labels
+            for i in best:
+                best_preds[i] = 1
+            best_preds = list(mlb.inverse_transform(array(best_preds).reshape(1, num_of_labels))[0])
+            if len(best_preds) > 20:
+                top_20_local = top_50[:20]
+                top_20_preds_local = [0] * num_of_labels
+                for i in top_20_local:
+                    top_20_preds_local[i] = 1
+                best_preds = list(mlb.inverse_transform(array(top_20_preds_local).reshape(1, num_of_labels))[0])
+            avg_num_of_preds += len(best_preds)
+            all_best_preds_lens.append(len(best_preds))
+            if len(list_of_erules) == 0 or not popular:
+                not_pop_tests += 1
+            if len(list_of_erules) > 0:
+                if all(map(lambda yy: yy in top_10_preds, list_of_erules)):
+                    progs_top_10 += 1
+                if any(map(lambda yy: yy in top_10_preds, list_of_erules)):
+                    progs_top_10_one += 1
+                if all(map(lambda yy: yy in top_20_preds, list_of_erules)):
+                    progs_top_20 += 1
+                if any(map(lambda yy: yy in top_20_preds, list_of_erules)):
+                    progs_top_20_one += 1
+                if all(map(lambda yy: yy in top_50_preds, list_of_erules)):
+                    progs_top_50 += 1
+                if any(map(lambda yy: yy in top_50_preds, list_of_erules)):
+                    progs_top_50_one += 1
+                if all(map(lambda yy: yy in best_preds, list_of_erules)):
+                    progs_best += 1
+                if any(map(lambda yy: yy in best_preds, list_of_erules)):
+                    progs_best_one += 1
+                if not popular:
+                    if all(map(lambda yy: yy in top_10_preds, list_of_erules)):
+                        progs_top_10_not_pop += 1
+                    if all(map(lambda yy: yy in top_20_preds, list_of_erules)):
+                        progs_top_20_not_pop += 1
+                    if all(map(lambda yy: yy in top_50_preds, list_of_erules)):
+                        progs_top_50_not_pop += 1
+                    if any(map(lambda yy: yy in top_20_preds, list_of_erules)):
+                        progs_top_20_one_not_pop += 1
+                    if all(map(lambda yy: yy in best_preds, list_of_erules)):
+                        progs_best_not_pop += 1
+                    if any(map(lambda yy: yy in best_preds, list_of_erules)):
+                        progs_best_one_not_pop += 1
+        print(">> Top 10 predictions accuracy:", progs_top_10 * 100.0 / all_tests)
+        print(">> Top 10 predictions acc. (rare):", progs_top_10_not_pop * 100.0 / not_pop_tests)
+        print(">> Top 20 predictions accuracy:", progs_top_20 * 100.0 / all_tests)
+        print(">> Top 20 predictions acc. (rare):", progs_top_20_not_pop * 100.0 / not_pop_tests)
+        print(">> Top 50 predictions accuracy:", progs_top_50 * 100.0 / all_tests)
+        print(">> Top 50 predictions acc. (rare):", progs_top_50_not_pop * 100.0 / not_pop_tests)
+        print(">> Threshold predictions accuracy:", progs_best * 100.0 / all_tests)
+        print(">> Threshold predictions acc. (rare):", progs_best_not_pop * 100.0 / not_pop_tests)
+        print(">> Num. of rare programs:", not_pop_tests, "(" + str(not_pop_tests * 100.0 / all_tests) + "%)")
+        print(">> Avg. Number of threshold predictions:", avg_num_of_preds / all_tests)
+        print(">> Median Number of threshold predictions:", median_high(all_best_preds_lens))
+        print(">> Min Number of threshold predictions:", min(all_best_preds_lens))
+        print(">> Max Number of threshold predictions:", max(all_best_preds_lens))

@@ -217,13 +217,14 @@ if __name__ == "__main__":
         top_preds = list(mlb.inverse_transform(array(top_preds).reshape(1, num_of_labels))[0])
         return list(map(lambda r: reverse_labels[r], top_preds))
 
-    if not exists(join(outDir, "erule-dataset-test-set-generic.txt")):
-        with open(join(outDir, "erule-dataset-test-set-generic.txt"), "w") as outFile:
-            for tokns, eruls, tok_chgs, dur in zip(old_xs_test, ys_test, num_chngs_test, user_ts_test):
+    if not exists(join(outDir, "erule-test-set-generic.txt")):
+        with open(join(outDir, "erule-test-set-generic.txt"), "w") as outFile:
+            top_50_erules = set(er[0] for er in all_erules[:50])
+            for tokns, eruls, tok_chgs, dur in zip(list(zip(*test_set))[1], list(zip(*test_set))[2], num_chngs_test, user_ts_test):
                 popular = "popular"
-                if not any(map(lambda yy: yy in top_50_erules_ids, eruls)):
+                if not any(map(lambda yy: yy in top_50_erules, eruls)):
                     popular = "not_popular"
-                outFile.write(tokns + " <||> " + " <++> ".join(list(map(lambda r: reverse_labels[r], eruls))) + " <||> " + str(tok_chgs) + " <||> " + str(dur) + " <||> " + popular + "\n")
+                outFile.write(tokns + " <||> " + " <++> ".join(eruls) + " <||> " + str(tok_chgs) + " <||> " + str(dur) + " <||> " + popular + "\n")
     if not exists(join(outDir, "test-set-50-popular-partials-probs.txt")):
         top_50_erules = [er[0] for er in all_erules[:50]]
         with open(join(outDir, "test-set-50-popular-partials-probs.txt"), "w") as outFile:
