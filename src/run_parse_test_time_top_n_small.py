@@ -21,21 +21,21 @@ def rate(secs, times):
 def print_results(succs, bads, avg_time, parse_times, time_gs, user_sames, all_ls, any_ls):
     positives = len(list(filter(lambda dt: dt > 0, time_gs)))
     print("---------------------------------------------------")
-    print("# Dataset size:", succs)
-    print("# Parse accuracy (%):", bads * 100.0 / succs)
-    print("# Mean parse time (sec):", avg_time / succs)
-    print("# Median parse time (sec):", median_low(parse_times))
-    print("# Dataset repaired faster than user (%):", positives * 100 / succs)
-    # print("# Mean parse time speedup (sec):", mean(time_gs))
-    # print("# Median parse time speedup (sec):", median_high(time_gs))
-    print("# User fix accuracy (%):", user_sames * 100.0 / succs)
-    print("# All error locations fixed accuracy (%):", all_ls * 100.0 / succs)
-    print("# Any error locations fixed accuracy (%):", any_ls * 100.0 / succs)
+    print("Dataset size:", succs)
+    print("Parse accuracy (%):", bads * 100.0 / succs)
+    print("Mean parse time (sec):", avg_time / succs)
+    print("Median parse time (sec):", median_low(parse_times))
+    print("Dataset repaired faster than user (%):", positives * 100 / succs)
+    # print("Mean parse time speedup (sec):", mean(time_gs))
+    # print("Median parse time speedup (sec):", median_high(time_gs))
+    print("User fix accuracy (%):", user_sames * 100.0 / succs)
+    print("All error locations fixed accuracy (%):", all_ls * 100.0 / succs)
+    print("Any error locations fixed accuracy (%):", any_ls * 100.0 / succs)
     rates = defaultdict(float)
     for dt in range(1, 61):
         rates[dt] = rate(dt, parse_times)
         if dt <= 60 and (dt % 5 == 0 or dt == 1):
-            print("#", dt, "sec: Parse accuracy =", rates[dt])
+            print(dt, "sec: Parse accuracy =", rates[dt])
     print("---------------------------------------------------")
 
 
@@ -166,7 +166,7 @@ def do_all_test(grammar_file, data_dir, models_dir, top_rules_num, ecpp_max_cost
     all_error_rules = predict_error_rules(grammar_file, models_dir, '/device:GPU:0', dataset, False, do_sfile=True, max_erules=top_rules_num)
     dataset = [(get_token_list(prog, terminals), erules, user_time, get_token_list(user_fix, terminals), prog, user_fix, get_actual_token_list(prog, terminals))
                 for prog, erules, user_time, user_fix in zip(dataset, all_error_rules, user_times, user_fixes)]
-    print("# Programs to repair:", len(dataset))
+    print("Programs to repair:", len(dataset))
     i = 0
     for sample in tqdm.tqdm(dataset):
         i += 1

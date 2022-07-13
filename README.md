@@ -8,8 +8,8 @@ All programs mentioned below should be able to run on a multicore 16GB RAM
 laptop, with or without a dedicated GPU. For training the machine learning (ML)
 model, a modern GPU would be required, but since the training data are not
 publicly available we provided the pre-trained model. The code requires at least
-Python 3.7.5 and ideally Python 3.10.x, since it was tested mainly on the latest
-version.
+Python 3.7.5 and ideally Python 3.10.x, since it was tested mainly with the
+latest version.
 
 ### Getting the source
 
@@ -51,10 +51,10 @@ Let's run a quick test to make sure everything was installed correctly. We'll
 use the pre-trained Transformer classifier to predict a set of error rules and
 then generate a parse error repair for the paper example.
 
-Execute the following command:
+**To run Seq2Parse**, execute the following command:
 
 ``` shell
-~/seq2parse/src $ python seq2parse.py python-grammar.txt ./models 0 human-study/orig_paper.py
+~/seq2parse/src $ python seq2parse.py python-grammar.txt ./models 0 human_study/orig_paper.py
 ```
 
 You should get the following output:
@@ -88,22 +88,22 @@ def bar(a):
 
 The command line output should include the ML model architecture at the start,
 followed by the lines with `Original Buggy Program` and `Repaired Program` near
-the end. Those are the original buggy input program `orig_paper.py` and the
-repaired program Seq2Parse produces. We observe that the last line `return b +`
-is fixed by removing the extra `+` operator.
+the end. Those sections show the original buggy input program `orig_paper.py`
+and the repaired program that Seq2Parse produces. We observe that the last line
+`return b +` is fixed by removing the extra `+` operator.
 
 ## Reproducing the evaluation (Step-by-Step Instructions)
 
-Part of the paper evaluation can not be reproduced due the private dataset we
-used. We provide the full anonymized test set for some parts of the evaluation
-and a very small subset of it when the full programs are needed.
+Part of the paper evaluation can not be reproduced due the private dataset that
+we used. We provide the full anonymized test set for some parts of the
+evaluation and a very small subset of it when the full programs are needed.
 
 ### Accuracy (Sec. 7.1)
 
 The first experiment compares the accuracy of our transformer classifiers. We
 provide the pre-trained model and all the necessary auxiliary files in the
-`model` directory. We also provide an anonymized test set of abstracted program
-token sequences with the ground truth error production rules in
+`models` directory. We also provide an anonymized test set of the abstracted
+program token sequences with the ground truth error production rules in
 `datasets/erule-test-set-generic.txt` Each line consists of the abstracted
 sequences, the error rules, the number of token changes and time the original
 author of the program needed to fix it.
@@ -141,15 +141,15 @@ _________________________________________________________________
 
 The `Top N predictions accuracy` lines show the accuracy for the top N predicted
 error rules, presented in the *Abstracted* blue bar in the paper's Figure 13.
-Additionally, the `Top N predictions acc. (rare)` lines show the *Abstracted*
-green bar in Figure 13 for the rare programs accuracy. Finally, `Threshold
-predictions accuracy`  and `Threshold predictions acc. (rare)` show the
-*Threshold* accuracies of Figure 13.
+Additionally, the `Top N predictions acc. (rare)` lines show the the rare
+programs accuracy in the *Abstracted* green bar in Figure 13. Finally,
+`Threshold predictions accuracy`  and `Threshold predictions acc. (rare)` show
+the *Threshold* accuracies of Figure 13.
 
 ### Repaired Program Preciseness & Efficiency (Sec. 7.2 & 7.3)
 
 Unfortunately, we can't provide the full dataset to reproduce the program repair
-rates. We will show though the repair rate for the *50* public programs that we
+rates. We will show though the repair rate for the *50 public programs* that we
 used for our human study, that can be found in the `human_study` directory. Each
 `program_N` subdirectory contains the original buggy program `original.py`, the
 user fix `user_fix.py`, the Seq2Parse repair `eccp_repair.py` along with other
@@ -158,9 +158,9 @@ run a smaller version of Seq2Parse.
 
 [website demo]: http://seq2parse.goto.ucsd.edu/index.html
 
-Run the `human_study` evaluation with `run_parse_test_time_top_n_small.py` a
-smaller version of `run_parse_test_time_top_n_preds_partials.py` that runs the
-full test set evaluation, but requires the private dataset. This evaluation will
+Run the `human_study` evaluation with `run_parse_test_time_top_n_small.py`, a
+smaller version of `run_parse_test_time_top_n_preds_partials.py` which runs the
+full test set evaluation but requires the private dataset. This evaluation will
 take approximately 6 minutes on a modern laptop to complete the automated repair
 and data analysis.
 
@@ -173,34 +173,34 @@ and we expect an output similar to this:
 ``` shell
 _________________________________________________________________
 2/2 [==============================] - 1s 31ms/step
-# Programs to repair: 50
+Programs to repair: 50
 100%|████████████████████████████████████████████████████████████| 50/50 [05:27<00:00,  6.56s/it]
 ---------------------------------------------------
-# Dataset size: 50
-# Parse accuracy (%): 100.0
-# Mean parse time (sec): 6.458792008679957
-# Median parse time (sec): 1.8143638589972397
-# Dataset repaired faster than user (%): 96.0
-# User fix accuracy (%): 10.0
-# All error locations fixed accuracy (%): 62.0
-# Any error locations fixed accuracy (%): 90.0
-# 1 sec: Parse accuracy = 22.0
-# 5 sec: Parse accuracy = 80.0
-# 10 sec: Parse accuracy = 86.0
-# 15 sec: Parse accuracy = 90.0
-# 20 sec: Parse accuracy = 94.0
-# 25 sec: Parse accuracy = 96.0
-# 30 sec: Parse accuracy = 96.0
-# 35 sec: Parse accuracy = 96.0
-# 40 sec: Parse accuracy = 96.0
-# 45 sec: Parse accuracy = 96.0
-# 50 sec: Parse accuracy = 96.0
-# 55 sec: Parse accuracy = 96.0
-# 60 sec: Parse accuracy = 96.0
+Dataset size: 50
+Parse accuracy (%): 100.0
+Mean parse time (sec): 6.458792008679957
+Median parse time (sec): 1.8143638589972397
+Dataset repaired faster than user (%): 96.0
+User fix accuracy (%): 10.0
+All error locations fixed accuracy (%): 62.0
+Any error locations fixed accuracy (%): 90.0
+1 sec: Parse accuracy = 22.0
+5 sec: Parse accuracy = 80.0
+10 sec: Parse accuracy = 86.0
+15 sec: Parse accuracy = 90.0
+20 sec: Parse accuracy = 94.0
+25 sec: Parse accuracy = 96.0
+30 sec: Parse accuracy = 96.0
+35 sec: Parse accuracy = 96.0
+40 sec: Parse accuracy = 96.0
+45 sec: Parse accuracy = 96.0
+50 sec: Parse accuracy = 96.0
+55 sec: Parse accuracy = 96.0
+60 sec: Parse accuracy = 96.0
 ---------------------------------------------------
 ```
 
-`Parse accuracy` shows how many program were repaired and parsed by Seq2Parse
+`Parse accuracy` shows how many programs were repaired and parsed by Seq2Parse
 and uses the *MinimumCost* approach from Figure 14. `Median parse time` shows
 the median time needed to repair and parse a program in this set. The rest of
 the results are also self-explanatory.
@@ -212,8 +212,9 @@ that can be reached at this [link].
 
 [link]: https://dijkstra.eecs.umich.edu/~endremad/APR_HumanEval/
 
-All these programs are included at our [website demo], where we run a smaller
-version of Seq2Parse. Additionally, these programs or any other *Python program with syntax errors* can use our website demo or the local command:
+All the program stimuli are also included at our [website demo], where we run a
+smaller version of Seq2Parse. Additionally, these programs or any other *Python
+program with syntax errors* can use our website demo or the local command:
 
 ``` shell
 ~/seq2parse/src $ python seq2parse.py python-grammar.txt ./models GPU_NUM INPUT_PROG.py
@@ -221,11 +222,11 @@ version of Seq2Parse. Additionally, these programs or any other *Python program 
 
 where `INPUT_PROG.py` is a Python program file and `GPU_NUM` is the ID of the
 local GPU to use (if multiple exist), otherwise set to 0. If no GPUs are
-available, the script will default CPU usage.
+available, the script will default to CPU usage.
 
 The output of the above Seq2Parse command is the original program and the
 Seq2Parse repair. The command will also generate a `INPUT_PROG.py.json` file at
-a `.seq2parse` directory (generated if it doesn't exist at the same directory as
-`INPUT_PROG.py`). `INPUT_PROG.py.json` has information used by the [website
-demo] for line-by-line syntax error feedback (will be used on a future VS Code
-plugin as well).
+a `.seq2parse` directory (generated if it doesn't exist, at the same directory
+as `INPUT_PROG.py`). `INPUT_PROG.py.json` has information used by the [website
+demo] for line-by-line syntax error feedback (and will also be used on a future
+VS Code plugin).

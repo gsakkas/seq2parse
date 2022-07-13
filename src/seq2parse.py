@@ -89,7 +89,6 @@ if __name__ == "__main__":
 
     prog_tokens = get_token_list(input_prog, terminals)
     error_rules = predict_error_rules(grammarFile, modelsDir, gpuToUse, input_prog, True)
-    print(error_rules)
     actual_tokens = get_actual_token_list(input_prog, terminals)
 
     repaired_prog = repair(ERROR_GRAMMAR, max_cost, prog_tokens, error_rules, actual_tokens).replace('_white_space_', ' ').replace('_NEWLINE_', '\n').replace("\\n", '\n')
@@ -101,42 +100,40 @@ if __name__ == "__main__":
     print(repaired_prog[:-3])
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
-    ['Err_Close_Paren -> ', 'Err_Colon -> ', 'Err_Dedent -> ', 'Err_Dedent -> H Dedent', 'Err_Endmarker -> H Endmarker', 'Err_If_Keyword -> ', 'Err_Indent -> ', 'Err_Literals -> ', 'Err_Literals -> H Literals', 'Err_Newline -> H Newline', 'Err_Open_Paren -> ', 'Err_Open_Paren -> H Open_Paren', 'Err_Return_Keyword -> H Return_Keyword', 'InsertErr -> :', 'InsertErr -> _DEDENT_', 'InsertErr -> _INDENT_', 'InsertErr -> _NAME_', 'InsertErr -> def', 'InsertErr -> for', 'InsertErr -> while']
-    ['Err_And_Bool_Op -> ', 'Err_And_Bool_Op -> Err_Tag', 'Err_And_Bool_Op -> H And_Bool_Op', 'Err_Arith_Op -> ', 'Err_Arith_Op -> Err_Tag', 'Err_Arith_Op -> H Arith_Op', 'Err_Assign_Op -> H Assign_Op', 'Err_Close_Paren -> ', 'Err_Close_Paren -> Err_Tag', 'Err_Close_Paren -> H Close_Paren', 'Err_Colon -> ', 'Err_Colon -> Err_Tag', 'Err_Colon -> H Colon', 'Err_Comma -> ', 'Err_Comma -> Err_Tag', 'Err_Comp_Op -> ', 'Err_Comp_Op -> Err_Tag', 'Err_Comp_Op -> H Comp_Op', 'Err_Dot -> ', 'Err_Dot -> H Dot']
-    # diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
-    # line_changes = [(ch_type, line_num + 1, get_line_location(input_prog.split('\n')[line_num], prev_line.replace('_INDENT_', ''), token_num, ch_type) + 1, len(input_prog.split('\n')[line_num]), (prev, change), ch_line.replace('_INDENT_', ''))
-    #                 for _, line_num, prev_line, ch_line in get_changes(list(diff_lines))
-    #                     for ch_type, token_num, prev, change in get_changes(list(df.ndiff(prev_line.replace('_INDENT_', '').split(), ch_line.replace('_INDENT_', '').split())))]
-    # # line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, prev, change in get_changes(list(diff_lines))]
+    diff_lines = df.ndiff(actual_tokens.split('_NEWLINE_'), get_actual_token_list(repaired_prog, terminals).split('_NEWLINE_'))
+    line_changes = [(ch_type, line_num + 1, get_line_location(input_prog.split('\n')[line_num], prev_line.replace('_INDENT_', ''), token_num, ch_type) + 1, len(input_prog.split('\n')[line_num]), (prev, change), ch_line.replace('_INDENT_', ''))
+                    for _, line_num, prev_line, ch_line in get_changes(list(diff_lines))
+                        for ch_type, token_num, prev, change in get_changes(list(df.ndiff(prev_line.replace('_INDENT_', '').split(), ch_line.replace('_INDENT_', '').split())))]
+    # line_changes = [(ch_type, line_num + 1, len(input_prog.split('\n')[line_num]) + 1, change) for ch_type, line_num, prev, change in get_changes(list(diff_lines))]
 
-    # result = { "status": "safe"
-    #          , "errors": []
-    #          , "types": {}
-    #          }
+    result = { "status": "safe"
+             , "errors": []
+             , "types": {}
+             }
 
-    # if line_changes:
-    #     result["status"] = "unsafe"
-    #     for ch_type, line_num, start, line_len, (prev, change), ch_line in line_changes:
-    #         if ch_type == 'Add':
-    #             msg = ch_type + " \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
-    #             column = 1
-    #             length = line_len
-    #         elif ch_type == 'Delete':
-    #             msg = ch_type + " \'" + prev.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
-    #             column = start
-    #             length = len(prev)
-    #         else:
-    #             msg = ch_type + " \'" + prev.strip() + "\' with \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
-    #             column = start
-    #             length = len(prev)
-    #         result["errors"].append({ "message": msg
-    #                                 , "start"  : {"line": line_num, "column": column}
-    #                                 , "stop"   : {"line": line_num, "column": column + length if column + length > 1 else 20}
-    #                                 })
-    # tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
-    # if not exists(tmpDir):
-    #     mkdir(tmpDir)
-    # newInputPath = Path(join(tmpDir, inputPath.name))
+    if line_changes:
+        result["status"] = "unsafe"
+        for ch_type, line_num, start, line_len, (prev, change), ch_line in line_changes:
+            if ch_type == 'Add':
+                msg = ch_type + " \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = 1
+                length = line_len
+            elif ch_type == 'Delete':
+                msg = ch_type + " \'" + prev.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = start
+                length = len(prev)
+            else:
+                msg = ch_type + " \'" + prev.strip() + "\' with \'" + change.strip() + "\' on line " + str(line_num) + ", column " + str(start) + ":\n\'" + ch_line.strip() + "\'\n"
+                column = start
+                length = len(prev)
+            result["errors"].append({ "message": msg
+                                    , "start"  : {"line": line_num, "column": column}
+                                    , "stop"   : {"line": line_num, "column": column + length if column + length > 1 else 20}
+                                    })
+    tmpDir = join(inputPath.parent.absolute(), ".seq2parse")
+    if not exists(tmpDir):
+        mkdir(tmpDir)
+    newInputPath = Path(join(tmpDir, inputPath.name))
 
-    # with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
-    #     json.dump(result, out_file, indent=4)
+    with open(newInputPath.with_suffix(".py.json"), "w") as out_file:
+        json.dump(result, out_file, indent=4)
