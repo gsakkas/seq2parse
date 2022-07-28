@@ -45,6 +45,14 @@ on tensorflow see the online [instructions].
 [tensorflow]: https://www.tensorflow.org/
 [instructions]:  https://www.tensorflow.org/install/pip#linux
 
+In case Python 3.10 is not available, Python 3.8 can be used with `virtualenv`, with the following commands:
+
+``` shell
+~/seq2parse/src $ virtualenv -p 3.8 .venv
+~/seq2parse/src $ source .venv/bin/activate
+~/seq2parse/src $ pip install -r requirements_3_8.txt
+```
+
 ### Testing
 
 Let's run a quick test to make sure everything was installed correctly. We'll
