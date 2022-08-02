@@ -1,0 +1,69 @@
+\centering
+\resizebox{1.05\linewidth}{!}{
+    \begin{tikzpicture}
+    [font=\large, edge from parent,
+    % every node/.style={top color=white, bottom color=black!20,
+    % ellipse, minimum size=8mm, draw=black!75,
+    % thick, drop shadow, align=center},
+    edge from parent/.style={draw=black!75, thick},
+    level distance=1.0cm]
+    \node (func) {\texttt{FuncDef}}
+        child [xscale=0.8] {
+            node (def) {\texttt{\bfseries def}}
+        }
+        child [xscale=0.8] {
+            node (name1) {\texttt{name}}
+        }
+        child [xscale=0.8] {
+            node (params) {\texttt{Params}}
+            child [xscale=0.8] {
+                node (openParen) {\texttt{\bfseries (}}
+            }
+            child [xscale=0.8] {
+                node (name2) {\texttt{name}}
+            }
+            child [xscale=0.8] {
+                node (closeParen) {\texttt{\bfseries )}}
+            }
+        }
+        child [xscale=0.8] {
+            node (colon) {\texttt{\bfseries :}}
+        }
+        child [xscale=1.1] {
+            node (block) {\texttt{Block}}
+            child [xscale=0.7] {
+                node (newline1) {\texttt{\textbackslash n}}
+            }
+            child [xscale=0.8] {
+                node (indent) {\texttt{indent}}
+            }
+            child [xscale=0.8] {
+                node (stmts1) {\texttt{Stmts}}
+                child [xscale=0.9] {
+                    node (stmt1) {\texttt{Stmt}}
+                    child {
+                        node (expr1) {\texttt{ExprStmt}}
+                    }
+                }
+                child [xscale=0.9] {
+                    node (newline2) {\texttt{\textbackslash n}}
+                }
+                child [xscale=0.9] {
+                    node [style={minimum size=6.5mm, draw=black, thick}] (stmts2) {\texttt{Stmts$^1$}}
+                    child {
+                        node (stmt2) {\texttt{Stmt}}
+                    }
+                    child {
+                        node (newline3) {\texttt{\textbackslash n}}
+                    }
+                }
+            }
+            child [xscale=0.8] {
+                node (dedent) {\texttt{dedent}}
+            }
+        };
+    \end{tikzpicture}
+}
+\caption{The partial parse tree generated for \texttt{bar} in the example at
+\autoref{fig:bad-prog}}
+\label{fig:partial-parse-tree-1}

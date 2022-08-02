@@ -1,0 +1,164 @@
+\section{Training Sequence Classifiers}
+\label{sec:seq-classifiers}
+
+Our next task is to \emph{train} a model that can predict the error production
+rules that are needed to parse a given program $e_{\bot}$ (with syntax errors)
+according to a given grammar $G$, by using its (abstracted) program token
+sequence $t^a$.
+%
+We define the function $\predictDLsym$ which takes as input a \emph{pre-trained
+sequence classifier} $\Model$ and an abstracted token sequence $t^a$ and returns
+as output a \emph{small subset} of $\errorrulessym$.
+%
+We train the $\Model$ offline with the $\trainDLsym$ method with a dataset
+$\List{t^a \times \errorrulessym}$ of token sequences $t^a$ and the \emph{exact
+small set} of error production rules $\errorrulessym$ that the ECE-Parser used
+to generate the \emph{user parse}. We build our classifier $\Model$ using
+classic \emph{Deep Neural Networks (\dnn{}s)} and parts of state-of-the-art
+\emph{Sequence-to-Sequence (seq2seq)} models. We leave the high level details of
+acquiring the dataset of labeled token sequences and using the predictor for new
+erroneous programs for \autoref{sec:whole-system}. In the next few paragraphs,
+we summarize the recent advances in machine learning that help as build the
+sequence classifier.
+
+We encode the task of learning a function that will map token sequences of
+erroneous programs to a small set of error production rules as a
+\emph{supervised multi-class classification (MCC)} problem. A \emph{supervised}
+learning problem is one where, given a labeled training set, the task is to
+learn a function that accurately maps the inputs to output labels and
+generalizes to future inputs. In a \emph{classification} problem, the function
+we are trying to learn maps inputs to a discrete set of two or more output
+labels, called \emph{classes}. We use a \emph{Transformer encoder} to encode the
+input sequences into abstract vectors that we then directly feed into a
+\emph{\dnn} classifier to build a \emph{Transformer classifier}.
+
+\mypara{Neural Networks}
+A neural network can be represented as a directed acyclic graph whose nodes are
+arranged in layers that are fully connected by weighted edges. The first layer
+corresponds to the input features, and the final to the output. The output of an
+internal node is the sum of the weighted outputs of the previous layer passed to
+a non-linear \emph{activation function}, which in recent work is commonly chosen
+to be the rectified linear unit (ReLU) \citep{Nair2010-xg}. In this work, we use
+relatively \emph{deep neural networks} (\dnn) that have proven to make more
+accurate predictions in recent work~\citep{Schmidhuber_2015}. A thorough
+introduction to neural networks is beyond the scope of this
+work~\citep{Hastie2009-bn, Nielsen2015-pu}.
+
+% For example, the outputs of an internal layer of nodes $l$ is given as $y_l =
+% g(W_{l-1} y_{l-1})$, where $W_{l-1}$ is the weight matrix for the edges between
+% layers $l$ and $l-1$ and $y_{l-1}$ is the output of the previous layer. The
+% input $y_0 = x$ is the input features of the neural network and, finally, g is
+% the activation function, which in recent work is commonly chosen to be the
+% rectified linear unit (ReLU), defined as $g(x) = max(0, x)$ \citep{Nair2010-xg}.
+% The number of layers, the number of nodes per layer, and the connections between
+% layers constitute the \emph{architecture} of a neural network
+
+\mypara{Sequence Models}
+\emph{Seq2seq} models aim to transform input sequences of one domain into
+sequences of another domain \citep{Sutskever_2014}. In the general case, these
+models consist of two major layers, an \emph{encoder} and a \emph{decoder}. The
+encoder transforms an input token sequence $x_1, x_2, \dots, x_n$ into a
+\emph{abstract vector} $V \in \R^k$ that captures all the essence and context of
+the input sequence. This vector does not necessarily have some physical meaning
+and is just an internal representation of the input sequence into a higher
+dimensional space. The abstract vector is then given as an input to the decoder,
+which in turn transforms it into an output sequence $y_1, y_2, \dots, y_n$.
+
+% \begin{align}
+%     h_t &= f(W_{hx} x_t + W_{hh} h_{t-1}) \label{eq:1} \\
+%     y_t &= g(W_{yh} h_t) \label{eq:2}
+% \end{align}
+
+The simplest approach historically uses a Recurrent Neural Network (RNN)
+\citep{Rumelhart1986, Werbos1990}, which is a natural next step from the classic
+neural networks. Each RNN unit operates on each input token $x_t$ separately. It
+keeps an internal \emph{hidden state} $h_t$ that is calculated as
+% in $h_t = f(W_{hx} x_t + W_{hh} h_{t-1})$,
+a function of the input token $x_t$ and the previous hidden state $h_{t-1}$.
+% The weight matrices $W_{hx}$ and $W_{hh}$ parametrize the input-to-hidden and
+% the hidden-to-hidden connections respectively. The function $f$ is another
+% non-linear activation function such as \emph{tanh, sigmoid} and \emph{ReLU}.
+The output $y_t$ is calculated as
+% $y_t = g(W_{yh} h_t)$, \ie
+the product of the current hidden state $h_t$ and an output weight matrix. The
+activation function is usually chosen as the standard \emph{softmax} function
+\citep{Goodfellow-et-al-2016, Bishop-book-2006}. Softmax assigns probabilities
+to each output that must add up to 1.
+% which, for an output vector $y = (y_1, \dots, y_N) \in \R^{N}$, is defined as:
+% \[ \sigma(y)_i = \frac{e^{y_i}}{\sum_{j=1}^{N} e^{y_j}},\ for\ i = 1, \dots, N.
+% \]
+Finally, the loss function at all steps of the RNN is typically calculated as
+the sum of the cross-entropy loss of each step.
+
+% These recurrent models have to generate the sequence of hidden states $h_t$, as
+% a function of the previous hidden state $h_{t-1}$ and the input $x_t$. This
+% sequential generation of hidden states limits parallelization within training
+% examples and causes training problems when dealing with longer sequences, as
+% memory constraints limit batching across examples. However, the latest
+% state-of-the-art approach for seq2seq architectures is the newer
+% \emph{Transformer} model \citep{Vaswani_2017} that replaces the classic RNN unit
+% and solves these problems due to its \emph{attention mechanisms}.
+
+\mypara{Transformers}
+The Transformer is an \dnn architecture that deviates from the recurrent pattern
+(\eg, RNNs) and is solely relying on \emph{attention mechanisms}. Attention has
+been of interest lately \citep{Bahdanau2015, Kim2017, Vaswani_2017} mainly due
+to its ability to detect dependencies in the input or output sequences
+regardless the distance of the tokens. The nature of this architecture makes the
+Transformer significantly easier to parallelize and thus has a higher
+quality of predictions and sequence translations after a shorter training
+period.
+
+The novel architecture of a Transformer \citep{Vaswani_2017} is structured as a
+\emph{stack of $N$ identical layers}. Each layer has two main sub-layers. The
+first is a \emph{multi-head self-attention mechanism}, and the second is a
+position-wise fully connected neural network. The output of each sub-layer is
+$LayerNorm(x + SubLayer(x))$, where $SubLayer(x)$ is the function implemented by
+each sub-layer, followed by a residual connection around each of the two
+sub-layers and  by layer normalization $LayerNorm(x)$. To facilitate these
+residual connections, all sub-layers in the model, as well as the input
+\emph{embedding layers}, produce outputs of the same dimension $d_{model}$.
+
+% This architecture is used as described above in a seq2seq model
+% \citep{Vaswani_2017} for the encoder. The decoder would require an extra third
+% sub-layer, which performs multi-head attention over the output of the encoder
+% stack. However, in our task we learn sets of error production rules, which we
+% frame as a classic \emph{multi-class classification} problem. We are dealing
+% with input sequences of varied sizes, where no straightforward feature
+% extraction technique exists. Therefore, we utilize the effectiveness of the
+% state-of-the-art \emph{Transformer encoder} to summarize the programs into
+% fixed-length vectors that can then be fed into classic \dnn{} classifiers.
+
+% \subsection{Transformer Classifier}
+% \label{sec:seq-classifiers:location-rank}
+
+
+% \mypara{Multi-class \dnn{}s}
+%
+% A \dnn can be used as a binary classifier, \ie predict if the given input
+% belongs into a class or not. While this model is enough for many tasks, \eg
+% error localization \citep{Sakkas_2020, Seidel:2017}, in the case of error rule
+% prediction we have to select from multiple \emph{classes}. We therefore use a
+% \dnn for our error rule prediction $\Model$, but we adjust the output layer to
+% have $N$ nodes for the selected $N$ error-rule-classes.
+
+% \mypara{Multi-class Transformer Classifiers}
+%
+\mypara{Transformer Classifier}
+For our task, we choose to structure $\Model$ as a \emph{Transformer
+Classifier}. We use a novel Transformer encoder to represent an abstracted token
+sequence $t^a$ into an abstract vector $V \in \R^k$. The abstract vector $V$ is
+then fed as input into a multi-class \dnn. We use $\trainDLsym$ to train the
+$\Model$ given the training set $\List{t^a \times \errorrulessym}$. The binary
+cross-entropy loss function is used per class to assign the loss per training
+cycle. $\Model$ predicts error production rules for a new input program $t^a$.
+Critically, we require that the classifier outputs \emph{confidence scores}
+$\Conf$ that measure how sure the classifier is that a rule can be used to parse
+the associated input program $e_{\bot}$. The $\predictDLsym$ function uses the
+trained $\Model$ to predict the confidence scores $\List{\errorrulessym\ \times\
+\Conf}$ for all error production rules $\errorrulessym$ for a new unknown
+program $e_\bot$ with syntax errors. The $\errorrulessym$ are then sorted based
+on their predicted confidence score $\Conf$ and finally the \emph{top-N} rules
+are returned for error-correcting parsing. $N$ is a small number in the 10s that
+will give accurate predictions without making the ECE-Parser too slow, as we
+discuss in \autoref{sec:eval}.

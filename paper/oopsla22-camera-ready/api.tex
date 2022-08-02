@@ -1,0 +1,52 @@
+\begin{figure}[t]
+\small
+\begin{minipage}[t]{0.38\linewidth}
+  \small
+  \lstDeleteShortInline{|}
+  \[
+  \boxed{
+  \begin{array}{lcl}
+    G              & \defeq  & (N,\ \Sigma,\ P,\ S) \\
+    \pcfgsym       & \defeq  & (N,\ \Sigma,\ P,\ S,\ W) \\
+    \midrule
+    G'             & \defeq  & (N',\ \Sigma,\ P',\ S') \\
+    P'             & \defeq  & P\ \cup\ \errorrulessym \\
+    N'             & \defeq  & N\ \cup\ \{S',\ H,\ I\}\ \cup\\
+                   &         & \{E_a\ |\ a \in \Sigma\} \\
+    \midrule
+    e              & \in    & L(G) \\
+    e_{\bot}       & \notin & L(G) \\
+    \pairsym       & \defeq & e_{\bot} \times e \\
+    \datasetsym    & \defeq & \List{\pairsym} \\
+  \end{array}
+  }
+  \]
+  \lstMakeShortInline[language=Python, mathescape=true]{|}
+\end{minipage}
+\begin{minipage}[t]{0.61\linewidth}
+  \small
+  \lstDeleteShortInline{|}
+  \[
+  \boxed{
+  \begin{array}{c|lcl}
+    \multirow{2}{*}{\S~\ref{sec:prog-abstract}}   & \learnPCFGsym  & : & G \to \List{e} \to \pcfgsym \\
+                                                  & \partialsym    & : & \pcfgsym \to e_{\bot} \to t^a  \\
+                                                    \midrule
+    \multirow{2}{*}{\S~\ref{sec:seq-classifiers}} & \trainDLsym    & : & \List{t^a \times \errorrulessym} \to \Model \\
+                                                  & \predictDLsym  & : & \Model \to t^a \to \errorrulessym \\
+                                                    \midrule
+    \multirow{4}{*}{\S~\ref{sec:whole-system}}    & \diffsym       & : & \pairsym \to \errorrulessym \\
+                                                  & \ecepsym       & : & \errorrulessym \to e_{\bot} \to e \\
+                                                  & \trainsym      & : & \datasetsym \to \Model \\
+                                                  & \predictsym    & : & \Model \to G \to e_{\bot} \to \errorrulessym \\
+                                                    \midrule
+                                                  & \systemsym     & : & G \to \datasetsym \to (e_{\bot} \to e) \\
+  \end{array}
+  }
+  \]
+  \lstMakeShortInline[language=Python, mathescape=true]{|}
+\end{minipage}
+\caption{A high-level API of the \toolname system that learns to repair syntax
+errors.}
+\label{fig:api}
+\end{figure}

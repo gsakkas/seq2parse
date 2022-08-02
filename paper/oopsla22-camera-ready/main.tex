@@ -1,0 +1,388 @@
+%% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
+\documentclass[acmsmall,review,anonymous]{acmart}
+\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+% \pagestyle{plain} % removes running headers
+
+%% For double-blind review submission, w/ CCS and ACM Reference
+%\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For single-blind review submission, w/ CCS and ACM Reference
+%\documentclass[sigplan,review]{acmart}\settopmatter{printfolios=true}
+%% For final camera-ready submission, w/ required CCS and ACM Reference
+%\documentclass[sigplan]{acmart}\settopmatter{}
+
+
+%% Conference information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
+\acmArticle{1}
+\acmYear{2018}
+\acmMonth{1}
+\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2018}           %% If different from \acmYear
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \citep{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \citep{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Other packages
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithmicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows,trees,shapes,fit,patterns}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usepackage{pgfplotstable}
+\usepackage{bm}
+\usepackage{framed}
+\usepackage{amsmath}
+% \usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage[skip=4pt]{caption}
+\usepackage{wrapfig}
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage{multirow}
+\usepackage{cite}
+
+\lstset{
+  language=Python,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\small\ttfamily\bfseries,
+  mathescape=true
+}
+
+\lstnewenvironment{ecode}{
+\lstset{
+  language=Python,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\footnotesize\ttfamily\bfseries\color{deepblue},
+  emphstyle=\footnotesize\ttfamily\bfseries\color{deepred},
+  stringstyle=\footnotesize\ttfamily\color{deepgreen},
+  literate=*
+    {1}{{{\color{deepred}1}}}{1}
+    {2}{{{\color{deepred}2}}}{1}
+    {3}{{{\color{deepred}3}}}{1}
+    {4}{{{\color{deepred}4}}}{1}
+    {5}{{{\color{deepred}5}}}{1}
+    {6}{{{\color{deepred}6}}}{1}
+    {7}{{{\color{deepred}7}}}{1}
+    {8}{{{\color{deepred}8}}}{1}
+    {9}{{{\color{deepred}9}}}{1},
+  numbers=left,
+  xleftmargin=5.5mm,
+  moredelim=[is][\bfseries]{==}{==},
+  moredelim=[is][\underbar]{__}{__},
+  moredelim=[is][\bfseries\underbar]{_=}{=_},
+  escapeinside={(*@}{@*)}
+}}
+{}
+
+\lstnewenvironment{rules}{
+\lstset{
+  language=Python,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\footnotesize\ttfamily\bfseries,
+  xleftmargin=0.5mm,
+  numbers=none,
+  moredelim=[is][\bfseries]{==}{==},
+  moredelim=[is][\underbar]{__}{__},
+  moredelim=[is][\bfseries\underbar]{_=}{=_},
+  escapeinside={(*@}{@*)}
+}}
+{}
+
+\MakeRobust{\Call}
+
+\newcommand{\algorithmautorefname}{Algorithm}
+\makeatletter
+\renewcommand{\ALG@beginalgorithmic}{\small}
+\renewcommand{\ALG@endalgorithmic}{\small}
+\makeatother
+
+\lstMakeShortInline[language=Python, mathescape=true]{|}
+
+%% Our commands
+\usepackage{commands}
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+
+% This is the syntax highlighting for python:
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{8} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{8}  % for normal
+
+% Custom colors
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.8,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+morekeywords={self},              % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+literate=*
+  {1}{{{\color{deepred}1}}}{1}
+  {2}{{{\color{deepred}2}}}{1}
+  {3}{{{\color{deepred}3}}}{1}
+  {4}{{{\color{deepred}4}}}{1}
+  {5}{{{\color{deepred}5}}}{1}
+  {6}{{{\color{deepred}6}}}{1}
+  {7}{{{\color{deepred}7}}}{1}
+  {8}{{{\color{deepred}8}}}{1}
+  {9}{{{\color{deepred}9}}}{1},
+frame=tb,                         % Any extra options here
+showstringspaces=false
+}}
+
+% Python environment
+\lstnewenvironment{python2}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% Python for external files
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+
+% Python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+
+
+\begin{document}
+
+%% Title information
+\title[\toolname]{\toolname: Neurosymbolic Parse Error Repair}
+
+% \titlenote{with title note}             %% \titlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+% \subtitle{Subtitle}                     %% \subtitle is optional
+% \subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+%                                         %% can be repeated if necessary;
+%                                         %% contents suppressed with 'anonymous'
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{Georgios Sakkas}
+% \authornote{with author1 note}          %% \authornote is optional;
+%                                         %% can be repeated if necessary
+% \orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  \department{Computer Science \& Engineering}
+  \institution{University of California, San Diego}
+  % \streetaddress{Street1 Address1}
+  \city{La Jolla}
+  \state{CA}
+  % \postcode{Post-Code1}
+  \country{USA}
+}
+\email{gsakkas@eng.ucsd.edu}
+
+\author{Madeline Endres}
+\affiliation{
+  \department{Computer Science \& Engineering}
+  \institution{University of Michigan}
+  \city{Ann Arbor}
+  \state{MI}
+  \country{USA}
+}
+\email{endremad@umich.edu}
+
+\author{Philip Guo}
+\affiliation{
+  \department{Computer Science \& Engineering}
+  \institution{University of California, San Diego}
+  \city{La Jolla}
+  \state{CA}
+  \country{USA}
+}
+\email{pg@ucsd.edu}
+
+\author{Westley Weimer}
+\affiliation{
+  \department{Computer Science \& Engineering}
+  \institution{University of Michigan}
+  \city{Ann Arbor}
+  \state{MI}
+  \country{USA}
+}
+\email{weimerw@umich.edu}
+
+\author{Ranjit Jhala}
+\affiliation{
+  \department{Computer Science \& Engineering}
+  \institution{University of California, San Diego}
+  \city{La Jolla}
+  \state{CA}
+  \country{USA}
+}
+\email{jhala@cs.ucsd.edu}
+
+\begin{abstract}
+We present \toolname, a neurosymbolic approach
+to automatically repairing parse errors.
+%
+\toolname is based on the insight that
+%
+\emph{Symbolic} Error Correcting (EC) Parsers can, in principle,
+synthesize repairs, but, in practice, are overwhelmed by
+the many error-correction rules that are not \emph{relevant}
+to the particular program that requires repair.
+%
+In contrast, \emph{Neural} approaches are fooled by the large
+space of possible sequence level edits, but can precisely
+pinpoint the set of EC-rules that \emph{are} relevant
+to a particular program.
+%
+We show how to combine their complementary strengths
+by using neural methods to train a sequence classifier
+that predicts the small set of relevant EC-rules
+for an ill-parsed program, after which, the symbolic
+EC-parsing algorithm can make short work of generating
+useful repairs.
+%
+We train and evaluate our method on a dataset of 1,100,000
+Python programs, and show that \toolname is
+%
+\emph{accurate} and \emph{efficient}: it can parse $94\%$
+of our tests within $2.1$ seconds, while generating the
+exact user fix in 1 out 3 of the cases; and
+%
+\emph{useful}: humans perceive both \toolname-generated
+error-locations and repairs to be almost as good as
+human-generated ones in a statistically-significant manner.
+\end{abstract}
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10011007.10011006.10011008</concept_id>
+<concept_desc>Software and its engineering~General programming languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003456.10003457.10003521.10003525</concept_id>
+<concept_desc>Social and professional topics~History of programming languages</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~General programming languages}
+\ccsdesc[300]{Social and professional topics~History of programming languages}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+% \keywords{keyword1, keyword2, keyword3}  %% \keywords are mandatory in final camera-ready submission
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+\input{introduction}
+\input{error-analysis}
+\input{overview}
+\input{program-abstraction}
+\input{seq-classifiers}
+\input{whole-system}
+\input{evaluation}
+\input{related-work}
+\input{conclusion}
+
+
+%% Acknowledgments
+% \begin{acks}                            %% acks environment is optional
+%                                         %% contents suppressed with 'anonymous'
+%   %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+%   %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+%   %% acknowledge financial support and will be used by metadata
+%   %% extraction tools.
+%   This material is based upon work supported by the
+%   \grantsponsor{GS100000001}{National Science
+%     Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+%   No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+%   No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+%   conclusions or recommendations expressed in this material are those
+%   of the author and do not necessarily reflect the views of the
+%   National Science Foundation.
+% \end{acks}
+
+
+%% Bibliography
+\bibliography{bibliography}
+
+
+%% Appendix
+% \appendix
+% \section{Appendix}
+
+% Text of appendix \ldots
+
+\end{document}

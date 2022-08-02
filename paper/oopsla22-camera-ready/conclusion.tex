@@ -1,0 +1,24 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We have presented \emph{neurosymbolic parse program repair}, a new neurosymbolic
+approach to automatically repair parse errors.
+%
+Our approach is to use a dataset of ill-parsed programs and their fixed versions
+to train a Transformer classifier (neural component) which allows us to
+accurately predict EC-rules for new programs with syntax errors. In order to
+make accurate predictions, we abstract the low-level program token sequences
+using partial parses and probabilistic grammars. A small set of predicted
+EC-rules is finally used with an ECE-Parser (symbolic component) to parse and
+repair new ill-parsed programs in a tractable and precise manner.
+
+We have implemented our approach in \toolname, and demonstrated, using a corpus
+of 1,100,000 ill-parsed \python programs drawn from two years of data from an
+online web-based educational compiler, that \toolname makes accurate EC-rule
+predictions 81\% of the time when considering the top 20 EC-rules, and that the
+predicted EC-rules let us parse and repair over 94\% of the test set in 2.1 sec
+median parse time, while generating the user fix in almost 1 out of 3 cases.
+%
+Finally, we conducted a user study with 39 participants which showed that
+\toolname's edit locations and repairs are useful and helpful, even when they
+are not equivalent to the user's fix.

@@ -1,0 +1,21 @@
+\begin{algorithm}[H]
+    \captionsetup{font=small}
+    \caption{Training $\systemsym$'s model $\Model$}
+    \label{algo:training-classifier-algo}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}[1]
+    \Require{Probabilistic Grammar $G$, $\datasetsym\ Ds$}
+    \Ensure{Classifier $Model$}
+    \Procedure{Train}{$G,\,Ds$}
+    \State $D_{ML} \gets \emptyset$
+    \ForAll{$\pbad \times \pfix \in Ds$}
+      \State $t^a \gets$ \Call{PartialParse}{$G,\,\pbad$}
+      \State $rules \gets$ \Call{DiffRules}{$\pbad \times \pfix$}
+      \State $D_{ML} \gets D_{ML}\,\cup\ (t_a \times rules)$
+    \EndFor
+    \State $Model \gets$ \Call{TrainDL}{$D_{ML}$}
+    \State \Return{$Model$}
+    \EndProcedure
+    \end{algorithmic}
+\end{algorithm}

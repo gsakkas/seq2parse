@@ -1,0 +1,157 @@
+
+\section{Introduction}
+\label{sec:intro}
+
+Parse errors can vex novices who
+are learning to program.
+%
+Traditional error messages
+only indicate the first error
+or produce messages that
+are either incomprehensibly
+verbose or not descriptive
+enough to help swiftly remedy
+the error~\citep{qian2017, VanDerSpek_2005}).
+%
+When they occur in larger code bases, parse errors
+may even trouble experts, and can require a great deal of
+effort to fix~\citep{Denny_2012, Ahadi_2018, Kummerfeld2003}.
+
+Owing to their ubiquity and importance, there are \emph{two}
+established lines of work on automatically suggesting \emph{repairs}
+for parse errors.
+%
+In the first line, Programming Languages researchers
+have investigated \emph{symbolic} approaches starting
+with classical parsing algorithms, \eg, LR~\citep{Aho1974}
+or Earley~\citep{Earley_1970}.
+%
+These algorithms can accurately locate syntax errors,
+but do not provide \emph{actionable} feedback on how
+to fix the error.
+%
+\citet{Aho_1972} extends these ideas to implement
+\emph{error correcting parsers} (EC-Parsers) that
+use special error production rules to handle
+programs with syntax errors and
+synthesize minimal-edit parse error repairs.
+%
+Sadly, EC-parsers have remained mostly of theoretical
+interest, as their running time is cubic in the
+program size, and quadratic in the size of the language's
+grammar, which has rendered them impractical for
+real-world languages~\citep{McLean1996, Rajasekaran2014}.
+
+In the second line, Machine Learning and NLP researchers have
+pursued \emph{Deep Neural Network} (\dnn)
+approaches using advanced sequence-to-sequence
+models \citep{Sutskever_2014, Hardalov_2018}
+that use a large corpus of code to predict
+the next token (\eg, at a parse error location).
+%
+Unfortunately, these methods ignore the high-level structure
+of the language (or must learn it from vast amounts
+of data) and hence, lack accuracy in real-world contexts.
+%
+For example, state-of-the-art methods such as \citet{Ahmed_2021} parse and
+repair only \emph{32\%} of real student code with up to 3 syntax errors
+while \citet{Wu2020} repair only \emph{58\%} of syntax errors in a
+real-world dataset.
+
+In this paper, we present \toolname, a new approach
+to automatically repairing parse errors
+based on the following key insight.
+%
+Symbolic EC-Parsers \citep{Aho_1972} can, in principle,
+synthesize repairs, but, in practice, are overwhelmed by
+the many error-correction rules that are not \emph{relevant}
+to the particular program that requires repair.
+%
+In contrast, Neural approaches are fooled by the large
+space of possible sequence level edits, but can precisely
+pinpoint the set of EC-rules that are \emph{relevant}
+to a particular program.
+%
+Thus, \toolname addresses the problem of parse error
+repair by a neurosymbolic approach that combines
+the complementary strengths of the two lines of work
+via the following concrete contributions.
+
+\mypara{1. Motivation}
+%
+Our first contribution is an empirical analysis of a real-world
+dataset of more than a million novice Python programs that shows
+that parse errors constitute the majority of novice errors, take a long
+time to fix, and that the fixes themselves can often require
+multiple edits.
+%
+This analysis clearly demonstrates that an automated tool that
+suggests parse error repairs in a few seconds could greatly
+benefit many novices (\S~\ref{sec:error-analysis}).
+
+\mypara{2. Implementation}
+%
+Our second contribution is the design and implementation
+of \toolname, which exploits the insight above to
+efficiently and accurately suggest repairs in a
+neurosymbolic fashion:
+%
+(1) train sequence classifiers to predict the \emph{relevant}
+EC-rules for a given program (\S~\ref{sec:seq-classifiers}), and then
+%
+(2) use the predicted rules to synthesize repairs
+via EC-Parsing (\S~\ref{sec:whole-system}).
+
+\mypara{3. Abstraction}
+%
+Predicting the rules is challenging.
+Standard NLP token-sequence based
+methods are confused by long
+trailing contexts that are
+independent of the parse error.
+%
+This confusion yields to inaccurate
+classifiers that predict irrelevant
+rules yielding woefully low repair rates.
+%
+Our second key insight eliminates neural confusion
+via a symbolic intervention: we show how to use
+Probabilistic Context Free Grammars (PCFGs)
+to \emph{abstract} long low-level token
+sequences so that the irrelevant trailing
+context is compressed into single non-terminals,
+yielding compressed abstract token sequences
+that can be accurately understood by \dnn{}s
+(\S~\ref{sec:prog-abstract}).
+
+\mypara{4. Evaluation}
+%
+Our final contribution is an evaluation of \toolname
+using a dataset of more than 1,100,000 Python programs
+that demonstrates its benefits in three ways.
+%
+First, we show its \emph{accuracy}: \toolname correctly predicts
+the right set of error rules $81\%$ of the time when considering the top $20$
+rules and can parse $94\%$ of our tests within $2.1$ seconds with these
+predictions, a significant improvement over prior methods
+which were stuck below a $60\%$ repair rate.
+%
+Second, we demonstrate its \emph{efficiency}: \toolname parses and repairs
+erroneous programs within $20$ seconds $83\%$ of the time, while also generating
+\emph{the user fix in almost 1 out 3 of the cases}.
+%
+Finally, we measure the \emph{quality} of the generated repairs via a human
+study with 39 participants and show that humans perceive both \toolname's edit
+locations and final repair quality to be useful and helpful, in a
+statistically-significant manner, even when not equivalent to the user's fix
+(\S~\ref{sec:eval}).
+
+% The rest of the paper is organized as follows: \autoref{sec:error-analysis}
+% shows the importance of syntax errors in novice software
+% development.
+% In \autoref{sec:overview} we present a high-level overview, while
+% \autoref{sec:prog-abstract}, \autoref{sec:seq-classifiers} and
+% \autoref{sec:whole-system} describe the algorithmic implementation of
+% \toolname. Finally, \autoref{sec:eval} presents quantitative and
+% qualitative results and \autoref{sec:related-work} places our work in
+% context.

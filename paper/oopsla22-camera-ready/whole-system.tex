@@ -1,0 +1,137 @@
+\section{Building a Fast Error Correcting Parser}
+\label{sec:whole-system}
+
+We show how $\systemsym$ uses the abstracted token sequences from
+\autoref{sec:prog-abstract} and the trained sequence models from
+\autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
+$(e_{\bot} \to e)$, that will parse an input program $e_{\bot}$ with syntax
+errors and produce a correct program $e$. We first describe how we extract a
+machine-learning-amenable training set from a corpus of fixed programs and
+finally how we structure everything to train our model.
+
+
+\subsection{Learning Error Production Rules}
+\label{sec:whole-system:error-rules}
+
+The $\trainDLsym$ method requires a dataset of token sequences $t^a$ that is
+annotated with an \emph{exact and small set} of error production rules, \ie
+$\List{t^a \times \errorrulessym}$. These $\errorrulessym$ are just a subset of
+all the possible error rules that are needed to parse and fix $t^a$. The
+straight-forward approach is to use $\ecepsym$ with all possible error
+production rules for each program $e_{\bot}$ in the dataset. Then, when
+$\ecepsym$ returns with a successful parse, we extract the rules that where used
+to parse the program $e_{\bot}$. This approach generates a dataset with the
+smallest possible set of error rules as labels per program, since the original
+ECE-Parser returns the minimum-distance edit parse. However, this approach
+completely ignores the programmer's fix and takes an unreasonable amount of time
+to parse a dataset with millions of programs, due to the inefficient nature of
+the ECE-Parser.
+
+We suggest using an $O(ND)$ difference algorithm \citep{Myers_1986} to get a
+small but still representative set of error production rules for each program
+$e_{\bot}$. We employ this algorithm to find the differences between the input
+\emph{program token sequence} $t^i$, which is the lexed program $e_{\bot}$ and
+the \emph{fixed token sequence} $t^o$, which is the lexed program $e$. This
+algorithm returns changes between token sequences in the form of \emph{inserted
+or deleted tokens}. It is possible that this algorithm returns a sequence of
+deletions followed by a sequence of insertions, which can in turn be interpreted
+as a \emph{replacement} of tokens. We map these three types of changes to the
+respective error production rules. Let $t^i$ be a sequence $t^i_1, t^i_2, \dots,
+t^i_n$ and $t^o$ be the updated sequence $t^o_1, t^o_2, \dots, t^o_m$. We map:
+\begin{itemize}
+    \item an inserted output token $t^o_j$ to a \emph{deletion} error $E_{t^o_j}
+    \rightarrow \epsilon$.
+    \item a deleted input token $t^i_k$ to an \emph{insertion} error $Tok\
+    \rightarrow t^i_k$ and the helper rule $E_{t^i_{k+1}} \rightarrow Ins\
+    t^i_{k+1}$.
+    \item a replaced token $t^i_k$ with $t^o_j$ to a \emph{replacement} error
+    $Repl\ \rightarrow t^i_k$ and the helper rule $E_{t^o_j} \rightarrow Repl$.
+\end{itemize}
+
+In the case of an insertion error, we also include the helper rules $Ins\
+\rightarrow\ Tok$ and $Ins\ \rightarrow\ Ins\ Tok$, that can derive any nonempty
+sequence of insertions. To introduce (possible) insertion errors at the end of a
+program, we include the starting production rules $S' \rightarrow S$ and $S'
+\rightarrow S\ Ins$.
+
+The above algorithm, so far, adds only the \emph{terminal error productions}. We
+have to include the \emph{non-terminal error productions} that will invoke the
+terminal ones. If $X \rightarrow a_0b_0a_1b_1 \dots a_mb_m,\ m \geq 0$, is a
+production in $P$ such that $a_i$ is in $N^*$ and $b_i$ is in $\Sigma$, then we
+add the error production $X \rightarrow a_0X_{b_0}a_1X_{b_1} \dots a_mX_{b_m},\
+m \geq 0$ to $P'$, where each $X_{b_i}$, is either a new non-terminal $E_{b_i}$
+that was added with the previous algorithm, or just $b_i$ again if it was not
+added.
+
+Finally, we further refine the new small set of error productions for each
+program $e_{\bot}$ with ECE-Parser, in order to create the final annotated
+dataset $\List{t^a \times \errorrulessym}$. The changes that we extracted from
+the programmers' fixes might include irrelevant changes to the parse error fix,
+\eg code clean-up. Therefore, filtering with the ECE-Parser is still essential
+to annotate each program with the appropriate error production rules. We
+implement this error-rule-extracting approach in the function $\diffsym$, which
+extracts the token differences between an erroneous program $e_{\bot}$ and a
+fixed program $e$ and returns the appropriate error production rules.
+
+
+\subsection{Training and Using a Transformer Classifier}
+\label{sec:whole-system:training-classifier}
+
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{0.49\linewidth}
+    \centering
+    \input{training-classifier-algo.tex}
+  \end{minipage}
+  \hspace{0.02\linewidth}
+  \begin{minipage}[t]{0.47\linewidth}
+    \centering
+    \input{predict-algo.tex}
+  \end{minipage}
+\end{figure}
+
+% \mypara{Training the Transformer Classifier}
+%
+Given a (probabilistic) grammar $G$ and a dataset $Ds$,
+\Cref{algo:training-classifier-algo} extracts a machine-learning appropriate
+dataset $D_{ML}$ in order to $\trainsym$ a Transformer classifier $Model$ with
+$\trainDLsym$. The classifier $Model$ can then be used to predict error rules
+for new erroneous programs $\pbad$.
+
+The dataset $D_{ML}$ starts as an empty set. For each program pair $\pbad \times
+\pfix$, we, first, employ $\partialsym$ with the PCFG $G$ and an erroneous
+program $\pbad$ to extract the abstracted token sequence $t^a$. Second, we use
+the token difference algorithm $\diffsym$ to extract the specific error $rules$
+that fix $\pbad$ based on $\pfix$. The abstracted sequence $t^a$ is annotated
+with the label $rules$ and is added to $D_{ML}$. The Transformer classifier
+$Model$ is trained with $\trainDLsym$ and the newly extracted dataset $D_{ML}$,
+which is finally returned by the algorithm. Finally, the $\trainsym$ing
+procedure can be performed offline and thus won't affect the performance of the
+final program repair.
+
+% \mypara{Predicting Error Rules}
+%
+Having trained the Transformer classifier $Model$, we can now predict error
+rules $Rls$, that will be used by an ECE-Parser, by using the $\predictsym$
+procedure defined in \Cref{algo:predict-algo}. $\predictsym$ uses the same input
+grammar $G$ to generate an abstracted token sequence $t^a$ for the program $P$
+with the $\partialsym$ procedure. Finally, the $\predictDLsym$ procedure
+predicts a small set of error production rules $Rls$ for the sequence $t^a$
+given the pre-trained $Model$.
+
+\subsection{Generating an Efficient Error Correcting Parser}
+\label{sec:whole-system:building-ecp}
+
+\input{ecep-algo.tex}
+
+\Cref{algo:ecep-algo} presents our \emph{neurosymbolic} approach, $\systemsym$.
+This is the high-level algorithm that combines everything that we described so
+far in the last three sections. $\systemsym$ first extracts the fixed programs
+$ps$ from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$
+for the input grammar $G$ with $\learnPCFGsym$. It then $\trainsym$s the
+Transformer classifier $Model$ to predict error production rules. We define an
+error rule predictor, \textsc{ERulePredictor}, using the $\predictsym$ procedure
+with the pre-trained $Model$ and grammar $PCFG$. Finally, the algorithm returns
+the ECE-Parser $Prs$, which we define as a function that takes as input an
+erroneous program $\pbad$ that uses the \textsc{ERulePredictor} to get the set
+of error rules needed by $\ecepsym$ to parse and repair it.
