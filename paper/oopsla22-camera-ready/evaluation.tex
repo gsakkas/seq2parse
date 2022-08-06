@@ -2,7 +2,7 @@
 \label{sec:eval}
 
 We have implemented our approach in \toolname: a system for repairing parse
-errors for \python at its entirety. Next, we describe our implementation and an
+errors for \python in its entirety. Next, we describe our implementation and an
 evaluation that addresses four questions:
 
 \begin{itemize}
@@ -42,7 +42,7 @@ with the ECE-Parser and the ``diff'' error rules, as described in
 \toolname's error rule prediction uses a Transformer classifier with \emph{six}
 transformer blocks, that each has a fully-connected hidden layer of 256 neurons
 and 12 attention heads. The output of the transformer blocks is then connected
-to a \dnn based classifier with \emph{two} fully-connected hidden layers of 256
+to a \dnn-based classifier with \emph{two} fully-connected hidden layers of 256
 and 128 neurons respectively. The neurons use rectified linear units (ReLU) as
 their activation function, while the output layer uses the sigmoid function for
 each class. Additionally, there are \emph{two input embedding layers} of a
@@ -79,7 +79,7 @@ The predicted error rule set ranges between 1--20 elements.
 The blue bars show the accuracy on the full test set of \textsc{All} 15,000 test
 programs, while the green bars show the results on a subset of \textsc{Rare}
 programs, \ie programs that did not include any of the 50 most popular error
-rules. The \textsc{Rare} programs amount only for 4\% of our test set.
+rules. The \textsc{Rare} programs account for only 4\% of our test set.
 
 The \textsc{Original} predictor, even with the Top-50 predicted error rules, is
 less accurate than the Top-20 predictions of the \textsc{Abstracted}, with an
@@ -94,7 +94,7 @@ number of selected error rules of 14 (average 14.1). This could potentially mean
 that this predictor is a valid alternative for the static Top-20 predictions.
 
 Finally, we observe that our \textsc{Abstracted} classifiers generalize
-efficiently for our dataset of erroneous \python programs and is almost as
+efficiently for our dataset of erroneous \python programs and are almost as
 accurate for the \textsc{Rare} programs as the rest of the dataset with a
 73.32\% Top-20 accuracy (88.81\% Top-50 accuracy). The same holds for the
 \textsc{Threshold} predictions with a 69.83\% \textsc{Rare} accuracy.
@@ -142,22 +142,22 @@ debugging \citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the \emph{parse
-accuracy}), the rare programs parse accuracy, and the \emph{user equivalent
-parse accuracy}, \ie the amount of parses that match the one that the user
-compiled. We observe that the \textsc{MinimumCost} parser \emph{outperforms}
-every other option with 94.25\% parse accuracy and 94.01\% rare parse accuracy.
-It also generates the intended user parse for 20.55\% of the set, \ie over 1 out
-5 of the cases. The 20 most popular parser with 79.87\% parse accuracy and
+accuracy}), the rare program parse accuracy, and the \emph{user equivalent parse
+accuracy}, \ie the amount of parses that match the one that the user compiled.
+We observe that the \textsc{MinimumCost} parser \emph{outperforms} every other
+option with 94.25\% parse accuracy and 94.01\% rare parse accuracy. It also
+generates the intended user parse for 20.55\% of the set, \ie over 1 out 5 of
+the cases. The \textsc{20 Most Popular} parser with 79.87\% parse accuracy and
 65.01\% rare parse accuracy is much less accurate, and is 4.24\% less likely to
-generate the user parse, while the 50 most popular is slightly less accurate
-with 90.89\% and 81.26\% accuracy, as expected from the usage of a large number
-of popular error rules. The 50 most popular parser has also a high user fix
-accuracy of 18.56\%. The \textsc{AllParses} parser has the lowest parse accuracy
-of 61.82\%, however it manages to generate the user fix 33.92\% of the time and
-achieve a high 72.22\% rare accuracy. Finally, the \textsc{Threshold} parser is
-almost as accurate as the efficient \textsc{MinimumCost} parser with 94.19\% and
-93.42\% parse and rare accuracy, while achieving a slightly higher user fix
-accuracy of 21.19\%.
+generate the user parse, while the \textsc{50 Most Popular} is slightly less
+accurate with 90.89\% and 81.26\% accuracy, as expected from the usage of a
+large number of popular error rules. The \textsc{50 Most Popular} parser has
+also a high user fix accuracy of 18.56\%. The \textsc{AllParses} parser has the
+lowest parse accuracy of 61.82\%, however it manages to generate the user fix
+33.92\% of the time and achieve a high 72.22\% rare accuracy. Finally, the
+\textsc{Threshold} parser is almost as accurate as the efficient
+\textsc{MinimumCost} parser with 94.19\% and 93.42\% parse and rare accuracy,
+while achieving a slightly higher user fix accuracy of 21.19\%.
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with

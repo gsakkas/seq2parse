@@ -131,7 +131,7 @@ Literal  $\rightarrow$ name | number | ...
 \end{minipage}
 \end{figure}
 
-\subsection{Error Correcting Parsing}
+\subsection{Error-Correcting Parsing}
 \label{sec:overview:ec-parsing}
 
 \mypara{Earley Parsers for Python}
@@ -174,9 +174,9 @@ productions rules.
 % \label{fig:error-rules}
 % \end{figure}
 
-\mypara{Error Correcting Parsers for Python}
+\mypara{Error-Correcting Parsers for Python}
 %
-An \emph{Error Correcting Earley} (ECE) Parser
+An \emph{Error-Correcting Earley} (ECE) Parser
 extends the original algorithm's operations,
 to find a \emph{minimum-edit} parse for a program
 with parse errors~\citep{Aho_1972}.
@@ -229,9 +229,10 @@ These four new error rules have the following usage for each terminal |t|:
   \item Using |E_t $\rightarrow$ Replace| a \emph{replacement} error is considered.
   |Replace| will match any terminal token that is \emph{different} than |t|,
   making a replacement possible.
-  \item  The rules |E_t $\rightarrow$ Insert t| will introduce a \emph{insertion} error,
-  \ie |Insert| will match any \emph{sequence} of |Token|s that are not supposed
-  to precede |t| in order to make the program parse.
+  \item  The rules |E_t $\rightarrow$ Insert t| will introduce an
+  \emph{insertion} error, \ie |Insert| will match any \emph{sequence} of
+  |Token|s that are not supposed to precede |t| in order to make the program
+  parse.
 \end{enumerate}
 % When, for example, a \texttt{Return\_Stmt} is added to the ECE-Parser's chart at
 % some location $i$, then the next four options are considered:
@@ -271,8 +272,8 @@ the relevant error production rules are:
 Finally, the |Replace| non-terminal can match any possible terminal in $G$ to
 introduce replacement errors, the |Insert| non-terminal will introduce a
 sequence of insertion errors by using |Token| which also matches every terminal
-and we just differentiate the name in order be able to distinguish the different
-types of errors.
+and we just differentiate the name in order to be able to distinguish the
+different types of errors.
 \begin{itemize}
   \item \lstinline{Replace  $\rightarrow$ return | pass | \n | + | ... [all terminals]}
   \item \lstinline{Insert   $\rightarrow$ Token | Insert Token}
@@ -309,7 +310,7 @@ Considering a deletion error (\autoref{fig:adding-partial}), the
 and generate a parse that suggests that a \emph{number} is missing after the |+|
 operator. On the other hand, the
 %
-|E_\n $\rightarrow$ Insert \n| error rule can be used to consider a insertion
+|E_\n $\rightarrow$ Insert \n| error rule can be used to consider an insertion
 error (\autoref{fig:deleting-partial}) before the new line character, basically
 \emph{deleting} the |+| operator. In this case, |ArExpr $\rightarrow$ Literal|
 is used to parse the program instead of
@@ -327,7 +328,7 @@ rules |E_t| (excluding the non-error base case |E_t $\rightarrow$ t|), |Replace|
 and |Token|, \emph{$455$ terminal error rules} have to be added to the grammar
 $G'$. The Python grammar that we used has also \emph{$283$ production rules},
 from which \emph{$182$ rules} have terminals in them, meaning another
-\emph{$182$ error rules} need to be added. Accounting the four helper production
+\emph{$182$ error rules} need to be added. Including the four helper production
 rules, \eg for the new start symbol, the new grammar $G'$ has \emph{$641$ new
 error production rules}. This large amount of error rules renders the ECE-Parser
 not scalable for large programs or programs with a lot of parse errors when
@@ -414,7 +415,7 @@ any \emph{completed} production rules can be used to abstract the relevant
 \emph{token sub-sequences} with the high-level \emph{non-terminal}.
 
 \autoref{fig:partial-parse-tree-1} shows how partial parses can be used to
-abstract long low-level sequence of tokens into short sequences of
+abstract long low-level sequences of tokens into short sequences of
 non-terminals.
 %
 (1)~The function |foo| is completely parsed,
@@ -617,11 +618,9 @@ the error rules |E_t $\rightarrow$ Replace| and
 \subsection{Predicting Error Rules with Sequence Classifiers}
 \label{sec:overview:seq-classifiers}
 
-The learned sequence classifier model,
-which has be trained on the updated
-error-rule-labeled data set can now
-be used to predict the relevant rules
-for new erroneous programs.
+The learned sequence classifier model, which has been trained on the updated
+error-rule-labeled data set can now be used to predict the relevant rules for
+new erroneous programs.
 %
 Additionally, neural networks have
 the advantage of associating each

@@ -15,7 +15,7 @@ $\List{t^a \times \errorrulessym}$ of token sequences $t^a$ and the \emph{exact
 small set} of error production rules $\errorrulessym$ that the ECE-Parser used
 to generate the \emph{user parse}. We build our classifier $\Model$ using
 classic \emph{Deep Neural Networks (\dnn{}s)} and parts of state-of-the-art
-\emph{Sequence-to-Sequence (seq2seq)} models. We leave the high level details of
+\emph{Sequence-to-Sequence (seq2seq)} models. We leave the high-level details of
 acquiring the dataset of labeled token sequences and using the predictor for new
 erroneous programs for \autoref{sec:whole-system}. In the next few paragraphs,
 we summarize the recent advances in machine learning that help as build the
@@ -57,7 +57,7 @@ work~\citep{Hastie2009-bn, Nielsen2015-pu}.
 \emph{Seq2seq} models aim to transform input sequences of one domain into
 sequences of another domain \citep{Sutskever_2014}. In the general case, these
 models consist of two major layers, an \emph{encoder} and a \emph{decoder}. The
-encoder transforms an input token sequence $x_1, x_2, \dots, x_n$ into a
+encoder transforms an input token sequence $x_1, x_2, \dots, x_n$ into an
 \emph{abstract vector} $V \in \R^k$ that captures all the essence and context of
 the input sequence. This vector does not necessarily have some physical meaning
 and is just an internal representation of the input sequence into a higher
@@ -100,14 +100,13 @@ the sum of the cross-entropy loss of each step.
 % and solves these problems due to its \emph{attention mechanisms}.
 
 \mypara{Transformers}
-The Transformer is an \dnn architecture that deviates from the recurrent pattern
+The Transformer is a \dnn architecture that deviates from the recurrent pattern
 (\eg, RNNs) and is solely relying on \emph{attention mechanisms}. Attention has
 been of interest lately \citep{Bahdanau2015, Kim2017, Vaswani_2017} mainly due
 to its ability to detect dependencies in the input or output sequences
 regardless the distance of the tokens. The nature of this architecture makes the
-Transformer significantly easier to parallelize and thus has a higher
-quality of predictions and sequence translations after a shorter training
-period.
+Transformer significantly easier to parallelize and thus has a higher quality of
+predictions and sequence translations after a shorter training period.
 
 The novel architecture of a Transformer \citep{Vaswani_2017} is structured as a
 \emph{stack of $N$ identical layers}. Each layer has two main sub-layers. The

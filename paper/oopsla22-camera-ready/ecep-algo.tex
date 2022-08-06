@@ -6,7 +6,7 @@
     \renewcommand{\algorithmicensure}{\textbf{Output:}}
     \begin{algorithmic}[1]
     \Require{Grammar $G$, $\datasetsym\ Ds$}
-    \Ensure{Error Correcting Parser $Prs$}
+    \Ensure{Error-Correcting Parser $Prs$}
     \Procedure{Seq2Parse}{$G,\,Ds$}
     \State $ps \gets$ \Call{Map}{$\lambda.p \to$ \Call{Snd}{$p$}$,\,Ds$}
     \State $PCFG \gets$ \Call{LearnPCFG}{$G,\,ps$}
