@@ -51,7 +51,7 @@ def rate(secs, times):
     return len(in_set) * 100.0 / len(times)
 
 
-def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg_time, parse_times, tpsize, time_gs, user_sames, all_ls, any_ls, out_dir, results_file, repaired_tuplas, repair_csts, used_erls, max_used_erls, max_time=30):
+def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, all_tok_chngs, avg_time, parse_times, tpsize, sizes, time_gs, user_sames, all_ls, any_ls, out_dir, results_file, repaired_tuplas, repair_csts, used_erls, max_used_erls, max_time=30):
     positives = len(list(filter(lambda dt: dt > 0, time_gs)))
     print("# Dataset size:", succs, "/", fails + succs)
     print("# Parse accuracy within time limit (%):", bads * 100.0 / succs)
@@ -60,6 +60,14 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
     print("# => Not popular parse accuracy (%):", not_pop_bads * 100.0 / not_pops)
     print("# => Mean parse time (sec):", avg_time / (fails + succs))
     print("# => Median parse time (sec):", median_low(parse_times))
+    temp_87 = list(map(lambda x: x[0], filter(lambda d: d[1] > 87, zip(parse_times, sizes))))
+    print("# => Median parse time (sec):", median_low(temp_87), "for", len(temp_87), "programs with length > 87")
+    temp_100 = list(map(lambda x: x[0], filter(lambda d: d[1] > 100, zip(parse_times, sizes))))
+    print("# => Median parse time (sec):", median_low(temp_100), "for", len(temp_100), "programs with length > 100")
+    temp_250 = list(map(lambda x: x[0], filter(lambda d: d[1] > 250, zip(parse_times, sizes))))
+    print("# => Median parse time (sec):", median_low(temp_250), "for", len(temp_250), "programs with length > 250")
+    temp_500 = list(map(lambda x: x[0], filter(lambda d: d[1] > 500, zip(parse_times, sizes))))
+    print("# => Median parse time (sec):", median_low(temp_500), "for", len(temp_500), "programs with length > 500")
     print("# => Avg. parse time / 50 tokens (sec):", avg_time * 50 / tpsize)
     print("# => Dataset parsed faster than user (%):", positives * 100 / succs)
     print("# => Mean parse time speedup (sec):", mean(time_gs))
@@ -88,6 +96,12 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
     for tok_chgs in sorted(accs_per_chgs.keys())[:5]:
         parsed, total_progs = accs_per_chgs[tok_chgs]
         print(tok_chgs, "token changes accuracy (%) =", parsed * 100.0 / total_progs)
+    median_times_per_tok_chngs = defaultdict(float)
+    for tok_chgs in sorted(accs_per_chgs.keys()):
+        temp = list(map(lambda x: x[0], filter(lambda d: d[1] == tok_chgs, zip(parse_times, all_tok_chngs))))
+        median_times_per_tok_chngs[tok_chgs] = median_low(temp)
+        if tok_chgs <= 5:
+            print(tok_chgs, "token changes median parse time (sec) =", median_times_per_tok_chngs[tok_chgs])
     print("---------------------------------------------------")
     with open(join(out_dir, results_file), "w") as dataset_file:
         dataset_file.write("Dataset size: " + str(succs) + "/" + str(fails + succs) + "\n")
@@ -97,6 +111,10 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
         dataset_file.write("=> Not popular parse accuracy (%): " + str(not_pop_bads * 100.0 / not_pops) + "\n")
         dataset_file.write("=> Mean parse time (sec): " + str(avg_time / (fails + succs)) + "\n")
         dataset_file.write("=> Median parse time (sec): " + str(median_low(parse_times)) + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_87)) + " for " + str(len(temp_87)) + "programs with length > 87" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_100)) + " for " + str(len(temp_100)) + "programs with length > 100" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_250)) + " for " + str(len(temp_250)) + "programs with length > 250" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_500)) + " for " + str(len(temp_500)) + "programs with length > 500" + "\n")
         dataset_file.write("=> Avg. parse time / 50 tokens (sec): " + str(avg_time * 50 / tpsize) + "\n")
         dataset_file.write("=> Dataset parsed faster than user (%): " + str(positives * 100 / succs) + "\n")
         dataset_file.write("=> Mean parse time speedup (sec): " + str(mean(time_gs)) + "\n")
@@ -114,6 +132,8 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
         for tok_chgs in sorted(accs_per_chgs.keys()):
             parsed, total_progs = accs_per_chgs[tok_chgs]
             dataset_file.write(str(tok_chgs) + " token changes accuracy (%) = " + str(parsed * 100.0 / total_progs) + "\n")
+        for tok_chgs in sorted(accs_per_chgs.keys()):
+            dataset_file.write(str(tok_chgs) + " token changes median parse time (sec) = "  + str(median_times_per_tok_chngs[tok_chgs]) + "\n")
     with open(join(out_dir, "repaired_prog_pairs.jsonl"), 'w') as repaired_progs_file:
         for pair in repaired_tuplas:
             repaired_progs_file.write(json.dumps(pair) + "\n")
@@ -256,6 +276,8 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
     dataset = []
     avg_run_time = 0.0
     total_size = 0
+    all_sizes = []
+    all_tok_chngs = []
     parsed_progs_times = []
     time_gains = []
     all_tuplas = []
@@ -299,14 +321,16 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                         max_used_erules.append(max(used_erls))
                         parsed, total_progs = accs_per_changes[tok_chgs]
                         accs_per_changes[tok_chgs] = (parsed + 1, total_progs)
+                        all_tok_chngs.append(tok_chgs)
                     avg_run_time += run_time
                     parsed_progs_times.append(run_time)
                     total_size += size
+                    all_sizes.append(size)
                     time_gains.append(dt)
                     all_tuplas.append(tupla)
                     done += 1
                     if (failed + done) % 50 == 0:
-                        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, avg_run_time, parsed_progs_times, total_size, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, all_tok_chngs, avg_run_time, parsed_progs_times, total_size, all_sizes, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
             except StopIteration:
                 break
             except (TimeoutError, ProcessExpired):
@@ -315,7 +339,7 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                 avg_run_time += run_time
                 parsed_progs_times.append(run_time)
                 if (failed + done) % 50 == 0:
-                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, avg_run_time, parsed_progs_times, total_size, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, all_tok_chngs, avg_run_time, parsed_progs_times, total_size, all_sizes, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
             except Exception as e:
                 print("WHY here?!", str(e))
                 traceback.print_tb(e.__traceback__)
@@ -324,8 +348,8 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                 avg_run_time += run_time
                 parsed_progs_times.append(run_time)
                 if (failed + done) % 50 == 0:
-                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, avg_run_time, parsed_progs_times, total_size, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
-        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, avg_run_time, parsed_progs_times, total_size, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, all_tok_chngs, avg_run_time, parsed_progs_times, total_size, all_sizes, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, all_tok_chngs, avg_run_time, parsed_progs_times, total_size, all_sizes, time_gains, same_as_users, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
 
 
 if __name__ == "__main__":

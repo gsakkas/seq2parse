@@ -1,36 +1,20 @@
+import json
+import resource
 import sys
 from collections import defaultdict
-from copy import deepcopy
-import resource
-# import timeit
-# import multiprocessing.pool
-# from multiprocessing import TimeoutError
-from os.path import join
-from functools import partial
-from pathlib import Path
-import json
-# import signal
-# from contextlib import contextmanager
 from concurrent.futures import TimeoutError
-from pebble import ProcessPool, ProcessExpired
-# import tqdm
+from copy import deepcopy
+from functools import partial
+from os.path import join
+from pathlib import Path
+
+from pebble import ProcessExpired, ProcessPool
+
 import earleyparser
-from ecpp_individual_grammar import read_grammar, prog_has_parse, prog_error_rules, get_token_list, get_actual_token_list
-from run_extract_token_distribution import return_all_changes
 import earleyparser_interm_repr
-# import run_parse_test_time as rptt
-
-
-# @contextmanager
-# def time_limit(seconds):
-#     def signal_handler(signum, frame):
-#         raise TimeoutError("Timed out!")
-#     signal.signal(signal.SIGALRM, signal_handler)
-#     signal.alarm(seconds)
-#     try:
-#         yield
-#     finally:
-#         signal.alarm(0)
+from ecpp_individual_grammar import (get_actual_token_list, get_token_list,
+                                     prog_error_rules, read_grammar)
+from run_extract_token_distribution import return_all_changes
 
 
 def limit_memory():
@@ -87,7 +71,6 @@ def store_dataset(erule_dataset, out_file):
 
 
 def has_parse(grammar, egrammar, igrammar, tup):
-    # start_time = timeit.default_timer()
     i, l = tup
     dct = json.loads(l)
     if dct["index"] in [466, 467, 468] and dct["fixIndex"] == 470 and dct["duration"] in [362, 375, 380]:
@@ -141,7 +124,6 @@ if __name__ == "__main__":
     erules_per_token_changes = defaultdict(int)
     avrg_erules_used = 0
     with ProcessPool(max_workers=24, max_tasks=5) as pool:
-    # pool = multiprocessing.pool.Pool(12)
         with open(join(outDir, "parts-order.txt"), "w") as out_file:
             for partPath in list(dataDir.glob('part_*')):
                 out_file.write(partPath.name + '\n')
@@ -161,16 +143,11 @@ if __name__ == "__main__":
                 print("# Syntax Errors in failPath:", len(list(bugs)))
                 programs = enumerate(goodPath.read_text().strip().split('\n'))
                 new_has_parse = partial(has_parse, GRAMMAR, ERROR_GRAMMAR, INTERIM_GRAMMAR)
-                # it = pool.imap_unordered(new_has_parse, list(programs), 1)
                 future = pool.map(new_has_parse, programs, chunksize=1, timeout=TIMEOUT)
                 it = future.result()
                 while True:
-                # for line in goodPath.read_text().strip().split('\n'):
                     try:
-                        # bruh = it.next(timeout=TIMEOUT)
                         bruh = next(it)
-                        # with time_limit(TIMEOUT):
-                        # bruh = has_parse(line)
                         if bruh:
                             idx, tok_chs, parse_bad, erules, num_of_rules, lexed_prog, duration, upd_tokens, next_token, lexed_fixed_prog, orig_bad, orig_fix, orig_tokens = bruh
                             if tok_chs < 0:
@@ -207,16 +184,11 @@ if __name__ == "__main__":
                             # store_results(parsed_progs_buckets, all_buckets, erules_per_token_changes, outDir)
                 good_ids = set(good_ids)
                 programs = enumerate(failPath.read_text().strip().split('\n'))
-                # it = pool.imap_unordered(new_has_parse, programs, 1)
                 future = pool.map(new_has_parse, programs, chunksize=1, timeout=TIMEOUT)
                 it = future.result()
                 while True:
-                # for line in failPath.read_text().strip().split('\n'):
                     try:
-                        # bruh = it.next(timeout=TIMEOUT)
                         bruh = next(it)
-                        # with time_limit(TIMEOUT):
-                        # bruh = has_parse(line)
                         if bruh:
                             idx, tok_chs, parse_bad, erules, num_of_rules, lexed_prog, duration, upd_tokens, next_token, lexed_fixed_prog, orig_bad, orig_fix, orig_tokens = bruh
                             if tok_chs < 0:

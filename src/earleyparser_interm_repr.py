@@ -26,7 +26,7 @@ class Rule():
         # Represents the rule 'lhs -> rhs', where lhs is a non-terminal and
         # rhs is a list of non-terminals and terminals.
         self.lhs, self.rhs = lhs, rhs
-        self.prob = 0.0
+        self.prob = 1.0
 
     def __contains__(self, sym):
         return sym in self.rhs
