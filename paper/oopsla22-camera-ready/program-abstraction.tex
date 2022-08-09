@@ -70,27 +70,33 @@ the input length. We define a \emph{partial parse} to be any partially completed
 rules, \ie if there is $(X \rightarrow \alpha \cdot \beta, i)$ in some state
 $S(k)$, where $i < k \leq n$.
 
+\GS{TODO: updated this section to highlight the iterative nature of the
+abstraction algorithm. check again.}
+
 Let, again, $t^i_1, t^i_2, \dots, t^i_j, \dots, t^i_k, \dots, t^i_n$ be the
-input token sequence $t^i$, where at location $k$ there is a parse error and the
+input token sequence $t^i$, where there is a parse error at location $k$ and the
 parser has exhausted all possibilities and can not add any more rules in state
-$S(k + 1)$, \ie $S(k + 1) = \emptyset$. We want to abstract $t^i$ by getting the
-longest possible part of the program that has a partial parse, \ie by finding
-the largest $j$ for which there is a rule $(X \rightarrow \alpha \cdot \beta, 0)
-\in S(j)$. We use this rule for $X$ to replace $t^i_1, t^i_2, \dots, t^i_j$ in
-$t^i$ with $\alpha$, thus getting an abstracted sequence $t^a$. In the same
-manner, we use the longest possible partial parses that we can extract from the
-chart to abstract $t^i_{j+1}, \dots, t^i_k$, until we reach the parse error at
-location $k$.
+$S(k + 1)$, \ie $S(k + 1) = \emptyset$. We want to abstract program subsequences
+$t^i_j, \dots, t^i_k$ by getting the longest possible parts of the program $t^i$
+that have a partial parse. For example, we start from the beginning of the
+program $t^i_1$ by finding the largest $j$ for which there is a rule $(X
+\rightarrow \alpha \cdot \beta, 0) \in S(j)$. We use this rule for $X$ to
+replace $t^i_1, t^i_2, \dots, t^i_j$ in $t^i$ with $\alpha$, thus getting an
+abstracted sequence $t^a$. In the same manner, we use the longest possible
+partial parses that we can extract from the chart to abstract $t^i_{j+1}, \dots,
+t^i_k$, iteratively, until we reach the parse error at location $k$.
 
 % \mypara{Problem: Multiple Partial Parses}
 %
 However, each of the states $S(j),\ 0 \leq j \leq k$, holds a large number of
 partial parses and, thus, our heuristic to choose the longest possible partial
 parse to abstract programs may not be able to abstract the token sequence fully
-until the error location $k$. Additionally, there may be two or more partial
-parses in $S(k)$, with different lengths, \eg $\{(X \rightarrow \alpha \cdot
-\beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\ j \neq h$.
-We propose selecting the most \emph{probable parse} with the aid of a PCFG.
+until the error location $k$, or not even until the end location $n$ of the
+program that may not have any more parse errors. Additionally, there may be two
+or more partial parses in $S(k)$, with different lengths, \eg $\{(X \rightarrow
+\alpha \cdot \beta,\ j),\ (X' \rightarrow \alpha' \cdot \beta',\ h)\} \in S(k),\
+j \neq h$. We propose selecting the most \emph{probable parse} with the aid of a
+PCFG.
 
 
 \subsection{Probabilistic Context-Free Grammars}
