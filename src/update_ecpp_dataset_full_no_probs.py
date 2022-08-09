@@ -55,21 +55,27 @@ if __name__ == "__main__":
             continue
         dataset = []
         dataset_part_file = join(partPath, "erule-dataset-partials-probs-fixes.txt")
+
         if not exists(dataset_part_file):
             continue
-        else:
-            with open(dataset_part_file, "r") as inFile:
-                old_dataset = list(map(read_sample, inFile.read().split('\n')[:-1]))
-                if len(old_dataset[0]) < 10:
-                    print(f">>> WRONG NUMBER OF DATA IN {partPath.name}!!!")
-                for old_results in tqdm.tqdm(old_dataset):
-                    orig_bad = old_results[7].replace("\\n", '\n').replace("\\r", '\r').replace("\\t", '\t')[1:-1]
-                    tokens = get_token_list(orig_bad, terminals)
-                    old_results_temp = list(old_results)
-                    old_results_temp[1], old_results_temp[5] = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
-                    if old_results_temp[5] is None:
-                        dataset.append(old_results)
-                    else:
-                        dataset.append(tuple(old_results_temp))
+
+        with open(dataset_part_file, "r") as inFile:
+            old_dataset = list(map(read_sample, inFile.read().split('\n')[:-1]))
+
+            if len(old_dataset[0]) < 10:
+                print(f">>> WRONG NUMBER OF DATA IN {partPath.name}!!!")
+                continue
+
+            for old_results in tqdm.tqdm(old_dataset):
+                orig_bad = old_results[7].replace("\\n", '\n').replace("\\r", '\r').replace("\\t", '\t')[1:-1]
+                tokens = get_token_list(orig_bad, terminals)
+                old_results_temp = list(old_results)
+                old_results_temp[1], old_results_temp[5] = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
+                if old_results_temp[5] is None:
+                    dataset.append(old_results)
+                else:
+                    old_results_temp[5] = str(old_results_temp[5][0])
+                    dataset.append(tuple(old_results_temp))
+
             with open(join(partPath, "erule-dataset-partials-no-probs-fixes.txt"), "w") as outFile:
                 store_dataset(dataset, outFile)
