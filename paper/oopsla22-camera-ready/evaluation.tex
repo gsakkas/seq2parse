@@ -1,14 +1,17 @@
 \section{Evaluation}
 \label{sec:eval}
 
-\GS{we had this part in rebuttal: "We will make available supplementary
+\GS{\sout{we had this part in rebuttal: "We will make available supplementary
 materials, including (a) the human study website itself as well as the stimuli,
 (b) the source code, and (c) a demonstration website at which arbitrary programs
-can be passed to our algorithm and the output can be observed."}
+can be passed to our algorithm and the output can be observed."}}
 
 We have implemented our approach in \toolname: a system for repairing parse
-errors for \python in its entirety. Next, we describe our implementation and an
-evaluation that addresses four questions:
+errors for \python in its entirety. All code for \toolname is publicly available
+at \url{https://github.com/gsakkas/seq2parse} and we've provided a running
+smaller version of \toolname on a
+\href{http://seq2parse.goto.ucsd.edu/index.html}{website demo}. Next, we
+describe our implementation and an evaluation that addresses four questions:
 
 \begin{itemize}
     \item \textbf{RQ1}: How \emph{accurate} are \toolname's predicted error production rules?
@@ -63,12 +66,8 @@ total of 50 epochs.
 
 \input{evaluation-classifier-accuracy}
 
-\GS{we had this part in rebuttal: "We will augment the text in Section 7.1 to
-explain that the MinimumCost version of Seq2Parse only retains the top \#1
-(minimum cost) repair, resulting in a more efficient parser, unlike AllParses,
-which is slower but retains all possible repairs and thus obtains a higher
-accuracy (as shown in Section 7.3)"}
-%
+\GS{TODO: Explain how accuracy is computed???}
+
 \autoref{fig:accuracy-results} shows the accuracy results of our error
 production rule prediction experiments. The y-axis describes the
 \emph{prediction accuracy}, \ie the fraction of test programs for which the
@@ -120,16 +119,23 @@ accurate for the \textsc{Rare} programs as the rest of the dataset with a
 \subsection{RQ2: Repaired Program Preciseness}
 \label{sec:eval:precise}
 
+
+\GS{\sout{TODO: We had this part in rebuttal: "We will augment the text in
+Section 7.2 to explain that the MinimumCost version of Seq2Parse only retains
+the top \#1 (minimum cost) repair, resulting in a more efficient parser, unlike
+AllParses, which is slower but retains all possible repairs and thus obtains a
+higher accuracy (as shown in Section 7.3)"}}
+
+\GS{\sout{TODO: Clarify on the difference of the 3 approaches better. why they are
+allowed different numbers of edits. "We will elaborate that the maximum number
+of edits was selected to provide a uniform (wall clock) run time for the
+algorithms (e.g., since MinimumCost is faster than AllParses)."}}
+
 Next we evaluate \toolname's end-to-end accuracy and preciseness in generating
 \toolname's parsing time to \emph{5 mins} and run our experiments on the
 15,000-program test set. Additionally, we use here the highest-performing
 transformer classifiers, \ie the \textsc{Abstracted} and \textsc{Threshold}
 classifiers.
-
-\GS{\sout{TODO: clarify on the difference of the 3 approaches better. why they are
-allowed different numbers of edits. "We will elaborate that the maximum number
-of edits was selected to provide a uniform (wall clock) run time for the
-algorithms (e.g., since MinimumCost is faster than AllParses)."}}
 
 We compare \emph{three versions} of our \toolname implementation
 (\textsc{AllParses}, \textsc{MinimumCost} and \textsc{Threshold}) against two
@@ -144,18 +150,19 @@ repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
 \emph{all possible states} that arise from using the predicted error rules
 similarly to the original ECE-Parser described by \citet{Aho_1972}. We use a
 maximum repair cost of 2 edits (\ie a maximum of 2 insertions, deletions or
-replacements) to limit the search space. The \textsc{MinimumCost} version
-however keeps always the minimum-edit repair and discards all other states that
+replacements) to limit the search space. The \textsc{MinimumCost} version,
+however, always keeps the minimum-edit repair and discards all other states that
 may lead to a higher cost. This more efficient version of the ECE-Parser allows
 for a higher maximum cost of 10 edits. We use the same ECE-Parser and cost as in
 \textsc{MinimumCost} for our \textsc{Threshold} parser. The maximum cost for
 each parser is a hyperparameter to \toolname and is set here arbitrarily in
 order to achieve a uniform run time across experiments while getting
-multiple-edit repairs. Finally, while \textsc{AllParses} can generate a large
-number of repairs, we keep only the top 5 repairs after filtering with a static
-code checker (\textsc{Pylint}, \url{https://www.pylint.org/}) as most developers
-will consider only a few suggestions before falling back to manual debugging
-\citep{Kochhar2016-oc, Parnin2011-ce}.
+high-quality multiple-edit repairs. Finally, \textsc{MinimumCost} will always
+return the top 1 repair, while \textsc{AllParses} can generate a large number of
+repairs and we select to keep only the top 5 repairs after filtering with a
+static code checker (\textsc{Pylint}, \url{https://www.pylint.org/}) as most
+developers will consider only a few suggestions before falling back to manual
+debugging \citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the \emph{parse
@@ -205,7 +212,7 @@ while achieving a slightly higher user fix accuracy of 21.19\%.
     \centering
     \includegraphics[width=\linewidth]{tool-repair-rate.pdf}
     \caption{The repair rate for all the approaches in
-    \autoref{tab:seq2parse_full_results}. \GS{TODO: zoom out graph and smoothen
+    \autoref{tab:seq2parse_full_results}. \GS{TODO: Zoom out graph and smoothen
     by fitting a line over results}}
     \label{fig:tool-repair-rate}
   \end{minipage}
@@ -229,7 +236,7 @@ repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
 time of 5.3 seconds. \GS{TODO: Going to add median parse times for small/big
-programs and a few/a lot syntax errors. Running experiments.}
+programs and a few/a lot syntax errors to show scalabilty. Running experiments.}
 
 We observe that, using a fixed set of the 20 and 50 most popular rules,
 \toolname (with the \textsc{MinimumCost} ECE-Parser) repairs 61.41\% and 58.61\%
