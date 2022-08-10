@@ -99,7 +99,7 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, all
     median_times_per_tok_chngs = defaultdict(float)
     for tok_chgs in sorted(accs_per_chgs.keys()):
         temp = list(map(lambda x: x[0], filter(lambda d: d[1] == tok_chgs, zip(parse_times, all_tok_chngs))))
-        median_times_per_tok_chngs[tok_chgs] = median_low(temp)
+        median_times_per_tok_chngs[tok_chgs] = median_low(temp) if len(temp) > 0 else None
         if tok_chgs <= 5:
             print(tok_chgs, "token changes median parse time (sec) =", median_times_per_tok_chngs[tok_chgs])
     print("---------------------------------------------------")

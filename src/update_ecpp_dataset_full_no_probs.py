@@ -72,10 +72,11 @@ if __name__ == "__main__":
                 old_results_temp = list(old_results)
                 old_results_temp[1], old_results_temp[5] = earleyparser_interm_repr.get_updated_seq(tokens, INTERIM_GRAMMAR)
                 if old_results_temp[5] is None:
-                    dataset.append(old_results)
+                    old_results_temp = list(old_results)
+                    old_results_temp[5] = str(old_results_temp[5][0]) if isinstance(old_results_temp[5], list) else str(old_results_temp[5])
                 else:
-                    old_results_temp[5] = str(old_results_temp[5][0])
-                    dataset.append(tuple(old_results_temp))
+                    old_results_temp[5] = str(old_results_temp[5][0]) if isinstance(old_results_temp[5], list) else str(old_results_temp[5])
+                dataset.append(tuple(old_results_temp))
 
             with open(join(partPath, "erule-dataset-partials-no-probs-fixes.txt"), "w") as outFile:
                 store_dataset(dataset, outFile)
