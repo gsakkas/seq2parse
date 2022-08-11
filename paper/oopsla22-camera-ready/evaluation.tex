@@ -66,13 +66,13 @@ total of 50 epochs.
 
 \input{evaluation-classifier-accuracy}
 
-\GS{TODO: Explain how accuracy is computed???}
+\GS{\sout{TODO: Explain how accuracy is computed???}}
 
 \autoref{fig:accuracy-results} shows the accuracy results of our error
 production rule prediction experiments. The y-axis describes the
 \emph{prediction accuracy}, \ie the fraction of test programs for which the
-correct \emph{full set} of error rules to repair the program was predicted in
-the top-K sorted rules.
+correct \emph{full set} of error rules to repair the program (extracted from
+the user fix) was predicted in the top-K sorted rules.
 %
 The \textsc{Original} version of our transformer classifier does not consider
 the abstracted token sequences and used the full \textsc{Original} token
@@ -228,15 +228,23 @@ practical usability for developers.) We compare the efficiency of \toolname for
 all the versions of \autoref{tab:seq2parse_full_results} using the full test set
 of 15,000 programs.
 
+\GS{\sout{TODO: Going to add median parse times for small/big programs and a
+few/a lot syntax errors to show scalabilty. Running experiments.}}
+
 \autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
 \toolname approaches' repair rates over their repair time. We observe that using
 \textsc{Threshold} predictions with the \textsc{MinimumCost} ECE-Parser is the
 most efficient and it maintains the highest parse accuracy at all times, with a
 repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
+We also observe that the median parse time for \emph{larger programs} is not
+much higher with 2.2 seconds for programs with more than 100 tokens, 2.3 seconds
+for more than 250 and 500 tokens.
+
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
-time of 5.3 seconds. \GS{TODO: Going to add median parse times for small/big
-programs and a few/a lot syntax errors to show scalabilty. Running experiments.}
+time of 5.3 seconds. For larger programs the median parse time is 5.1 seconds
+for programs with more than 100 tokens, 4.9 and 4.4 seconds for more than 250
+and 500 tokens respectively.
 
 We observe that, using a fixed set of the 20 and 50 most popular rules,
 \toolname (with the \textsc{MinimumCost} ECE-Parser) repairs 61.41\% and 58.61\%

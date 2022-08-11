@@ -1,8 +1,8 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have presented \emph{neurosymbolic parse program repair}, a new neurosymbolic
-approach to automatically repair parse errors.
+We have presented \emph{neurosymbolic parse program repair}, a new
+language-agnostic neurosymbolic approach to automatically repair parse errors.
 %
 Our approach is to use a dataset of ill-parsed programs and their fixed versions
 to train a Transformer classifier (neural component) which allows us to
@@ -10,7 +10,9 @@ accurately predict EC-rules for new programs with syntax errors. In order to
 make accurate predictions, we abstract the low-level program token sequences
 using partial parses and probabilistic grammars. A small set of predicted
 EC-rules is finally used with an ECE-Parser (symbolic component) to parse and
-repair new ill-parsed programs in a tractable and precise manner.
+repair new ill-parsed programs in a tractable and precise manner. We believe
+that the \emph{novel} combination of neural and symbolic components helps
+outperform previous work in terms of repair accuracy and efficiency.
 
 We have implemented our approach in \toolname, and demonstrated, using a corpus
 of 1,100,000 ill-parsed \python programs drawn from two years of data from an
