@@ -1,16 +1,19 @@
 \section{Evaluation}
 \label{sec:eval}
 
+\iffalse
+% On 8/11, WRW confirms these are all done. 
 \GS{\sout{we had this part in rebuttal: "We will make available supplementary
 materials, including (a) the human study website itself as well as the stimuli,
 (b) the source code, and (c) a demonstration website at which arbitrary programs
 can be passed to our algorithm and the output can be observed."}}
+\fi 
 
 We have implemented our approach in \toolname: a system for repairing parse
-errors for \python in its entirety. All code for \toolname is publicly available
-at \url{https://github.com/gsakkas/seq2parse} and we've provided a running
-smaller version of \toolname on a
-\href{http://seq2parse.goto.ucsd.edu/index.html}{website demo}. Next, we
+errors for \python in its entirety. The code for \toolname is publicly available
+at \url{https://github.com/gsakkas/seq2parse} and a simplified online
+demonstration is available at
+\href{http://seq2parse.goto.ucsd.edu/index.html}. Next, we
 describe our implementation and an evaluation that addresses four questions:
 
 \begin{itemize}
@@ -66,13 +69,12 @@ total of 50 epochs.
 
 \input{evaluation-classifier-accuracy}
 
-\GS{\sout{TODO: Explain how accuracy is computed???}}
-
 \autoref{fig:accuracy-results} shows the accuracy results of our error
 production rule prediction experiments. The y-axis describes the
 \emph{prediction accuracy}, \ie the fraction of test programs for which the
 correct \emph{full set} of error rules to repair the program (extracted from
 the user fix) was predicted in the top-K sorted rules.
+% \GS{\sout{Accuracy is computed by ...}}
 %
 The \textsc{Original} version of our transformer classifier does not consider
 the abstracted token sequences and used the full \textsc{Original} token
@@ -120,6 +122,8 @@ accurate for the \textsc{Rare} programs as the rest of the dataset with a
 \label{sec:eval:precise}
 
 
+\iffalse
+% On 8/11, WRW confirms these are all done.
 \GS{\sout{TODO: We had this part in rebuttal: "We will augment the text in
 Section 7.2 to explain that the MinimumCost version of Seq2Parse only retains
 the top \#1 (minimum cost) repair, resulting in a more efficient parser, unlike
@@ -130,9 +134,11 @@ higher accuracy (as shown in Section 7.3)"}}
 allowed different numbers of edits. "We will elaborate that the maximum number
 of edits was selected to provide a uniform (wall clock) run time for the
 algorithms (e.g., since MinimumCost is faster than AllParses)."}}
+\fi 
 
-Next we evaluate \toolname's end-to-end accuracy and preciseness in generating
-\toolname's parsing time to \emph{5 mins} and run our experiments on the
+Next we evaluate \toolname's end-to-end accuracy and preciseness when
+restricting
+\toolname's parsing time to \emph{5 minutes} and run our experiments on the
 15,000-program test set. Additionally, we use here the highest-performing
 transformer classifiers, \ie the \textsc{Abstracted} and \textsc{Threshold}
 classifiers.
@@ -149,20 +155,20 @@ Our \textsc{AllParses} and \textsc{MinimumCost} ECE-Parsers both use the
 repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
 \emph{all possible states} that arise from using the predicted error rules
 similarly to the original ECE-Parser described by \citet{Aho_1972}. We use a
-maximum repair cost of 2 edits (\ie a maximum of 2 insertions, deletions or
+maximum repair cost of 2 edits (\ie, a maximum of 2 insertions, deletions or
 replacements) to limit the search space. The \textsc{MinimumCost} version,
 however, always keeps the minimum-edit repair and discards all other states that
 may lead to a higher cost. This more efficient version of the ECE-Parser allows
 for a higher maximum cost of 10 edits. We use the same ECE-Parser and cost as in
 \textsc{MinimumCost} for our \textsc{Threshold} parser. The maximum cost for
-each parser is a hyperparameter to \toolname and is set here arbitrarily in
-order to achieve a uniform run time across experiments while getting
+each parser is a hyperparameter to \toolname{} and is set here arbitrarily 
+to achieve a uniform run time across experiments while obtaining
 high-quality multiple-edit repairs. Finally, \textsc{MinimumCost} will always
 return the top 1 repair, while \textsc{AllParses} can generate a large number of
 repairs and we select to keep only the top 5 repairs after filtering with a
 static code checker (\textsc{Pylint}, \url{https://www.pylint.org/}) as most
 developers will consider only a few suggestions before falling back to manual
-debugging \citep{Kochhar2016-oc, Parnin2011-ce}.
+debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
 each of these four versions can parse successfully (\ie the \emph{parse
@@ -285,8 +291,9 @@ Twitter. The study was online, took around 30 minutes, and participants could
 enter a drawing for one of two \$50 awards. In the study, participants were each
 asked to rate 15 debugging hints randomly selected from a corpus of 50
 stimuli.\footnote{All human study stimuli are included in our replication
-package at \url{https://github.com/gsakkas/seq2parse} and the human study
-\href{https://dijkstra.eecs.umich.edu/~endremad/APR_HumanEval/}{website}.}
+package at \url{https://github.com/gsakkas/seq2parse} and via the human study
+website 
+\href{https://dijkstra.eecs.umich.edu/~endremad/APR_HumanEval/}.}
 
 We created the stimuli by selecting 50 buggy programs from our test set for
 which \toolname and the human produced different fixes. Other than ensuring a
