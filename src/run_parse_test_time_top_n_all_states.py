@@ -36,7 +36,7 @@ def rate(secs, times):
     return len(in_set) * 100.0 / len(times)
 
 
-def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg_time, parse_times, tpsize, time_gs, user_sames, good_poss, all_ls, any_ls, out_dir, results_file, repaired_tuplas, repair_csts, pylint_csts, used_erls, max_used_erls, max_time=30):
+def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg_time, parse_times, tpsize, times_sizes, time_gs, user_sames, good_poss, all_ls, any_ls, out_dir, results_file, repaired_tuplas, repair_csts, pylint_csts, used_erls, max_used_erls, max_time=30):
     positives = len(list(filter(lambda dt: dt > 0, time_gs)))
     print("# Dataset size:", succs, "/", fails + succs)
     print("# Parse accuracy within time limit (%):", bads * 100.0 / succs)
@@ -47,6 +47,13 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
     print("# => Mean parse time (Pylint Top 1) (sec):", avg_time[1] / (fails + succs))
     print("# => Mean parse time (Pylint Top 3) (sec):", avg_time[2] / (fails + succs))
     print("# => Median parse time (sec):", median_low(parse_times[0]))
+    temp_87 = list(map(lambda x: x[0], filter(lambda d: d[1] > 87, times_sizes)))
+    print("# => Median parse time (sec):", median_low(temp_87) if len(temp_87) > 0 else None , "for", len(temp_87), "programs with length > 87")
+    temp_100 = list(map(lambda x: x[0], filter(lambda d: d[1] > 100, times_sizes)))
+    print("# => Median parse time (sec):", median_low(temp_100) if len(temp_100) > 0 else None , "for", len(temp_100), "programs with length > 100")
+    temp_250 = list(map(lambda x: x[0], filter(lambda d: d[1] > 250, times_sizes)))
+    print("# => Median parse time (sec):", median_low(temp_250) if len(temp_250) > 0 else None , "for", len(temp_250), "programs with length > 250")
+    temp_500 = list(map(lambda x: x[0], filter(lambda d: d[1] > 500, times_sizes)))
     print("# => Median parse time (Pylint Top 1) (sec):", median_low(parse_times[1]))
     print("# => Median parse time (Pylint Top 3) (sec):", median_low(parse_times[2]))
     print("# => Avg. parse time / 50 tokens (sec):", avg_time[0] * 50 / tpsize)
@@ -109,6 +116,10 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
         dataset_file.write("=> Mean parse time (Pylint Top 1) (sec): " + str(avg_time[1] / (fails + succs)) + "\n")
         dataset_file.write("=> Mean parse time (Pylint Top 3) (sec): " + str(avg_time[2] / (fails + succs)) + "\n")
         dataset_file.write("=> Median parse time (sec): " + str(median_low(parse_times[0])) + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_87) if len(temp_87) > 0 else None) + " for " + str(len(temp_87)) + " programs with length > 87" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_100) if len(temp_100) > 0 else None) + " for " + str(len(temp_100)) + " programs with length > 100" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_250) if len(temp_250) > 0 else None) + " for " + str(len(temp_250)) + " programs with length > 250" + "\n")
+        dataset_file.write("=> Median parse time (sec): " + str(median_low(temp_500) if len(temp_500) > 0 else None) + " for " + str(len(temp_500)) + " programs with length > 500" + "\n")
         dataset_file.write("=> Median parse time (Pylint Top 1) (sec): " + str(median_low(parse_times[1])) + "\n")
         dataset_file.write("=> Median parse time (Pylint Top 3) (sec): " + str(median_low(parse_times[2])) + "\n")
         dataset_file.write("=> Avg. parse time / 50 tokens (sec): " + str(avg_time[0] * 50 / tpsize) + "\n")
@@ -314,6 +325,7 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
     avg_run_time_pylint_top_1 = 0.0
     avg_run_time_pylint_top_3 = 0.0
     total_size = 0
+    all_times_sizes = []
     parsed_progs_times = []
     parsed_progs_times_top_1 = []
     parsed_progs_times_top_3 = []
@@ -408,11 +420,12 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                     parsed_progs_times_top_1.append(run_time + run_time_top_1)
                     parsed_progs_times_top_3.append(run_time + run_time_top_3)
                     total_size += size
+                    all_times_sizes.append((run_time, size))
                     time_gains.append(dt)
                     all_tuplas.append(tupla)
                     done += 1
                     if (failed + done) % 50 == 0:
-                        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, all_times_sizes, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
             except StopIteration:
                 break
             except (TimeoutError, ProcessExpired):
@@ -425,7 +438,7 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                 parsed_progs_times_top_1.append(run_time)
                 parsed_progs_times_top_3.append(run_time)
                 if (failed + done) % 50 == 0:
-                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, all_times_sizes, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
             except Exception as e:
                 print("WHY here?!", str(e))
                 traceback.print_tb(e.__traceback__)
@@ -438,8 +451,8 @@ def do_all_test(grammar_file, data_dir, out_dir, top_rules_num, ecpp_max_cost, r
                 parsed_progs_times_top_1.append(run_time)
                 parsed_progs_times_top_3.append(run_time)
                 if (failed + done) % 50 == 0:
-                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
-        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+                    print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, all_times_sizes, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
+        print_results(failed, done, parses_bad, not_popular_parses, all_not_populars, accs_per_changes, (avg_run_time, avg_run_time_pylint_top_1, avg_run_time_pylint_top_3), (parsed_progs_times, parsed_progs_times_top_1, parsed_progs_times_top_3), total_size, all_times_sizes, time_gains, same_as_users, good_repair_positions, finds_all_lines, finds_any_lines, out_dir, results_file, all_tuplas, all_user_repair_costs, all_pylint_repair_costs, all_used_erules, max_used_erules, max_time=TIMEOUT+5)
 
 
 if __name__ == "__main__":
