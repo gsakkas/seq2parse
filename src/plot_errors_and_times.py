@@ -180,7 +180,7 @@ if __name__ == "__main__":
     # Plot CDF of fix durations of the dataset
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=34)
-    plt.rc('legend', fontsize=22)
+    plt.rc('legend', fontsize=24)
 
     fig, ax = plt.subplots(figsize=(12, 8))
     xs = list(range(0, MAX_SECS // 2 + 1, 10))
@@ -197,8 +197,8 @@ if __name__ == "__main__":
             runtime_times[x] = y
 
     # ax.step(xs, total_ys, where='mid', linewidth=3.0, label='All Errors')
-    ax.step(xs, parse_ys, where='mid', linewidth=3.0, label='Parse Errors')
-    ax.step(xs, runtime_ys, where='mid', linewidth=3.0, label='Runtime Errors')
+    ax.line(xs, parse_ys, where='mid', linewidth=3.0, label='Parse Errors')
+    ax.line(xs, runtime_ys, where='mid', linewidth=3.0, label='Runtime Errors')
 
     ax.set_xlim([0, MAX_SECS // 2])
     ax.set_ylim([0, 105])
