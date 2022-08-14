@@ -12,9 +12,9 @@ can be passed to our algorithm and the output can be observed."}}
 We have implemented our approach in \toolname: a system for repairing parse
 errors for \python in its entirety. The code for \toolname is publicly available
 at \url{https://github.com/gsakkas/seq2parse} and a simplified online
-demonstration is available at
-\href{http://seq2parse.goto.ucsd.edu/index.html}. Next, we
-describe our implementation and an evaluation that addresses four questions:
+demonstration is available at \url{http://seq2parse.goto.ucsd.edu/index.html}.
+Next, we describe our implementation and an evaluation that addresses four
+questions:
 
 \begin{itemize}
     \item \textbf{RQ1}: How \emph{accurate} are \toolname's predicted error production rules?
@@ -61,8 +61,8 @@ length of 128 units, one for input tokens and one for their positions in the
 sequence. We also limit the input abstracted token sequences to a length of 128
 tokens, which covers $95.7\%$ of the training set, without the need of pruning
 them. Finally, the Transformer classifier was trained using an \textsc{Adam}
-optimizer \citep{Kingma2014-ng}, a variant of stochastic gradient descent, for a
-total of 50 epochs.
+optimizer \citep{Kingma2014-ng}, a variant of stochastic gradient descent, on
+NVIDIA GeForce RTX 3080 Ti for a total of 50 epochs.
 
 \subsection{RQ1: Accuracy}
 \label{sec:eval:accuracy}
@@ -90,7 +90,8 @@ predicted error rule set ranges between 1--20 elements.
 The blue bars show the accuracy on the full test set of \textsc{All} 15,000 test
 programs, while the green bars show the results on a subset of \textsc{Rare}
 programs, \ie programs that did not include any of the 50 most popular error
-rules. The \textsc{Rare} programs account for only 4\% of our test set.
+rules. The \textsc{Rare} programs account for 1233 programs, roughly 8\% of our
+test set.
 
 The \textsc{Original} predictor, even with the Top-50 predicted error rules, is
 less accurate than the Top-20 predictions of the \textsc{Abstracted}, with an
@@ -147,18 +148,19 @@ algorithms (e.g., since MinimumCost is faster than AllParses)."}}
 \fi
 
 Next we evaluate \toolname's end-to-end accuracy and preciseness when
-restricting
-\toolname's parsing time to \emph{5 minutes} and run our experiments on the
-15,000-program test set. Additionally, we use here the highest-performing
-transformer classifiers, \ie the \textsc{Abstracted} and \textsc{Threshold}
-classifiers.
+restricting \toolname's parsing time to \emph{5 minutes} and run our experiments
+on the 15,000-program test set. Additionally, we use here the highest-performing
+transformer classifiers, \ie the \textsc{Abstracted}, \textsc{NoPCFG} and
+\textsc{Threshold} classifiers.
 
 We compare \emph{three versions} of our \toolname implementation
 (\textsc{AllParses}, \textsc{MinimumCost} and \textsc{Threshold}) against two
 versions of the ECE-Parser with a static selection of the 20 and 50 most popular
 error production rules in our training set. We make this choice because we
 observe that the 50 most popular error rules are used as labels for as much as
-\emph{86\%} of the training set.
+\emph{86\%} of the training set. For the \textsc{AllParses},
+\textsc{MinimumCost} and \textsc{Threshold} versions, we run our experiments for
+the \textsc{Abstracted} and \textsc{NoPCFG} classifier predictions.
 
 Our \textsc{AllParses} and \textsc{MinimumCost} ECE-Parsers both use the
 \emph{Top-20 predictions} from our \textsc{Abstracted} classifier to parse and
@@ -193,36 +195,44 @@ debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
       20 Most Popular       & & 79.87\%          & 65.01\%           & 16.31\%          & 7.0 sec                       & & & --               & --                & --               & --                         & \\
       50 Most Popular       & & 90.89\%          & 81.26\%           & 18.56\%          & 13.6 sec                      & & & --               & --                & --               & --                         & \\
       \hline
-      \textsc{AllParses}    & & 61.82\%          & 72.22\%           & \textbf{33.92\%} & 23.2 sec                      & & & --               & --                & --               & --                         & \\
-      \textsc{MinimumCost}  & & \textbf{94.25\%} & \textbf{94.01\%}  & 20.55\%          & 5.3 \emph{(4.9)} sec          & & & 91.63\%          & 90.89\%           & 17.89\%          & 12.9 \emph{(12.3)} sec     & \\
-      \textsc{Threshold}    & & 94.19\%          & 93.42\%           & 21.19\%          & \textbf{2.1 \emph{(2.3)} sec} & & & 93.70\%          & 91.09\%           & 19.39\%          & 2.9 \emph{(3.3)} sec       & \\
+      \textsc{AllParses}    & & 61.82\%          & 72.22\%           & \textbf{33.92\%} & 23.2 sec                      & & & 59\%             & 62\%              & 22\%             & 21 \emph{(37)} sec         & \\
+      \textsc{MinimumCost}  & & \textbf{94.25\%} & \textbf{94.01\%}  & 20.55\%          & 5.3 \emph{(12.9)} sec         & & & 91.63\%          & 90.89\%           & 17.89\%          & 5.9 \emph{(18.7)} sec      & \\
+      \textsc{Threshold}    & & 94.19\%          & 93.42\%           & 21.19\%          & \textbf{2.1 \emph{(7.0)} sec} & & & 93.70\%          & 91.09\%           & 19.39\%          & 2.5 \emph{(9.1)} sec       & \\
     \end{tabular}
   } \caption{Experimental results of \toolname's repair approaches. The
   (\emph{parenthesized}) numbers in the Median Parse Time columns represent the
-  median time for larger programs, \ie programs with more than 250 tokens.
+  median time for larger programs, \ie programs with more than 100 tokens.
   \GS{\sout{TODO: Should we add end-to-end results for NoPCFG predictor? Running
   the experiments now either way.}}}
   \label{tab:seq2parse_full_results}
 \end{figure}
 
 \autoref{tab:seq2parse_full_results} shows the percentage of test programs that
-each of these four versions can parse successfully (\ie the \emph{parse
+each of these five versions can parse successfully (\ie the \emph{parse
 accuracy}), the rare program parse accuracy, and the \emph{user equivalent parse
 accuracy}, \ie the amount of parses that match the one that the user compiled.
-We observe that the \textsc{MinimumCost} parser \emph{outperforms} every other
-option with 94.25\% parse accuracy and 94.01\% rare parse accuracy. It also
-generates the intended user parse for 20.55\% of the set, \ie over 1 out 5 of
-the cases. The \textsc{20 Most Popular} parser with 79.87\% parse accuracy and
-65.01\% rare parse accuracy is much less accurate, and is 4.24\% less likely to
-generate the user parse, while the \textsc{50 Most Popular} is slightly less
-accurate with 90.89\% and 81.26\% accuracy, as expected from the usage of a
-large number of popular error rules. The \textsc{50 Most Popular} parser has
-also a high user fix accuracy of 18.56\%. The \textsc{AllParses} parser has the
-lowest parse accuracy of 61.82\%, however it manages to generate the user fix
-33.92\% of the time and achieve a high 72.22\% rare accuracy. Finally, the
-\textsc{Threshold} parser is almost as accurate as the efficient
-\textsc{MinimumCost} parser with 94.19\% and 93.42\% parse and rare accuracy,
-while achieving a slightly higher user fix accuracy of 21.19\%.
+We observe that the \textsc{Abstracted} \textsc{MinimumCost} parser
+\emph{outperforms} every other option with 94.25\% parse accuracy and 94.01\%
+rare parse accuracy. It also generates the intended user parse for 20.55\% of
+the set, \ie over 1 out 5 of the cases. The \textsc{20 Most Popular} parser with
+79.87\% parse accuracy and 65.01\% rare parse accuracy is much less accurate,
+and is 4.24\% less likely to generate the user parse, while the \textsc{50 Most
+Popular} is slightly less accurate with 90.89\% and 81.26\% accuracy, as
+expected from the usage of a large number of popular error rules. The \textsc{50
+Most Popular} parser has also a high user fix accuracy of 18.56\%. The
+\textsc{AllParses} parser has the lowest parse accuracy of 61.82\%, however it
+manages to generate the user fix 33.92\% of the time and achieve a high 72.22\%
+rare accuracy. Finally, the \textsc{Threshold} parser is almost as accurate as
+the efficient \textsc{MinimumCost} parser with 94.19\% and 93.42\% parse and
+rare accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
+
+Additionally, the \textsc{NoPCFG} \textsc{MinimumCost} parser achieves 2.6\%
+lower parse accuracy than then \textsc{Abstracted} version and 3.1\% less rare
+parse accuracy. The \textsc{NoPCFG} \textsc{Threshold} parser also performs only
+0.5\% less accurately than then \textsc{Abstracted} version and has a 2.3\% less
+rare parse accuracy. Finally, both \textsc{NoPCFG} parsers achieve 2.7\% and
+1.8\% respectively user fix accuracy. The \textsc{NoPCFG} \textsc{AllParses} is
+performs much worse with XX\% accuracy and YY\% rare parse accuracy.
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
@@ -257,19 +267,19 @@ few/a lot syntax errors to show scalabilty. Added results below.}}
 \textsc{Threshold} predictions with the \textsc{MinimumCost} ECE-Parser is the
 most efficient and it maintains the highest parse accuracy at all times, with a
 repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
-We also observe that the median parse time for \emph{larger programs} is not
-much higher with 2.2 seconds for programs with more than 100 tokens, 2.3 seconds
-for more than 250 and 500 tokens. We can then conclude that \toolname's
-scalability is \emph{not} proportional to the number of size of the input
-programs.
+We also observe that the median parse time for \emph{larger programs} is
+slightly higher with 7.0 seconds for programs with more than 100 tokens and
+increases a bit more for more than 500 tokens, with 10.8 seconds. While the
+ECE-parser used dynamic programming may not scale greatly for larger programs,
+\toolname's scalability is \emph{mostly} proportional to the predictor error
+rules and the number of syntax errors.
 
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
-time of 5.3 seconds. For larger programs the median parse time is 5.1 seconds
-for programs with more than 100 tokens, 4.9 and 4.4 seconds for more than 250
-and 500 tokens respectively. This result indicates that the ECE-parser can even
-be faster for bigger program, really only depending on the number of syntax
-errors that need to be repaired.
+time of 5.3 seconds. For larger programs the median parse time is 12.9 seconds
+for programs with more than 100 tokens and 50.8 seconds for more than 500
+tokens. We observe that a fixed-length set of predicted error rules can hinder
+the ECE-parser, when inaccurate predictions are involved.
 
 We observe that, using a fixed set of the 20 and 50 most popular rules,
 \toolname (with the \textsc{MinimumCost} ECE-Parser) repairs 61.41\% and 58.61\%
