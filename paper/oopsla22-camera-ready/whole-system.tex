@@ -1,7 +1,7 @@
 \section{Building a Fast Error-Correcting Parser}
 \label{sec:whole-system}
 
-We show how $\systemsym$ uses the abstracted token sequences from
+We show how \toolname uses the abstracted token sequences from
 \autoref{sec:prog-abstract} and the trained sequence models from
 \autoref{sec:seq-classifiers} to generate an \emph{error-correcting parser}
 $(e_{\bot} \to e)$, that will parse an input program $e_{\bot}$ with syntax
@@ -124,14 +124,14 @@ given the pre-trained $Model$.
 
 \input{ecep-algo.tex}
 
-\Cref{algo:ecep-algo} presents our \emph{neurosymbolic} approach, $\systemsym$.
+\Cref{algo:ecep-algo} presents our \emph{neurosymbolic} approach, \toolname.
 This is the high-level algorithm that combines everything that we described so
-far in the last three sections. $\systemsym$ first extracts the fixed programs
-$ps$ from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$
-for the input grammar $G$ with $\learnPCFGsym$. It then $\trainsym$s the
-Transformer classifier $Model$ to predict error production rules. We define an
-error rule predictor, \textsc{ERulePredictor}, using the $\predictsym$ procedure
-with the pre-trained $Model$ and grammar $PCFG$. Finally, the algorithm returns
-the ECE-Parser $Prs$, which we define as a function that takes as input an
-erroneous program $\pbad$ that uses the \textsc{ERulePredictor} to get the set
-of error rules needed by $\ecepsym$ to parse and repair it.
+far in the last three sections. \toolname first extracts the fixed programs $ps$
+from the dataset $Ds$ to learn a probabilistic context-free grammar $PCFG$ for
+the input grammar $G$ with $\learnPCFGsym$. It then $\trainsym$s the Transformer
+classifier $Model$ to predict error production rules. We define an error rule
+predictor, \textsc{ERulePredictor}, using the $\predictsym$ procedure with the
+pre-trained $Model$ and grammar $PCFG$. Finally, the algorithm returns the
+ECE-Parser $Prs$, which we define as a function that takes as input an erroneous
+program $\pbad$ that uses the \textsc{ERulePredictor} to get the set of error
+rules needed by $\ecepsym$ to parse and repair it.

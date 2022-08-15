@@ -41,24 +41,23 @@ in $t^i$ to generate the $t^o$. It can be the whole program, part of it or
 multiple parts of it. $t^o$ will finally be a token sequence that can be parsed
 by the original language's $L(G)$ parser.
 
-However, programs and hence, $n$ can be large which makes
-them unsuitable for training effectively sequence models.
-Therefore, our goal is to first generate an \emph{abstracted token sequence}
-$t^a$ that removes all irrelevant information from $t^i$
-and gives hints for the parse error fix by using the
-internal states of an \emph{Earley} parser.
+However, programs and hence, $n$ can be large which makes these token sequences
+unsuitable for training effectively sequence models. Therefore, our goal is to
+first generate an \emph{abstracted token sequence} $t^a$ that removes all
+irrelevant information from $t^i$ and gives hints for the parse error fix by
+using the internal states of an \emph{Earley} parser.
 
 
 \subsection{Earley Partial Parses}
 \label{sec:prog-abstract:partial}
 
-\toolname uses an \emph{Earley parser} to generate the abstracted token
-sequence $t^a$ for an input program sequence $t^i$. An Earley parser holds
-internally a \emph{chart} data structure, \ie \emph{a list of partial parses}.
-Given a production rule $X \rightarrow \alpha \beta$, the notation $X
-\rightarrow \alpha \cdot \beta$ represents a condition in which $\alpha$ has
-already been parsed and $\beta$ is expected and both are sequences of terminal
-and non-terminal symbols (tokens).
+\toolname uses an \emph{Earley parser}~\citep{Earley_1970} to generate the
+abstracted token sequence $t^a$ for an input program sequence $t^i$. An Earley
+parser holds internally a \emph{chart} data structure, \ie \emph{a list of
+partial parses}. Given a production rule $X \rightarrow \alpha \beta$, the
+notation $X \rightarrow \alpha \cdot \beta$ represents a condition in which
+$\alpha$ has already been parsed and $\beta$ is expected and both are sequences
+of terminal and non-terminal symbols (tokens).
 
 Each state is a tuple $(X \rightarrow \alpha \cdot \beta,\ j)$, consisting of
 \begin{itemize}

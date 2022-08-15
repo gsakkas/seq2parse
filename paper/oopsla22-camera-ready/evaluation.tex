@@ -1,14 +1,6 @@
 \section{Evaluation}
 \label{sec:eval}
 
-\iffalse
-% On 8/11, WRW confirms these are all done.
-\GS{\sout{we had this part in rebuttal: "We will make available supplementary
-materials, including (a) the human study website itself as well as the stimuli,
-(b) the source code, and (c) a demonstration website at which arbitrary programs
-can be passed to our algorithm and the output can be observed."}}
-\fi
-
 We have implemented our approach in \toolname: a system for repairing parse
 errors for \python in its entirety. The code for \toolname is publicly available
 at \url{https://github.com/gsakkas/seq2parse} and a simplified online
@@ -105,12 +97,11 @@ The \textsc{Threshold} predictions are almost as accurate as the
 number of selected error rules of 14 (average 14.1). This could potentially mean
 that this predictor is a valid alternative for the static Top-20 predictions.
 
-\GS{Should we mention sensitivity anywhere else, before this?} The classifiers
-are also not very \emph{sensitive} in the PCFG probabilities used during
-abstraction, as shown in the accuracy of the \textsc{NoPCFG} predictor. The
-\textsc{NoPCFG} predictor has almost 2\% less Top-10 and Top-20 accuracy,
-70.94\% and 80.69\% respectively, and less than 1\% for Top-50 predictions, with
-92.11\%.
+The classifiers are also not very \emph{sensitive} in the PCFG probabilities
+used during abstraction, as shown in the accuracy of the \textsc{NoPCFG}
+predictor. The \textsc{NoPCFG} predictor has almost 2\% less Top-10 and Top-20
+accuracy, 70.94\% and 80.69\% respectively, and less than 1\% for Top-50
+predictions, with 92.11\%.
 
 Finally, we observe that our \textsc{Abstracted} classifiers generalize
 efficiently for our dataset of erroneous \python programs and are almost as
@@ -131,21 +122,6 @@ accuracy (86.29\% Top-50 accuracy).
 
 \subsection{RQ2: Repaired Program Preciseness}
 \label{sec:eval:precise}
-
-
-\iffalse
-% On 8/11, WRW confirms these are all done.
-\GS{\sout{TODO: We had this part in rebuttal: "We will augment the text in
-Section 7.2 to explain that the MinimumCost version of Seq2Parse only retains
-the top \#1 (minimum cost) repair, resulting in a more efficient parser, unlike
-AllParses, which is slower but retains all possible repairs and thus obtains a
-higher accuracy (as shown in Section 7.3)"}}
-
-\GS{\sout{TODO: Clarify on the difference of the 3 approaches better. why they are
-allowed different numbers of edits. "We will elaborate that the maximum number
-of edits was selected to provide a uniform (wall clock) run time for the
-algorithms (e.g., since MinimumCost is faster than AllParses)."}}
-\fi
 
 Next we evaluate \toolname's end-to-end accuracy and preciseness when
 restricting \toolname's parsing time to \emph{5 minutes} and run our experiments
@@ -204,9 +180,7 @@ debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
     \end{tabular}
   } \caption{Experimental results of \toolname's repair approaches. The
   (\emph{parenthesized}) numbers in the Median Parse Time columns represent the
-  median time for larger programs, \ie programs with more than 100 tokens.
-  \GS{\sout{TODO: Should we add end-to-end results for NoPCFG predictor? Running
-  the experiments now either way.}}}
+  median time for larger programs, \ie programs with more than 100 tokens.}
   \label{tab:seq2parse_full_results}
 \end{figure}
 
@@ -238,7 +212,7 @@ rare parse accuracy. Finally, both \textsc{NoPCFG} parsers achieve 2.7\% and
 ECE-Parsers are not very sensitive to the PCFG use in the abstraction phase.
 However, the \textsc{NoPCFG} \textsc{AllParses} ECE-Parser performs much worse
 with 56.40\% accuracy and 62.20\% rare parse accuracy, which highlights the
-original algorithm's inefficiency.
+importance of abstracting token sequences with our full algorithm.
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
@@ -250,8 +224,7 @@ original algorithm's inefficiency.
   \centering
   \includegraphics[width=0.85\linewidth]{tool-repair-rate.pdf}
   \caption{The repair rate for all the approaches in
-  \autoref{tab:seq2parse_full_results}. \GS{\sout{TODO: Zoom out graph and
-  smoothen by fitting a line over results}}}
+  \autoref{tab:seq2parse_full_results}.}
   \label{fig:tool-repair-rate}
 \end{figure}
 
@@ -264,9 +237,6 @@ is undecidable, and we conjecture that a longer timeout will diminish the
 practical usability for developers.) We compare the efficiency of \toolname for
 all the versions of \autoref{tab:seq2parse_full_results} using the full test set
 of 15,000 programs.
-
-\GS{\sout{TODO: Going to add median parse times for small/big programs and a
-few/a lot syntax errors to show scalabilty. Added results below.}}
 
 \autoref{fig:tool-repair-rate} shows the cumulative distribution function of all
 \toolname approaches' repair rates over their repair time. We observe that using

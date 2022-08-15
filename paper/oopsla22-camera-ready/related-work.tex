@@ -130,40 +130,32 @@ uses a programming language \textsc{GPT} \citep{GPT2020} model that learns to
 predict the next token in program sequences and uses beam search to maintain a
 small set of accurate repairs.
 
-\GS{\sout{TODO: We had this part in rebuttal: "we will expand Section 8 with
-qualitative comparisons to the prominent CoCoNut, as well as the Facebook
-TransCoder paper (which uses tests rather than a metric like BLEU). In
-particular, while being careful to indicate that it would be an
-apples- to-oranges comparison, we can provide readers with additional context by
-reporting some of the success rates from those approaches (such as the 509/4456
-for CoCoNut on large standard software defects) and indicating which of those
-successes are likely to translate to this domain and which are not. We will add
-clarity to that discussion by following R1's suggestion that we indicate which
-algorithmic aspects of our approach represent progress over such
-state-of-the-art techniques (e.g., our novelty lies in applying neural and
-symbolic approaches in tandem, while error correcting parsing is already
-well-established)".}}
-
 \mypara{Qualitative Comparison to \toolname}
+\toolname performs quite well compared to the aforementioned published state of
+the art for the particular domain of novice programs. Noting that many of these
+are on different benchmarks or datasets, permitting only an indirect comparison.
+we believe that \toolname compares favorably in terms of \emph{accuracy} and
+\emph{efficiency}, since it completely repairs $94.25\%$ of our tests within
+$2.1$ seconds, while generating the exact user fix in more than 1 out 3 of the
+cases, a metric that most papers ignore.
+
+Specifically, \textsc{DeepFix} \citep{Gupta2017} uses a multi-layer seq2seq
+model to repair programs that may have up to 5 syntax errors, but initial
+results, although promising, yield error-free compilation for only \emph{27\%}
+out of the 6971 benchmark programs.
 %
-\textsc{DeepFix} \citep{Gupta2017} completely fixes only \emph{27\% }out of the 6971
-erroneous programs, that may have up to 5 syntax errors, in a way that the fixed
-programs compile without any errors.
+\emph{Lenient parsing} \citep{Ahmed_2021} leverages a large corpus of code and
+error seeding to train a transformer-based neural network, resulting in a
+broadly applicable approach, but one with potentially lower accuracy in our
+domain (a top-1 repair accuracy of only \emph{32\%} for real student code with
+up to 3 syntax errors).
 %
-\emph{Lenient parsing} \citep{Ahmed_2021} has a top-1 repair accuracy of only
-\emph{32\%} for real student code with up to 3 syntax errors.
+\textsc{GGF} \citep{Wu2020} tries to encode program context in a novel way by
+using a graph neural network and partial parses, which leads to a higher repair
+accuracy of \emph{58\%} of the syntax errors in a real-world dataset.
 %
-\textsc{GGF} \citep{Wu2020} manages to repair \emph{58\%} of the syntax errors in a
-real-world dataset.
-%
-\textsc{CoCoNuT} \citep{Lutellier2020} is a recent state-of-the-art automated
-repair technique evaluated on standard software defect benchmarks. While
-\textsc{CoCoNuT} repairs a broader range of defects than syntax errors, it only
-manages to repair 509 out of 4456 (11.42\%) defects.
-%
-While all previous approaches target different programming languages and use
-different datasets, we believe that, to the best of our knowledge, \toolname is
-more \emph{accurate} and \emph{efficient} since it far surpasses them by
-completely repairing $94.25\%$ of our tests within $2.1$ seconds, while
-generating the exact user fix in 1 out 3 of the cases, a metric that most papers
-ignore.
+Lastly, \textsc{CoCoNuT} \citep{Lutellier2020} is a recent state-of-the-art
+automated repair technique that depends on a different approach of context-aware
+NMTs and is evaluated on standard software defect benchmarks. While
+\textsc{CoCoNuT} is able to repair a broader range of defects than syntax
+errors, it only repairs 509 out of 4456 (11.42\%) benchmark defects.
