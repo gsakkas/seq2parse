@@ -54,6 +54,7 @@ def print_results(fails, succs, bads, not_pop_bads, not_pops, accs_per_chgs, avg
     temp_250 = list(map(lambda x: x[0], filter(lambda d: d[1] > 250, times_sizes)))
     print("# => Median parse time (sec):", median_low(temp_250) if len(temp_250) > 0 else None , "for", len(temp_250), "programs with length > 250")
     temp_500 = list(map(lambda x: x[0], filter(lambda d: d[1] > 500, times_sizes)))
+    print("# => Median parse time (sec):", median_low(temp_500) if len(temp_500) > 0 else None , "for", len(temp_500), "programs with length > 500")
     print("# => Median parse time (Pylint Top 1) (sec):", median_low(parse_times[1]))
     print("# => Median parse time (Pylint Top 3) (sec):", median_low(parse_times[2]))
     print("# => Avg. parse time / 50 tokens (sec):", avg_time[0] * 50 / tpsize)
