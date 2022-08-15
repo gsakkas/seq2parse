@@ -162,24 +162,27 @@ observe that the 50 most popular error rules are used as labels for as much as
 \textsc{MinimumCost} and \textsc{Threshold} versions, we run our experiments for
 the \textsc{Abstracted} and \textsc{NoPCFG} classifier predictions.
 
-Our \textsc{AllParses} and \textsc{MinimumCost} ECE-Parsers both use the
-\emph{Top-20 predictions} from our \textsc{Abstracted} classifier to parse and
-repair buggy programs. The \textsc{AllParses} ECE-Parser keeps internally
-\emph{all possible states} that arise from using the predicted error rules
-similarly to the original ECE-Parser described by \citet{Aho_1972}. We use a
-maximum repair cost of 2 edits (\ie, a maximum of 2 insertions, deletions or
-replacements) to limit the search space. The \textsc{MinimumCost} version,
-however, always keeps the minimum-edit repair and discards all other states that
-may lead to a higher cost. This more efficient version of the ECE-Parser allows
-for a higher maximum cost of 10 edits. We use the same ECE-Parser and cost as in
-\textsc{MinimumCost} for our \textsc{Threshold} parser. The maximum cost for
-each parser is a hyperparameter to \toolname{} and is set here arbitrarily
-to achieve a uniform run time across experiments while obtaining
-high-quality multiple-edit repairs. Finally, \textsc{MinimumCost} will always
-return the top 1 repair, while \textsc{AllParses} can generate a large number of
-repairs and we select to keep only the top 5 repairs after filtering with a
-static code checker (\textsc{Pylint}, \url{https://www.pylint.org/}) as most
-developers will consider only a few suggestions before falling back to manual
+The \textsc{MinimumCost} ECE-Parser uses the \emph{Top-20 predictions} from our
+\textsc{Abstracted} or \textsc{NoPCFG} classifier to parse and repair buggy
+programs. The \textsc{AllParses} and \textsc{Threshold} ECE-Parsers use the
+\textsc{Threshold} classifier's predicted set of error rules to repair programs.
+
+The \textsc{AllParses} ECE-Parser keeps internally \emph{all possible states}
+that arise from using the predicted error rules similarly to the original
+ECE-Parser described by \citet{Aho_1972}. We use a maximum repair cost of 3
+edits (\ie, a maximum of 3 insertions, deletions or replacements) to limit the
+search space. The \textsc{MinimumCost} version, however, always keeps the
+minimum-edit repair and discards all other states that may lead to a higher
+cost. This more efficient version of the ECE-Parser allows for a higher maximum
+cost of 10 edits. We use the same ECE-Parser and cost as in \textsc{MinimumCost}
+for our \textsc{Threshold} parser. The maximum cost for each parser is a
+hyperparameter to \toolname{} and is set here arbitrarily to achieve a uniform
+run time across experiments while obtaining high-quality multiple-edit repairs.
+Finally, \textsc{MinimumCost} will always return the top 1 repair, while
+\textsc{AllParses} can generate a large number of repairs and we select to keep
+only the top 5 repairs after filtering with a static code checker
+(\textsc{Pylint}, \url{https://www.pylint.org/}) as most developers will
+consider only a few suggestions before falling back to manual
 debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
 
 
@@ -195,7 +198,7 @@ debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
       20 Most Popular       & & 79.87\%          & 65.01\%           & 16.31\%          & 7.0 sec                       & & & --               & --                & --               & --                         & \\
       50 Most Popular       & & 90.89\%          & 81.26\%           & 18.56\%          & 13.6 sec                      & & & --               & --                & --               & --                         & \\
       \hline
-      \textsc{AllParses}    & & 61.82\%          & 72.22\%           & \textbf{33.92\%} & 23.2 sec                      & & & 59\%             & 62\%              & 22\%             & 21 \emph{(37)} sec         & \\
+      \textsc{AllParses}    & & 62.92\%          & 72.22\%           & \textbf{35.41\%} & 6.7 \emph{(11.3)} sec         & & & 56.40\%          & 62.20\%           & 31.36\%          & 20.8 \emph{(22.7)} sec     & \\
       \textsc{MinimumCost}  & & \textbf{94.25\%} & \textbf{94.01\%}  & 20.55\%          & 5.3 \emph{(12.9)} sec         & & & 91.63\%          & 90.89\%           & 17.89\%          & 5.9 \emph{(18.7)} sec      & \\
       \textsc{Threshold}    & & 94.19\%          & 93.42\%           & 21.19\%          & \textbf{2.1 \emph{(7.0)} sec} & & & 93.70\%          & 91.09\%           & 19.39\%          & 2.5 \emph{(9.1)} sec       & \\
     \end{tabular}
@@ -220,8 +223,8 @@ and is 4.24\% less likely to generate the user parse, while the \textsc{50 Most
 Popular} is slightly less accurate with 90.89\% and 81.26\% accuracy, as
 expected from the usage of a large number of popular error rules. The \textsc{50
 Most Popular} parser has also a high user fix accuracy of 18.56\%. The
-\textsc{AllParses} parser has the lowest parse accuracy of 61.82\%, however it
-manages to generate the user fix 33.92\% of the time and achieve a high 72.22\%
+\textsc{AllParses} parser has the lowest parse accuracy of 62.92\%, however it
+manages to generate the user fix 35.41\% of the time and achieve a high 72.22\%
 rare accuracy. Finally, the \textsc{Threshold} parser is almost as accurate as
 the efficient \textsc{MinimumCost} parser with 94.19\% and 93.42\% parse and
 rare accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
@@ -231,8 +234,11 @@ lower parse accuracy than then \textsc{Abstracted} version and 3.1\% less rare
 parse accuracy. The \textsc{NoPCFG} \textsc{Threshold} parser also performs only
 0.5\% less accurately than then \textsc{Abstracted} version and has a 2.3\% less
 rare parse accuracy. Finally, both \textsc{NoPCFG} parsers achieve 2.7\% and
-1.8\% respectively user fix accuracy. The \textsc{NoPCFG} \textsc{AllParses} is
-performs much worse with XX\% accuracy and YY\% rare parse accuracy.
+1.8\% respectively user fix accuracy. These results further confirm that our
+ECE-Parsers are not very sensitive to the PCFG use in the abstraction phase.
+However, the \textsc{NoPCFG} \textsc{AllParses} ECE-Parser performs much worse
+with 56.40\% accuracy and 62.20\% rare parse accuracy, which highlights the
+original algorithm's inefficiency.
 
 \begin{framed}
   \noindent \toolname can \emph{parse and repair 94.25\%} of programs with
@@ -270,9 +276,11 @@ repair rate of 83.04\% within 20 seconds and a median parse time of 2.1 seconds.
 We also observe that the median parse time for \emph{larger programs} is
 slightly higher with 7.0 seconds for programs with more than 100 tokens and
 increases a bit more for more than 500 tokens, with 10.8 seconds. While the
-ECE-parser used dynamic programming may not scale greatly for larger programs,
-\toolname's scalability is \emph{mostly} proportional to the predictor error
-rules and the number of syntax errors.
+ECE-parser uses dynamic programming that may not scale greatly for larger
+programs, \toolname's scalability is \emph{mostly} proportional to the predicted
+error rules and the number of syntax errors, and therefore we don't get an
+exponential explosion in parse time for larger programs. \GS{Should we explain
+this more or somewhere in the technical sections?}
 
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
@@ -289,9 +297,10 @@ programs quickly than the 20 most popular.
 
 We also observe that \toolname successfully parses around 38.50\% of the
 programs with its \textsc{AllParses} approach in 20 seconds and has a median
-parse time of 23.2 seconds. While this approach is much less efficient that the
-others, it is also able to generate the exact human repair in 1 out of 3
-cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
+parse time of 6.7 and 11.3 seconds for all programs and programs with more than
+100 tokens respectively. While this approach is much less efficient that the
+others, it is also able to generate the exact human repair in more than 1 out of
+3 cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
 
 \begin{framed}
   \noindent \toolname can parse programs with syntax errors for the vast
@@ -306,7 +315,7 @@ cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
 
 As \toolname is intended as an aid for programmers (especially novices) faced
 with parse errors, we are also interested in subjective human judgments of the
-quality and helpfulness of our repairs. Around 34\% of repairs produced by
+quality and helpfulness of our repairs. Around 35\% of repairs produced by
 \toolname using its \textsc{AllParses} approach are identical to the historical
 human repair and thus likely helpful for programmers. However, it may be that
 \toolname's parses (and thus repairs) are still helpful for debugging even when
@@ -321,8 +330,7 @@ enter a drawing for one of two \$50 awards. In the study, participants were each
 asked to rate 15 debugging hints randomly selected from a corpus of 50
 stimuli.\footnote{All human study stimuli are included in our replication
 package at \url{https://github.com/gsakkas/seq2parse} and via the human study
-website
-\href{https://dijkstra.eecs.umich.edu/~endremad/APR_HumanEval/}.}
+website \url{https://dijkstra.eecs.umich.edu/~endremad/APR_HumanEval/}.}
 
 We created the stimuli by selecting 50 buggy programs from our test set for
 which \toolname and the human produced different fixes. Other than ensuring a
@@ -479,7 +487,7 @@ result of favoring one insertion over one deletion.
 
 \begin{framed}
   \noindent
-  34\% of \toolname's repairs are equivalent to historical repairs.
+  35\% of \toolname's repairs are equivalent to historical repairs.
   Of the remainder, our human study found 15\% to be more useful than
   historical repairs and 52\% to be equally useful. In total, including
   both equivalent and non-equivalent cases, \toolname repairs are at
@@ -488,5 +496,5 @@ result of favoring one insertion over one deletion.
   % Even when non-equivalent, \toolname's repairs are still useful and helpful:
   % they contain debugging information beyond that in the Python error message 48\% of the time.
   % Ultimately, two-thirds of \toolname's fixes were either indistinguishable
-  % from (34\%), or judged better than (15\%), those produced by humans for helping debugging.
+  % from (35\%), or judged better than (15\%), those produced by humans for helping debugging.
 \end{framed}
