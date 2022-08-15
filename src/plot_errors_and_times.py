@@ -197,14 +197,14 @@ if __name__ == "__main__":
             runtime_times[x] = y
 
     # ax.step(xs, total_ys, where='mid', linewidth=3.0, label='All Errors')
-    ax.line(xs, parse_ys, where='mid', linewidth=3.0, label='Parse Errors')
-    ax.line(xs, runtime_ys, where='mid', linewidth=3.0, label='Runtime Errors')
+    ax.plot(xs, parse_ys, linewidth=3.0, label='Parse Errors')
+    ax.plot(xs, runtime_ys, linewidth=3.0, label='Runtime Errors')
 
     ax.set_xlim([0, MAX_SECS // 2])
     ax.set_ylim([0, 105])
 
     ax.grid(True, which='both')
-    ax.legend(loc='upper left')
+    ax.legend(loc='lower right')
     ax.set_xlabel('User Fix Duration (sec)')
     ax.set_ylabel('Fixed Dataset Rate (\%)')
 
