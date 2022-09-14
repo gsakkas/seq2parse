@@ -35,9 +35,10 @@
 %%   Right bracket \]     Circumflex    \^     Underscore    \_
 %%   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %%   Right brace   \}     Tilde         \~}
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{acmart}
-[2022/02/19 v1.83 Typesetting articles for the Association for Computing Machinery]
+[2022/04/09 v1.84 Typesetting articles for the Association for Computing Machinery]
 \def\@classname{acmart}
 \InputIfFileExists{acmart-preload-hook.tex}{%
   \ClassWarning{\@classname}{%
@@ -388,9 +389,9 @@
   }%
   \addto\captionsgerman{%
       \if@ACM@journal
-        \renewcommand\keywordsname{Zusätzliche Schlüsselwörter und Phrasen}%
+        \renewcommand\keywordsname{Zusätzliche Schlagwörter und Phrasen}%
       \else
-        \renewcommand\keywordsname{Schlüsselwörter}%
+        \renewcommand\keywordsname{Schlagwörter}%
       \fi
       \renewcommand\acksname{Danksagungen}%
   }%
@@ -1018,10 +1019,12 @@
   DLT,%
   DTRAP,%
   FAC,%
+  GAMES,%
   HEALTH,%
   IMWUT,%
   JACM,%
   JDIQ,%
+  JDS,%
   JEA,%
   JERIC,%
   JETC,%
@@ -1102,6 +1105,9 @@
   \def\@journalNameShort{Form. Asp. Comput.}%
   \def\@permissionCodeOne{0934-5043}%
   \def\@permissionCodeTwo{1433-299X}%
+\or % GAMES
+  \def\@journalName{ACM Games: Research and Practice}%
+  \def\@journalNameShort{ACM Games}%
 \or % HEALTH
   \def\@journalName{ACM Transactions on Computing for Healthcare}%
   \def\@journalNameShort{ACM Trans. Comput. Healthcare}%
@@ -1121,6 +1127,11 @@
   \def\@journalName{ACM Journal of Data and Information Quality}%
   \def\@journalNameShort{ACM J. Data Inform. Quality}%
   \def\@permissionCodeOne{1936-1955}%
+\or % JDS
+  \def\@journalName{ACM/JMS Journal of Data Science}%
+  \def\@journalNameShort{ACM/IMS J. Data Sci.}%
+  \def\@permissionCodeOne{2831-3194}%
+  \def\@permissionCodeTwo{2831-3194}%
 \or % JEA
   \def\@journalName{ACM Journal of Experimental Algorithmics}%
   \def\@journalNameShort{ACM J. Exp. Algor.}%

@@ -174,7 +174,7 @@ debugging~\citep{Kochhar2016-oc, Parnin2011-ce}.
       20 Most Popular       & & 79.87\%          & 65.01\%           & 16.31\%          & 7.0 sec                       & & & --               & --                & --               & --                         & \\
       50 Most Popular       & & 90.89\%          & 81.26\%           & 18.56\%          & 13.6 sec                      & & & --               & --                & --               & --                         & \\
       \hline
-      \textsc{AllParses}    & & 62.92\%          & 72.22\%           & \textbf{35.41\%} & 6.7 \emph{(11.3)} sec         & & & 56.40\%          & 62.20\%           & 31.36\%          & 20.8 \emph{(22.7)} sec     & \\
+      \textsc{AllParses}    & & 61.46\%          & 59.80\%           & \textbf{34.57\%} & 7.1 \emph{(14.2)} sec         & & & 55.52\%          & 56.42\%           & 30.21\%          & 20.3 \emph{(24.3)} sec     & \\
       \textsc{MinimumCost}  & & \textbf{94.25\%} & \textbf{94.01\%}  & 20.55\%          & 5.3 \emph{(12.9)} sec         & & & 91.63\%          & 90.89\%           & 17.89\%          & 5.9 \emph{(18.7)} sec      & \\
       \textsc{Threshold}    & & 94.19\%          & 93.42\%           & 21.19\%          & \textbf{2.1 \emph{(7.0)} sec} & & & 93.70\%          & 91.09\%           & 19.39\%          & 2.5 \emph{(9.1)} sec       & \\
     \end{tabular}
@@ -197,8 +197,8 @@ and is 4.24\% less likely to generate the user parse, while the \textsc{50 Most
 Popular} is slightly less accurate with 90.89\% and 81.26\% accuracy, as
 expected from the usage of a large number of popular error rules. The \textsc{50
 Most Popular} parser has also a high user fix accuracy of 18.56\%. The
-\textsc{AllParses} parser has the lowest parse accuracy of 62.92\%, however it
-manages to generate the user fix 35.41\% of the time and achieve a high 72.22\%
+\textsc{AllParses} parser has the lowest parse accuracy of 61.46\%, however it
+manages to generate the user fix 34.57\% of the time and also achieve a 59.80\%
 rare accuracy. Finally, the \textsc{Threshold} parser is almost as accurate as
 the efficient \textsc{MinimumCost} parser with 94.19\% and 93.42\% parse and
 rare accuracy, while achieving a slightly higher user fix accuracy of 21.19\%.
@@ -211,7 +211,7 @@ rare parse accuracy. Finally, both \textsc{NoPCFG} parsers achieve 2.7\% and
 1.8\% respectively user fix accuracy. These results further confirm that our
 ECE-Parsers are not very sensitive to the PCFG use in the abstraction phase.
 However, the \textsc{NoPCFG} \textsc{AllParses} ECE-Parser performs much worse
-with 56.40\% accuracy and 62.20\% rare parse accuracy, which highlights the
+with 55.52\% accuracy and 56.42\% rare parse accuracy, which highlights the
 importance of abstracting token sequences with our full algorithm.
 
 \begin{framed}
@@ -223,7 +223,7 @@ importance of abstracting token sequences with our full algorithm.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\linewidth]{tool-repair-rate.pdf}
-  \caption{The repair rate for all the approaches in
+  \caption{The repair rate for all the \textsc{Abstracted} approaches in
   \autoref{tab:seq2parse_full_results}.}
   \label{fig:tool-repair-rate}
 \end{figure}
@@ -249,8 +249,7 @@ increases a bit more for more than 500 tokens, with 10.8 seconds. While the
 ECE-parser uses dynamic programming that may not scale greatly for larger
 programs, \toolname's scalability is \emph{mostly} proportional to the predicted
 error rules and the number of syntax errors, and therefore we don't get an
-exponential explosion in parse time for larger programs. \GS{Should we explain
-this more or somewhere in the technical sections?}
+exponential explosion in parse time for larger programs.
 
 The \textsc{MinimumCost} with the top 20 error rule predictions is still very
 efficient with a repair rate of 78.10\% within 20 seconds and a median parse
@@ -265,9 +264,9 @@ of the programs respectively within 20 seconds, and has median parse times of
 7.0 and 13.6 seconds respectively. The 50 most popular rules admit parsing fewer
 programs quickly than the 20 most popular.
 
-We also observe that \toolname successfully parses around 38.50\% of the
+We also observe that \toolname successfully parses around 49.90\% of the
 programs with its \textsc{AllParses} approach in 20 seconds and has a median
-parse time of 6.7 and 11.3 seconds for all programs and programs with more than
+parse time of 7.1 and 14.2 seconds for all programs and programs with more than
 100 tokens respectively. While this approach is much less efficient that the
 others, it is also able to generate the exact human repair in more than 1 out of
 3 cases, representing a valuable quality tradeoff (\S~\ref{sec:eval:precise}).
@@ -430,30 +429,26 @@ print(a ** (* 3))
 \end{figure}
 
 To better contextualize these results, we provide examples of stimuli with
-statistically significant differences in debugging helpfulness.
-In figure~\ref{fig:progb}, \toolname's repair was
-significantly more helpful than the historical repair:
- \toolname correctly adds parentheses to \texttt{print}
-while the human simply deletes the
-buggy line, perhaps out of confusion or frustration.
-Similarly, figure~\ref{fig:proga}'s \toolname repair was also
-better than the human repair. In this case, the user appears to try to
-implement a function to calculate the greatest common divisor of two integers,
-but has empty \texttt{if} and \texttt{elif} statements.
-To ``fix'' this bug, the user
-deletes the \texttt{if} and \texttt{elif} and modifies the return statement.
-However, this fix does not correctly calculate the greatest common divisor.
-\toolname, on the other hand, adds a template variable to the \texttt{if} and
-\texttt{break} to the \texttt{elif}. While this also does not implement
-greatest common divisor, it is viewed as more helpful
-than the user repair. This example also demonstrates the beneficial ability of our approach
-to conduct multi-edit repairs.
+statistically significant differences in debugging helpfulness. In
+\autoref{fig:progb}, \toolname's repair was significantly more helpful than the
+historical repair: \toolname correctly adds parentheses to \texttt{print} while
+the human simply deletes the buggy line, perhaps out of confusion or
+frustration. Similarly, \autoref{fig:proga}'s \toolname repair was also better
+than the human repair. In this case, the user appears to try to implement a
+function to calculate the greatest common divisor of two integers, but has empty
+\texttt{if} and \texttt{elif} statements. To ``fix'' this bug, the user deletes
+the \texttt{if} and \texttt{elif} and modifies the return statement. However,
+this fix does not correctly calculate the greatest common divisor. \toolname, on
+the other hand, adds a template variable to the \texttt{if} and \texttt{break}
+to the \texttt{elif}. While this also does not implement greatest common
+divisor, it is viewed as more helpful than the user repair. This example also
+demonstrates the beneficial ability of our approach to conduct multi-edit
+repairs.
 
-Figure~\ref{fig:progc}, on the other hand, shows an example of a more
-helpful human repair. In this case, the
-human correctly deletes the extraneous \texttt{*} in the power operator
-while \toolname adds parentheses to make a more complex expression, the
-result of favoring one insertion over one deletion.
+\autoref{fig:progc}, on the other hand, shows an example of a more helpful human
+repair. In this case, the human correctly deletes the extraneous \texttt{*} in
+the power operator while \toolname adds parentheses to make a more complex
+expression, the result of favoring one insertion over one deletion.
 
 \begin{framed}
   \noindent

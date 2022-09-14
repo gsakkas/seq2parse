@@ -1,5 +1,5 @@
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
-\documentclass[acmsmall]{acmart}
+\documentclass[acmsmall,screen]{acmart}
 % \settopmatter{printfolios=true,printccs=false,printacmref=false}
 % \renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
 % \pagestyle{plain} % removes running headers
@@ -14,27 +14,26 @@
 %\documentclass[sigplan]{acmart}\settopmatter{}
 
 
-%% Conference information
-%% Supplied to authors by publisher for camera-ready submission;
-%% use defaults for review submission.
+%%% If you see 'ACMUNKNOWN' in the 'setcopyright' statement below,
+%%% please first submit your publishing-rights agreement with ACM (follow link on submission page).
+%%% Then please update our instructions page and copy-and-paste the NEW commands into your article.
+%%% Please contact us in case of questions; allow up to 10 min for the system to propagate the information.
+%%%
+%%% The following is specific to OOPSLA2 '22 and the paper
+%%% 'Seq2Parse: Neurosymbolic Parse Error Repair'
+%%% by Georgios Sakkas, Madeline Endres, Philip J. Guo, Westley Weimer, and Ranjit Jhala.
+%%%
+\setcopyright{rightsretained}
+\acmPrice{}
+\acmDOI{10.1145/3563330}
+\acmYear{2022}
+\copyrightyear{2022}
+\acmSubmissionID{oopslab22main-p391-p}
 \acmJournal{PACMPL}
-\acmVolume{1}
-\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
-\acmArticle{1}
-\acmYear{2018}
-\acmMonth{1}
-\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
-\startPage{1}
-
-%% Copyright information
-%% Supplied to authors (based on authors' rights management selection;
-%% see authors.acm.org) by publisher for camera-ready submission;
-%% use 'none' for review submission.
-\setcopyright{none}
-%\setcopyright{acmcopyright}
-%\setcopyright{acmlicensed}
-%\setcopyright{rightsretained}
-%\copyrightyear{2018}           %% If different from \acmYear
+\acmVolume{6}
+\acmNumber{OOPSLA2}
+\acmArticle{167}
+\acmMonth{10}
 
 %% Bibliography style
 \bibliographystyle{ACM-Reference-Format}
@@ -80,7 +79,6 @@
 \usepackage[nameinlink,noabbrev]{cleveref}
 \usepackage{multirow}
 \usepackage{cite}
-\usepackage{ulem}
 
 \lstset{
   language=Python,
@@ -203,8 +201,6 @@ showstringspaces=false
 
 \begin{document}
 
-\normalem
-
 %% Title information
 \title[\toolname]{\toolname: Neurosymbolic Parse Error Repair}
 
@@ -321,22 +317,40 @@ statistically-significant manner.
 %% 2012 ACM Computing Classification System (CSS) concepts
 %% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
 \begin{CCSXML}
-<ccs2012>
-<concept>
-<concept_id>10011007.10011006.10011008</concept_id>
-<concept_desc>Software and its engineering~General programming languages</concept_desc>
-<concept_significance>500</concept_significance>
-</concept>
-<concept>
-<concept_id>10003456.10003457.10003521.10003525</concept_id>
-<concept_desc>Social and professional topics~History of programming languages</concept_desc>
-<concept_significance>300</concept_significance>
-</concept>
-</ccs2012>
+  <ccs2012>
+    <concept>
+        <concept_id>10011007.10011006.10011039.10011040</concept_id>
+        <concept_desc>Software and its engineering~Syntax</concept_desc>
+        <concept_significance>300</concept_significance>
+        </concept>
+    <concept>
+        <concept_id>10010147.10010257</concept_id>
+        <concept_desc>Computing methodologies~Machine learning</concept_desc>
+        <concept_significance>300</concept_significance>
+        </concept>
+    <concept>
+        <concept_id>10011007.10011006.10011041.10011688</concept_id>
+        <concept_desc>Software and its engineering~Parsers</concept_desc>
+        <concept_significance>500</concept_significance>
+        </concept>
+    <concept>
+        <concept_id>10011007.10011074.10011092.10011782</concept_id>
+        <concept_desc>Software and its engineering~Automatic programming</concept_desc>
+        <concept_significance>500</concept_significance>
+        </concept>
+    <concept>
+        <concept_id>10002950.10003648.10003671</concept_id>
+        <concept_desc>Mathematics of computing~Probabilistic algorithms</concept_desc>
+        <concept_significance>300</concept_significance>
+        </concept>
+  </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Software and its engineering~General programming languages}
-\ccsdesc[300]{Social and professional topics~History of programming languages}
+\ccsdesc[300]{Software and its engineering~Syntax}
+\ccsdesc[300]{Computing methodologies~Machine learning}
+\ccsdesc[500]{Software and its engineering~Parsers}
+\ccsdesc[500]{Software and its engineering~Automatic programming}
+\ccsdesc[300]{Mathematics of computing~Probabilistic algorithms}
 %% End of generated code
 
 
@@ -362,22 +376,19 @@ statistically-significant manner.
 \input{conclusion}
 
 
-%% Acknowledgments
-% \begin{acks}                            %% acks environment is optional
-%                                         %% contents suppressed with 'anonymous'
-%   %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
-%   %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
-%   %% acknowledge financial support and will be used by metadata
-%   %% extraction tools.
-%   This material is based upon work supported by the
-%   \grantsponsor{GS100000001}{National Science
-%     Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
-%   No.~\grantnum{GS100000001}{nnnnnnn} and Grant
-%   No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
-%   conclusions or recommendations expressed in this material are those
-%   of the author and do not necessarily reflect the views of the
-%   National Science Foundation.
-% \end{acks}
+\begin{acks}
+  %% acks environment is optional
+  %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+  We thank the anonymous referees for their excellent suggestions for improving
+  the paper. This work was supported by the \grantsponsor{}{NSF}{} grants
+  (\grantnum{}{CCF-1908633}, \grantnum{}{CCF1763674}, \grantnum{}{IIS-1845900})
+  and the \grantsponsor{}{Air Force}{} grants (\grantnum{}{FA8750-19-2-0006},
+  \grantnum{}{FA8750-19-1-0501}).
+\end{acks}
 
 
 %% Bibliography
