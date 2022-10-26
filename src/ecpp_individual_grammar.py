@@ -1009,11 +1009,11 @@ class Lexer():
             if clean_input_prog[-1] != '\n':
                 clean_input_prog = clean_input_prog + '\n'
         clean_input_prog = re.sub(re.compile(r"\\\s*?\n") , "" , clean_input_prog)
-        clean_input_prog = re.sub(re.compile(r"\n\s*#.*?\n") , "\n" , clean_input_prog)
+        clean_input_prog = re.sub(re.compile(r"\n\s*#.*?\n") , "\n\n" , clean_input_prog)
         clean_input_prog = re.sub(re.compile(r"#[^\'\"]*?\n" ) , "\n" , clean_input_prog)
-        clean_input_prog = re.sub(re.compile(r"\n\s+\n" ) , "\n" , clean_input_prog)
-        while clean_input_prog.find('\n\n') >= 0:
-            clean_input_prog = clean_input_prog.replace('\n\n', '\n')
+        clean_input_prog = re.sub(re.compile(r"\n\s+\n" ) , "\n\n" , clean_input_prog)
+        # while clean_input_prog.find('\n\n') >= 0:
+        #     clean_input_prog = clean_input_prog.replace('\n\n', '\n')
         # print("=*" * 42 + "=")
         # print(clean_input_prog)
         parts = prog.split("__string__")
