@@ -64,7 +64,7 @@ def get_line_location(orig_line, parsed_line, token_num, option):
     prev_tokens = parsed_line.split()[:token_num]
     column = 0
     for token in prev_tokens:
-        orig_line = orig_line.replace(token, '')
+        orig_line = orig_line.replace(token, '', 1)
         column += len(token)
     column += len(orig_line) - len(orig_line.lstrip(' '))
     return column
